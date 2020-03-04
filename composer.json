@@ -1,5 +1,5 @@
 {
-    "name": "georgique/zf1",
+    "name": "uniquesca/zf1",
     "description": "Zend Framework 1",
     "type": "library",
     "keywords": [
@@ -24,7 +24,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.12.x-dev"
+            "dev-master": "1.12.20.1"
         }
     },
     "require-dev": {
