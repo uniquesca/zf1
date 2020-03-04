@@ -358,7 +358,7 @@ class Zend_Mail extends Zend_Mime_Message
      * @param  string $charset
      * @param  string $encoding
      * @return Zend_Mail Provides fluent interface
-    */
+     */
     public function setBodyText($txt, $charset = null, $encoding = Zend_Mime::ENCODING_QUOTEDPRINTABLE)
     {
         if ($charset === null) {
@@ -751,11 +751,11 @@ class Zend_Mail extends Zend_Mime_Message
         return $this;
     }
 
-     /**
-      * Clears the current Reply-To address from the message
-      *
-      * @return Zend_Mail Provides fluent interface
-      */
+    /**
+     * Clears the current Reply-To address from the message
+     *
+     * @return Zend_Mail Provides fluent interface
+     */
     public function clearReplyTo()
     {
         $this->_replyTo = null;
@@ -767,7 +767,7 @@ class Zend_Mail extends Zend_Mime_Message
     /**
      * Sets Default From-email and name of the message
      *
-     * @param  string $email
+     * @param  string               $email
      * @param  string $name optional
      * @return void
      */
@@ -818,7 +818,7 @@ class Zend_Mail extends Zend_Mime_Message
     /**
      * Sets Default ReplyTo-address and -name of the message
      *
-     * @param  string $email
+     * @param  string               $email
      * @param  string $name optional
      * @return void
      */
@@ -987,7 +987,7 @@ class Zend_Mail extends Zend_Mime_Message
                      */
                     require_once 'Zend/Mail/Exception.php';
                     throw new Zend_Mail_Exception('String representations of Date Header must be ' .
-                                                  'strtotime()-compatible');
+                        'strtotime()-compatible');
                 }
                 $date = date('r', $date);
             } else if ($date instanceof Zend_Date) {
@@ -998,7 +998,7 @@ class Zend_Mail extends Zend_Mime_Message
                  */
                 require_once 'Zend/Mail/Exception.php';
                 throw new Zend_Mail_Exception(__METHOD__ . ' only accepts UNIX timestamps, Zend_Date objects, ' .
-                                              ' and strtotime()-compatible strings');
+                    ' and strtotime()-compatible strings');
             }
             $this->_date = $date;
             $this->_storeHeader('Date', $date);
@@ -1139,9 +1139,9 @@ class Zend_Mail extends Zend_Mime_Message
     public function addHeader($name, $value, $append = false)
     {
         $prohibit = array('to', 'cc', 'bcc', 'from', 'subject',
-                          'reply-to', 'return-path',
-                          'date', 'message-id',
-                         );
+            'reply-to', 'return-path',
+            'date', 'message-id',
+        );
         if (in_array(strtolower($name), $prohibit)) {
             /**
              * @see Zend_Mail_Exception
@@ -1173,9 +1173,9 @@ class Zend_Mail extends Zend_Mime_Message
      * default transport had been set.
      *
      * @param  Zend_Mail_Transport_Abstract $transport
-     * @return Zend_Mail                    Provides fluent interface
+     * @return array Information about email prepared by transport
      */
-    public function send($transport = null)
+    public function send($transport = null, $send = true)
     {
         if ($transport === null) {
             if (! self::$_defaultTransport instanceof Zend_Mail_Transport_Abstract) {
@@ -1198,9 +1198,7 @@ class Zend_Mail extends Zend_Mime_Message
             $this->setReplyToFromDefault();
         }
 
-        $transport->send($this);
-
-        return $this;
+        return $transport->send($this, $send);
     }
 
     /**
@@ -1212,12 +1210,12 @@ class Zend_Mail extends Zend_Mime_Message
     protected function _filterEmail($email)
     {
         $rule = array("\r" => '',
-                      "\n" => '',
-                      "\t" => '',
-                      '"'  => '',
-                      ','  => '',
-                      '<'  => '',
-                      '>'  => '',
+            "\n" => '',
+            "\t" => '',
+            '"'  => '',
+            ','  => '',
+            '<'  => '',
+            '>'  => '',
         );
 
         return strtr($email, $rule);
@@ -1232,11 +1230,11 @@ class Zend_Mail extends Zend_Mime_Message
     protected function _filterName($name)
     {
         $rule = array("\r" => '',
-                      "\n" => '',
-                      "\t" => '',
-                      '"'  => "'",
-                      '<'  => '[',
-                      '>'  => ']',
+            "\n" => '',
+            "\t" => '',
+            '"'  => "'",
+            '<'  => '[',
+            '>'  => ']',
         );
 
         return trim(strtr($name, $rule));
@@ -1251,8 +1249,8 @@ class Zend_Mail extends Zend_Mime_Message
     protected function _filterOther($data)
     {
         $rule = array("\r" => '',
-                      "\n" => '',
-                      "\t" => '',
+            "\n" => '',
+            "\t" => '',
         );
 
         return strtr($data, $rule);

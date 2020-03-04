@@ -244,16 +244,16 @@ abstract class Zend_Mail_Transport_Abstract
             $html->disposition = false;
 
             $body = $boundaryLine
-                  . $text->getHeaders($this->EOL)
-                  . $this->EOL
-                  . $text->getContent($this->EOL)
-                  . $this->EOL
-                  . $boundaryLine
-                  . $html->getHeaders($this->EOL)
-                  . $this->EOL
-                  . $html->getContent($this->EOL)
-                  . $this->EOL
-                  . $boundaryEnd;
+                . $text->getHeaders($this->EOL)
+                . $this->EOL
+                . $text->getContent($this->EOL)
+                . $this->EOL
+                . $boundaryLine
+                . $html->getHeaders($this->EOL)
+                . $this->EOL
+                . $html->getContent($this->EOL)
+                . $this->EOL
+                . $boundaryEnd;
 
             $mp           = new Zend_Mime_Part($body);
             $mp->type     = Zend_Mime::MULTIPART_ALTERNATIVE;
@@ -298,11 +298,12 @@ abstract class Zend_Mail_Transport_Abstract
      * Send a mail using this transport
      *
      * @param  Zend_Mail $mail
+     * @param  boolean Whether email should be sent out
      * @access public
-     * @return void
+     * @return array Information about the email prepared
      * @throws Zend_Mail_Transport_Exception if mail is empty
      */
-    public function send(Zend_Mail $mail)
+    public function send(Zend_Mail $mail, $send = true)
     {
         $this->_isMultipart = false;
         $this->_mail        = $mail;
@@ -334,7 +335,9 @@ abstract class Zend_Mail_Transport_Abstract
 
         // Determine recipients, and prepare headers
         $this->recipients = implode(',', $mail->getRecipients());
-        $this->_prepareHeaders($this->_getHeaders($boundary));
+
+        $headers = $this->_getHeaders($boundary);
+        $this->_prepareHeaders($headers);
 
         // Create message body
         // This is done so that the same Zend_Mail object can be used in
@@ -345,6 +348,16 @@ abstract class Zend_Mail_Transport_Abstract
         $this->body = $message->generateMessage($this->EOL);
 
         // Send to transport!
-        $this->_sendMail();
+        if ($send) {
+            $this->_sendMail();
+        }
+
+        return array(
+            'recipients' => $mail->getRecipients(),
+            'subject' => $mail->getSubject(),
+            'header' => $this->header,
+            'body' => $this->body,
+            'headers' => $headers
+        );
     }
 }
