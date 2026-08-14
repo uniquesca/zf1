@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.25.1] - 2026-08-14
+
+### Added
+
+* Test php8.5 by @sreichel in https://github.com/Shardj/zf1-future/pull/486
+
+### Fixed
+
+* Update MultiSearcher.php and loaded.php by @Stevehans in https://github.com/Shardj/zf1-future/pull/526
+* Updated dependencies and added composer.lock by @sreichel in https://github.com/Shardj/zf1-future/pull/528
+* Code tidy - cosmetic - use braces on interpolated variables by @Stevehans in https://github.com/Shardj/zf1-future/pull/527
+* Fix: str_decrement on 0 by @sreichel in https://github.com/Shardj/zf1-future/pull/529
+* PHP8.4: Replace xml_set_object() with callable arrays in Translate ad… by @geoalexidis in https://github.com/Shardj/zf1-future/pull/534
+* Fix Zend_Debug::dump() xdebug quirk. by @GNfsys in https://github.com/Shardj/zf1-future/pull/536
+* PHPUnit Compatibility by @arnoschaefer in https://github.com/Shardj/zf1-future/pull/537
+* php 8.5: Replace deprecated methods for `SplObjectStorage()` by @sreichel in https://github.com/Shardj/zf1-future/pull/533
+* Fix Zend_Session::start() false-positive on PHP 8.x (SID constant persists after session_write_close) by @kevoriordan in https://github.com/Shardj/zf1-future/pull/538
+* Fix/session set save handler deprecation by @sanosuke-s74 in https://github.com/Shardj/zf1-future/pull/539
+* PHP 8.5 compatibility fixes by @oakimov in https://github.com/Shardj/zf1-future/pull/540
+* Fix implicit float to int deprecation in S3/Sqs retry backoff by @thenguyenit in https://github.com/Shardj/zf1-future/pull/541
+
 ## [1.25.0] - 2026-02-24
 
 * dropped PHP 7.1-7.3 support, added 8.2 support (without explicitly aiming to remove all deprecation notices)
