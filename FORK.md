@@ -67,23 +67,36 @@ and lowercased forms). There is no Punycode conversion, so an `xn--` entry does
 to be accepted both ways.
 
 Upstream lists most IDN TLDs only in Punycode, so `example.бг` and
-`example.商店` fail there while `example.xn--90ae` passes. Two blocks are
-appended to the end of `$_validTlds` to close that:
+`example.商店` fail there while `example.xn--90ae` passes.
 
-1. U-label (native script) forms for the 69 delegated IDN TLDs that upstream
-   carries only as `xn--`.
-2. Eight delegated TLDs missing from upstream's list in any form: `amazon`,
-   `kids`, `merck`, `spa`, `web`, and the A-labels `xn--4dbrk0ce` (ישראל),
-   `xn--cckwcxetd` (アマゾン), `xn--jlq480n2rg` (亚马逊).
+Upstream's array is left **completely untouched**. Everything we add sits in one
+block appended after its last entry, so upstream edits merge cleanly. The block
+has two parts:
 
-Checked against IANA `tlds-alpha-by-domain` version 2026081500: every one of
-the 1438 delegated TLDs now validates in Punycode form, and all 151 that have a
-native-script form validate that way too.
+1. **Backwards compatibility — 152 entries.** Every TLD the pre-2.0 fork
+   accepted that upstream does not carry, restored *verbatim*. This includes
+   TLDs IANA no longer delegates (`cartier`, `chrysler`, `mcdonalds`, `zippo`,
+   the withdrawn ISO codes `an`/`bl`/`bq`/`eh`/`mf`/`tp`/`um`, and the IDN test
+   TLDs) and 37 entries carrying U+200E/U+200F bidi marks exactly as the old
+   list stored them.
 
-Both blocks are appended after upstream's last entry and carry a comment, so
-they sit outside the region upstream edits and should not conflict on merge.
-Re-check them against IANA when merging a new upstream release — upstream may
-have adopted some, in which case the duplicates can be dropped.
+   These are kept **on purpose**. Existing stored addresses must keep
+   validating, so anything accepted before 2.0.0 is still accepted. Do not
+   "clean up" this list against IANA — that is a breaking change.
+
+2. **Completeness — 26 entries.** Delegated TLDs still absent after part 1, in
+   whichever form was missing (A-label, U-label, or both).
+
+Verified against IANA `tlds-alpha-by-domain` version 2026081500 and against the
+pre-2.0 fork:
+
+- all 1438 delegated TLDs validate in Punycode form
+- all 151 with a native-script form validate that way too
+- all 1682 distinct TLDs the old fork accepted still validate — zero regressions
+- every upstream entry retained; no duplicates introduced
+
+`tests/` has no coverage for this. When merging a new upstream release, re-run
+those four checks rather than eyeballing the diff.
 
 That is the whole delta. If it ever reaches zero, this fork can be retired in
 favour of requiring `shardj/zf1-future` directly.
