@@ -53,7 +53,7 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
      * headers of part as array
      * @var null|array
      */
-    public $_headers;
+    protected $_headers;
 
     /**
      * raw part body
@@ -102,20 +102,6 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
      * @var string 
      */
     protected $_partClass;
-
-    /**
-     * Whether mail is multipart or not
-     * @note Added by Uniques
-     * @var null
-     */
-    public $_multipart = null;
-
-    /**
-     * Whether mail doesn't have attachments
-     * @note Added by Uniques
-     * @var bool
-     */
-    protected $_withoutAttachments = false;
 
     /**
      * Public constructor
@@ -222,20 +208,10 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
      */
     public function isMultipart()
     {
-        if($this->_multipart === null) {
-            $this->setMultipart();
-        }
-
-        return $this->_multipart;
-    }
-
-    public function setMultipart()
-    {
-        $this->_multipart = false;
-
         try {
-            $this->_multipart = stripos($this->contentType, 'multipart/') === 0;
+            return stripos($this->contentType, 'multipart/') === 0;
         } catch(Zend_Mail_Exception $e) {
+            return false;
         }
     }
 
@@ -255,8 +231,7 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
         }
 
         if ($this->_mail) {
-            $this->_cacheContent();
-            return $this->_content;
+            return $this->_mail->getRawContent($this->_messageNum);
         } else {
             /**
              * @see Zend_Mail_Exception
@@ -288,31 +263,10 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
     {
         // caching content if we can't fetch parts
         if ($this->_content === null && $this->_mail) {
-
-            if ($this->_withoutAttachments) {
-                try {
-                    $this->getHeaders();
-                    list($this->_content, $contentTransferEncoding, $contentTypeWithCharset, $bodystructure, $attachmentParts) = $this->_mail->getBodyWithoutAttachments($this->_messageNum);
-                    // store in lower case
-                    $this->_headers['content-transfer-encoding'] = $contentTransferEncoding;
-                    $this->_headers['content-type'] = $contentTypeWithCharset;
-
-                    $this->_attachments = $attachmentParts;
-                    $this->_bodystructure = $bodystructure;
-
-                    $this->_multipart = false;
-                } catch (Exception $e) {
-                    // fetch full message when part fetching is failed.
-                    $this->_content = $this->_mail->getRawContent($this->_messageNum);
-                    $this->setMultipart();
-                }
-            } else {
-                $this->_content = $this->_mail->getRawContent($this->_messageNum);
-                $this->setMultipart();
-            }
+            $this->_content = $this->_mail->getRawContent($this->_messageNum);
         }
 
-        if (!$this->isMultipart() || $this->_withoutAttachments) {
+        if (!$this->isMultipart()) {
             return;
         }
 
@@ -522,11 +476,7 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
      */
     public function __get($name)
     {
-        if ($name == '_withoutAttachments') {
-            return $this->_withoutAttachments;
-        } else {
-            return $this->getHeader($name, 'string');
-        }
+        return $this->getHeader($name, 'string');
     }
 
     /**
@@ -642,15 +592,12 @@ class Zend_Mail_Part implements RecursiveIterator, Zend_Mail_Part_Interface
                 Zend_Mail_Header_HeaderName::assertValid($name);
             }
 
-            // Commented by Uniques team because of the issue when value contains the following text:  JUDICI?RIO BAHIA.pdf
-            /*
             if (is_array($value)) {
                 $this->_validateHeaders($value, false);
                 continue;
             }
 
             Zend_Mail_Header_HeaderValue::assertValid($value);
-            */
         }
     }
 }
