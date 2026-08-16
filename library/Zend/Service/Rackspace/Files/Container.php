@@ -24,11 +24,12 @@ require_once 'Zend/Service/Rackspace/Files.php';
 
 class Zend_Service_Rackspace_Files_Container
 {
-    const ERROR_PARAM_FILE_CONSTRUCT = 'The Zend_Service_Rackspace_Files passed in construction is not valid';
+    public $service;
+    public const ERROR_PARAM_FILE_CONSTRUCT = 'The Zend_Service_Rackspace_Files passed in construction is not valid';
 
-    const ERROR_PARAM_ARRAY_CONSTRUCT = 'The array passed in construction is not valid';
+    public const ERROR_PARAM_ARRAY_CONSTRUCT = 'The array passed in construction is not valid';
 
-    const ERROR_PARAM_NO_NAME = 'The container name is empty';
+    public const ERROR_PARAM_NO_NAME = 'The container name is empty';
 
     /**
      * @var string
@@ -240,7 +241,7 @@ class Zend_Service_Rackspace_Files_Container
      *
      * @return Zend_Service_Rackspace_Files_Object|bool
      */
-    public function getObject($name, $headers = array())
+    public function getObject($name, $headers = [])
     {
         return $this->service->getObject($this->getName(), $name, $headers);
     }
@@ -254,7 +255,7 @@ class Zend_Service_Rackspace_Files_Container
      *
      * @return bool
      */
-    public function addObject($name, $file, $metadata = array())
+    public function addObject($name, $file, $metadata = [])
     {
         return $this->service->storeObject(
             $this->getName(), $name, $file, $metadata
@@ -285,7 +286,7 @@ class Zend_Service_Rackspace_Files_Container
      * @return bool
      */
     public function copyObject(
-        $obj_source, $container_dest, $obj_dest, $metadata = array(),
+        $obj_source, $container_dest, $obj_dest, $metadata = [],
         $content_type = null
     )
     {
@@ -319,7 +320,7 @@ class Zend_Service_Rackspace_Files_Container
      *
      * @return bool
      */
-    public function setMetadataObject($object, $metadata = array())
+    public function setMetadataObject($object, $metadata = [])
     {
         return $this->service->setMetadataObject(
             $this->getName(), $object, $metadata

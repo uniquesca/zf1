@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,7 +37,7 @@ require_once 'Zend/Validate/Regex.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_RegexTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_RegexTest extends TestCase
 {
     /**
      * Ensures that the validator follows expected behavior
@@ -49,10 +52,10 @@ class Zend_Validate_RegexTest extends PHPUnit_Framework_TestCase
          *      - expected validation result
          *      - array of test input values
          */
-        $valuesExpected = array(
-            array('/[a-z]/', true, array('abc123', 'foo', 'a', 'z')),
-            array('/[a-z]/', false, array('123', 'A'))
-            );
+        $valuesExpected = [
+            ['/[a-z]/', true, ['abc123', 'foo', 'a', 'z']],
+            ['/[a-z]/', false, ['123', 'A']]
+            ];
         foreach ($valuesExpected as $element) {
             $validator = new Zend_Validate_Regex($element[0]);
             foreach ($element[2] as $input) {
@@ -69,7 +72,7 @@ class Zend_Validate_RegexTest extends PHPUnit_Framework_TestCase
     public function testGetMessages()
     {
         $validator = new Zend_Validate_Regex('/./');
-        $this->assertEquals(array(), $validator->getMessages());
+        $this->assertEquals([], $validator->getMessages());
     }
 
     /**
@@ -95,7 +98,7 @@ class Zend_Validate_RegexTest extends PHPUnit_Framework_TestCase
             $validator->isValid('anything');
             $this->fail('Expected Zend_Validate_Exception not thrown for bad pattern');
         } catch (Zend_Validate_Exception $e) {
-            $this->assertContains('Internal error while', $e->getMessage());
+            $this->assertStringContainsString('Internal error while', $e->getMessage());
         }
     }
 
@@ -105,6 +108,6 @@ class Zend_Validate_RegexTest extends PHPUnit_Framework_TestCase
     public function testNonStringValidation()
     {
         $validator = new Zend_Validate_Regex('/./');
-        $this->assertFalse($validator->isValid(array(1 => 1)));
+        $this->assertFalse($validator->isValid([1 => 1]));
     }
 }

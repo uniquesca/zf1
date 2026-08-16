@@ -30,6 +30,11 @@
 class Zend_Json_Server_Response
 {
     /**
+     * @var string
+     */
+    protected $_args;
+
+    /**
      * Response error
      * @var null|Zend_Json_Server_Error
      */
@@ -63,7 +68,7 @@ class Zend_Json_Server_Response
      * Set result
      *
      * @param  mixed $value
-     * @return Zend_Json_Server_Response
+     * @return $this
      */
     public function setResult($value)
     {
@@ -86,7 +91,7 @@ class Zend_Json_Server_Response
      * Set result error
      *
      * @param  Zend_Json_Server_Error $error
-     * @return Zend_Json_Server_Response
+     * @return $this
      */
     public function setError(Zend_Json_Server_Error $error)
     {
@@ -118,7 +123,7 @@ class Zend_Json_Server_Response
      * Set request ID
      *
      * @param  mixed $name
-     * @return Zend_Json_Server_Response
+     * @return $this
      */
     public function setId($name)
     {
@@ -140,7 +145,7 @@ class Zend_Json_Server_Response
      * Set JSON-RPC version
      *
      * @param  string $version
-     * @return Zend_Json_Server_Response
+     * @return $this
      */
     public function setVersion($version)
     {
@@ -173,15 +178,15 @@ class Zend_Json_Server_Response
     public function toJson()
     {
         if ($this->isError()) {
-            $response = array(
+            $response = [
                 'error'  => $this->getError()->toArray(),
                 'id'     => $this->getId(),
-            );
+            ];
         } else {
-            $response = array(
+            $response = [
                 'result' => $this->getResult(),
                 'id'     => $this->getId(),
-            );
+            ];
         }
 
         if (null !== ($version = $this->getVersion())) {
@@ -218,7 +223,7 @@ class Zend_Json_Server_Response
      * Set service map object
      *
      * @param  Zend_Json_Server_Smd $serviceMap
-     * @return Zend_Json_Server_Response
+     * @return $this
      */
     public function setServiceMap($serviceMap)
     {

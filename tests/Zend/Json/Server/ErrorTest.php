@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -39,8 +44,13 @@ require_once 'Zend/Json.php';
  * @group      Zend_Json
  * @group      Zend_Json_Server
  */
-class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
+class Zend_Json_Server_ErrorTest extends TestCase
 {
+    /**
+     * @var \Zend_Json_Server_Error|mixed
+     */
+    protected $error;
+
     /**
      * Runs the test methods of this class.
      *
@@ -48,9 +58,8 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Json_Server_ErrorTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Json_Server_ErrorTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -59,7 +68,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->error = new Zend_Json_Server_Error();
     }
@@ -70,7 +79,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -87,7 +96,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
 
     public function testCodeShouldBeLimitedToStandardIntegers()
     {
-        foreach (array(true, 'foo', array(), new stdClass, 2.0, 25) as $code) {
+        foreach ([true, 'foo', [], new stdClass(), 2.0, 25] as $code) {
             $this->error->setCode($code);
             $this->assertEquals(Zend_Json_Server_Error::ERROR_OTHER, $this->error->getCode());
         }
@@ -108,7 +117,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
 
     public function testSetMessageShouldCastToString()
     {
-        foreach (array(true, 2.0, 25) as $message) {
+        foreach ([true, 2.0, 25] as $message) {
             $this->error->setMessage($message);
             $this->assertEquals((string) $message, $this->error->getMessage());
         }
@@ -116,7 +125,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
 
     public function testSetMessageToNonScalarShouldSilentlyFail()
     {
-        foreach (array(array(), new stdClass) as $message) {
+        foreach ([[], new stdClass()] as $message) {
             $this->error->setMessage($message);
             $this->assertNull($this->error->getMessage());
         }
@@ -129,7 +138,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
 
     public function testShouldAllowArbitraryData()
     {
-        foreach (array(true, 'foo', 2, 2.0, array(), new stdClass) as $datum) {
+        foreach ([true, 'foo', 2, 2.0, [], new stdClass()] as $datum) {
             $this->error->setData($datum);
             $this->assertEquals($datum, $this->error->getData());
         }
@@ -160,7 +169,7 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
     {
         $this->error->setCode(Zend_Json_Server_Error::ERROR_OTHER)
                     ->setMessage('Unknown Error')
-                    ->setData(array('foo' => 'bar'));
+                    ->setData(['foo' => 'bar']);
     }
 
     public function validateArray($error)
@@ -181,6 +190,6 @@ class Zend_Json_Server_ErrorTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_Json_Server_ErrorTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Json_Server_ErrorTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Json_Server_ErrorTest::main") {
     Zend_Json_Server_ErrorTest::main();
 }

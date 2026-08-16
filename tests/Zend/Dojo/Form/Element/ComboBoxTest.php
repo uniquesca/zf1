@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -48,8 +53,18 @@ require_once 'Zend/Dojo/View/Helper/Dojo.php';
  * @group      Zend_Dojo
  * @group      Zend_Dojo_Form
  */
-class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
+class Zend_Dojo_Form_Element_ComboBoxTest extends TestCase
 {
+    /**
+     * @var \Zend_View
+     */
+    protected $view;
+
+    /**
+     * @var \Zend_Dojo_Form_Element_ComboBox
+     */
+    protected $element;
+
     /**
      * Runs the test methods of this class.
      *
@@ -57,8 +72,8 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Dojo_Form_Element_ComboBoxTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Dojo_Form_Element_ComboBoxTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -67,12 +82,12 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         Zend_Registry::_unsetInstance();
         Zend_Dojo_View_Helper_Dojo::setUseDeclarative();
 
-        $this->view    = $this->getView();
+        $this->view = $this->getView();
         $this->element = $this->getElement();
         $this->element->setView($this->view);
     }
@@ -83,7 +98,7 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -99,9 +114,9 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
     {
         $element = new Zend_Dojo_Form_Element_ComboBox(
             'foo',
-            array(
+            [
                 'label' => 'ComboBox',
-            )
+            ]
         );
         return $element;
     }
@@ -128,11 +143,11 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
 
     public function testSettingStoreParamsShouldProxyToStoreDijitParam()
     {
-        $this->element->setStoreParams(array('url' => '/js/foo.json'));
+        $this->element->setStoreParams(['url' => '/js/foo.json']);
         $this->assertTrue($this->element->hasDijitParam('store'));
         $store = $this->element->getDijitParam('store');
         $this->assertTrue(array_key_exists('params', $store));
-        $this->assertEquals(array('url' => '/js/foo.json'), $store['params']);
+        $this->assertEquals(['url' => '/js/foo.json'], $store['params']);
         $this->assertEquals($this->element->getStoreParams(), $store['params']);
     }
 
@@ -150,11 +165,11 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
      */
     public function testShouldNeverRegisterInArrayValidatorAutomatically()
     {
-        $options = array(
+        $options = [
             'foo' => 'Foo Value',
             'bar' => 'Bar Value',
             'baz' => 'Baz Value',
-        );
+        ];
         $this->element->setMultiOptions($options);
         $this->assertFalse($this->element->getValidator('InArray'));
         $this->element->isValid('test');
@@ -165,7 +180,7 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
     public function testShouldRenderComboBoxDijit()
     {
         $html = $this->element->render();
-        $this->assertContains('dojoType="dijit.form.ComboBox"', $html);
+        $this->assertStringContainsString('dojoType="dijit.form.ComboBox"', $html);
     }
 
     /**
@@ -177,20 +192,20 @@ class Zend_Dojo_Form_Element_ComboBoxTest extends PHPUnit_Framework_TestCase
         Zend_Dojo_View_Helper_Dojo::setUseProgrammatic();
         $this->element->setStoreId('foo')
                       ->setStoreType('dojo.data.ItemFileReadStore')
-                      ->setStoreParams(array(
+                      ->setStoreParams([
                           'url' => '/foo',
-                        ));
+                        ]);
 
         include_once 'Zend/Form/SubForm.php';
-        $subform = new Zend_Form_SubForm(array('name' => 'bar'));
+        $subform = new Zend_Form_SubForm(['name' => 'bar']);
         $subform->addElement($this->element);
         $html = $this->element->render();
         $dojo = $this->view->dojo()->__toString();
-        $this->assertContains('"store":"foo"', $dojo, $dojo);
+        $this->assertStringContainsString('"store":"foo"', $dojo, $dojo);
     }
 }
 
 // Call Zend_Dojo_Form_Element_ComboBoxTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Dojo_Form_Element_ComboBoxTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Dojo_Form_Element_ComboBoxTest::main") {
     Zend_Dojo_Form_Element_ComboBoxTest::main();
 }

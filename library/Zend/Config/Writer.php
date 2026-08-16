@@ -32,9 +32,9 @@ abstract class Zend_Config_Writer
      *
      * @var array
      */
-    protected $_skipOptions = array(
+    protected $_skipOptions = [
         'options'
-    );
+    ];
 
     /**
      * Config object to write
@@ -50,7 +50,7 @@ abstract class Zend_Config_Writer
      *
      * @param null|array $options
      */
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         if (is_array($options)) {
             $this->setOptions($options);

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -31,9 +34,8 @@ require_once 'Zend/Service/Amazon/Authentication/S3.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_Service_Amazon_Authentication_S3Test extends PHPUnit_Framework_TestCase
+class Zend_Service_Amazon_Authentication_S3Test extends TestCase
 {
-
     /**
      * @var Zend_Service_Amazon_Authentication_S3
      */
@@ -42,34 +44,33 @@ class Zend_Service_Amazon_Authentication_S3Test extends PHPUnit_Framework_TestCa
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    protected function set_up()
     {
-        parent::setUp();
+        parent::set_up();
 
-        // TODO Auto-generated Zend_Service_Amazon_Authentication_S3Test::setUp()
+        // TODO Auto-generated Zend_Service_Amazon_Authentication_S3Test::set_up()
 
 
         $this->Zend_Service_Amazon_Authentication_S3 = new Zend_Service_Amazon_Authentication_S3('0PN5J17HBGZHT7JJ3X82', 'uV3F3YluFJax1cknvbcGwgjvx4QpvB+leU8dUj2o', '2006-03-01');
-
     }
 
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown()
+    protected function tear_down()
     {
-        // TODO Auto-generated Zend_Service_Amazon_Authentication_S3Test::tearDown()
+        // TODO Auto-generated Zend_Service_Amazon_Authentication_S3Test::tear_down()
 
 
         $this->Zend_Service_Amazon_Authentication_S3 = null;
 
-        parent::tearDown();
+        parent::tear_down();
     }
 
 
     public function testGetGeneratesCorrectSignature()
     {
-        $headers = array();
+        $headers = [];
         $headers['Date'] = "Tue, 27 Mar 2007 19:36:42 +0000";
 
         $ret = $this->Zend_Service_Amazon_Authentication_S3->generateSignature('GET', 'http://s3.amazonaws.com/johnsmith/photos/puppy.jpg', $headers);
@@ -84,7 +85,7 @@ Tue, 27 Mar 2007 19:36:42 +0000
 
     public function testPutGeneratesCorrectSignature()
     {
-        $headers = array();
+        $headers = [];
         $headers['Date'] = "Tue, 27 Mar 2007 21:15:45 +0000";
         $headers['Content-Type'] = "image/jpeg";
         $headers['Content-Length'] = 94328;
@@ -101,7 +102,7 @@ Tue, 27 Mar 2007 21:15:45 +0000
 
     public function testListGeneratesCorrectSignature()
     {
-        $headers = array();
+        $headers = [];
         $headers['Date'] = "Tue, 27 Mar 2007 19:42:41 +0000";
 
         $ret = $this->Zend_Service_Amazon_Authentication_S3->generateSignature('GET', 'http://s3.amazonaws.com/johnsmith/?prefix=photos&max-keys=50&marker=puppy', $headers);
@@ -116,7 +117,7 @@ Tue, 27 Mar 2007 19:42:41 +0000
 
     public function testFetchGeneratesCorrectSignature()
     {
-        $headers = array();
+        $headers = [];
         $headers['Date'] = "Tue, 27 Mar 2007 19:44:46 +0000";
 
         $ret = $this->Zend_Service_Amazon_Authentication_S3->generateSignature('GET', 'http://s3.amazonaws.com/johnsmith/?acl', $headers);
@@ -131,8 +132,7 @@ Tue, 27 Mar 2007 19:44:46 +0000
 
     public function testDeleteGeneratesCorrectSignature()
     {
-
-        $headers = array();
+        $headers = [];
         $headers['x-amz-date'] = "Tue, 27 Mar 2007 21:20:26 +0000";
 
         $ret = $this->Zend_Service_Amazon_Authentication_S3->generateSignature('DELETE', 'http://s3.amazonaws.com/johnsmith/photos/puppy.jpg', $headers);
@@ -148,7 +148,7 @@ x-amz-date:Tue, 27 Mar 2007 21:20:26 +0000
 
     public function testUploadGeneratesCorrectSignature()
     {
-        $headers = array();
+        $headers = [];
         $headers['Date'] = "Tue, 27 Mar 2007 21:06:08 +0000";
         $headers['x-amz-acl'] = "public-read";
         $headers['content-type'] = "application/x-download";
@@ -175,6 +175,4 @@ x-amz-meta-filechecksum:0x02661779
 x-amz-meta-reviewedby:joe@johnsmith.net,jane@johnsmith.net
 //static.johnsmith.net/db-backup.dat.gz");
     }
-
 }
-

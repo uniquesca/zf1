@@ -41,12 +41,17 @@ require_once 'Zend/Pdf/Target.php';
 abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveIterator, Countable
 {
     /**
+     * Array of child outlines (array of Zend_Pdf_Outline objects)
+     * @var array
+     */
+    public $childOutlines = [];
+
+    /**
      * Action dictionary
      *
      * @var Zend_Pdf_Element_Dictionary|Zend_Pdf_Element_Object|Zend_Pdf_Element_Reference
      */
     protected $_actionDictionary;
-
 
     /**
      * An original list of chained actions
@@ -60,7 +65,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @var array  Array of Zend_Pdf_Action objects
      */
-    public $next = array();
+    public $next = [];
 
     /**
      * Object constructor
@@ -82,15 +87,15 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
         if ($dictionary->Next !== null) {
             if ($dictionary->Next instanceof Zend_Pdf_Element_Dictionary) {
                 // Check if dictionary object is not already processed
-                if (!$processedActions->contains($dictionary->Next)) {
-                    $processedActions->attach($dictionary->Next);
+                if (!$processedActions->offsetExists($dictionary->Next)) {
+                    $processedActions->offsetSet($dictionary->Next);
                     $this->next[] = Zend_Pdf_Action::load($dictionary->Next, $processedActions);
                 }
             } else if ($dictionary->Next instanceof Zend_Pdf_Element_Array) {
                 foreach ($dictionary->Next->items as $chainedActionDictionary) {
                     // Check if dictionary object is not already processed
-                    if (!$processedActions->contains($chainedActionDictionary)) {
-                        $processedActions->attach($chainedActionDictionary);
+                    if (!$processedActions->offsetExists($chainedActionDictionary)) {
+                        $processedActions->offsetSet($chainedActionDictionary);
                         $this->next[] = Zend_Pdf_Action::load($chainedActionDictionary, $processedActions);
                     }
                 }
@@ -112,7 +117,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      * @return Zend_Pdf_Action
      * @throws Zend_Pdf_Exception
      */
-    public static function load(Zend_Pdf_Element $dictionary, SplObjectStorage $processedActions = null)
+    public static function load(Zend_Pdf_Element $dictionary, ?SplObjectStorage $processedActions = null)
     {
         if ($processedActions === null) {
             $processedActions = new SplObjectStorage();
@@ -252,16 +257,16 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      * @param SplObjectStorage $processedActions  list of already processed actions (used to prevent infinity loop caused by cyclic references)
      * @return Zend_Pdf_Element_Object|Zend_Pdf_Element_Reference   Dictionary indirect object
      */
-    public function dumpAction(Zend_Pdf_ElementFactory_Interface $factory, SplObjectStorage $processedActions = null)
+    public function dumpAction(Zend_Pdf_ElementFactory_Interface $factory, ?SplObjectStorage $processedActions = null)
     {
         if ($processedActions === null) {
             $processedActions = new SplObjectStorage();
         }
-        if ($processedActions->contains($this)) {
+        if ($processedActions->offsetExists($this)) {
             require_once 'Zend/Pdf/Exception.php';
             throw new Zend_Pdf_Exception('Action chain cyclyc reference is detected.');
         }
-        $processedActions->attach($this);
+        $processedActions->offsetSet($this);
 
         $childListUpdated = false;
         if (count($this->_originalNextList) != count($this->next)) {
@@ -326,6 +331,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @return Zend_Pdf_Action
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->next);
@@ -336,6 +342,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @return integer
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->next);
@@ -344,6 +351,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
     /**
      * Go to next child
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         return next($this->next);
@@ -352,6 +360,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
     /**
      * Rewind children
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         return reset($this->next);
@@ -362,7 +371,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @return boolean
      */
-    public function valid()
+    public function valid(): bool
     {
         return current($this->next) !== false;
     }
@@ -372,7 +381,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @return Zend_Pdf_Action|null
      */
-    public function getChildren()
+    public function getChildren(): ?\RecursiveIterator
     {
         return current($this->next);
     }
@@ -382,7 +391,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @return bool  whether container has any pages
      */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return count($this->next) > 0;
     }
@@ -397,7 +406,7 @@ abstract class Zend_Pdf_Action extends Zend_Pdf_Target implements RecursiveItera
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->childOutlines);
     }

@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -33,8 +38,13 @@ require_once 'Zend/Translate/Adapter/Gettext.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Translate
  */
-class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
+class Zend_Translate_Adapter_GettextTest extends TestCase
 {
+    /**
+     * @var bool
+     */
+    protected $_errorOccurred;
+
     /**
      * Runs the test methods of this class.
      *
@@ -42,12 +52,12 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Translate_Adapter_GettextTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Translate_Adapter_GettextTest");
+        $result = (new resources_Runner())->run($suite);
         Zend_Translate_Adapter_Gettext::removeCache();
     }
 
-    public function setUp()
+    protected function set_up()
     {
         if (Zend_Translate_Adapter_Gettext::hasCache()) {
             Zend_Translate_Adapter_Gettext::removeCache();
@@ -63,14 +73,14 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
             $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/nofile.mo', 'en');
             $this->fail("exception expected");
         } catch (Zend_Translate_Exception $e) {
-            $this->assertContains('Error opening translation file', $e->getMessage());
+            $this->assertStringContainsString('Error opening translation file', $e->getMessage());
         }
 
         try {
             $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/failed.mo', 'en');
             $this->fail("exception expected");
         } catch (Zend_Translate_Exception $e) {
-            $this->assertContains('is not a gettext file', $e->getMessage());
+            $this->assertStringContainsString('is not a gettext file', $e->getMessage());
         }
     }
 
@@ -113,10 +123,10 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
             $adapter->addTranslation(dirname(__FILE__) . '/_files/translation_en2.mo', 'xx');
             $this->fail("exception expected");
         } catch (Zend_Translate_Exception $e) {
-            $this->assertContains('does not exist', $e->getMessage());
+            $this->assertStringContainsString('does not exist', $e->getMessage());
         }
 
-        $adapter->addTranslation(dirname(__FILE__) . '/_files/translation_en2.mo', 'de', array('clear' => true));
+        $adapter->addTranslation(dirname(__FILE__) . '/_files/translation_en2.mo', 'de', ['clear' => true]);
         $this->assertEquals('Nachricht 1', $adapter->translate('Message 1'));
         $this->assertEquals('Nachricht 8', $adapter->translate('Message 8'));
     }
@@ -124,20 +134,20 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
     public function testOptions()
     {
         $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/translation_en.mo', 'en');
-        $adapter->setOptions(array('testoption' => 'testkey'));
-        $expected = array(
-            'testoption'      => 'testkey',
-            'clear'           => false,
-            'content'         => dirname(__FILE__) . '/_files/translation_en.mo',
-            'scan'            => null,
-            'locale'          => 'en',
-            'ignore'          => '.',
-            'disableNotices'  => false,
-            'log'             => false,
-            'logMessage'      => 'Untranslated message within \'%locale%\': %message%',
+        $adapter->setOptions(['testoption' => 'testkey']);
+        $expected = [
+            'testoption' => 'testkey',
+            'clear' => false,
+            'content' => dirname(__FILE__) . '/_files/translation_en.mo',
+            'scan' => null,
+            'locale' => 'en',
+            'ignore' => '.',
+            'disableNotices' => false,
+            'log' => false,
+            'logMessage' => 'Untranslated message within \'%locale%\': %message%',
             'logUntranslated' => false,
-            'reload'          => false,
-        );
+            'reload' => false,
+        ];
         $options = $adapter->getOptions();
 
         foreach ($expected as $key => $value) {
@@ -154,7 +164,7 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
         $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/translation_en.mo', 'en');
         $this->assertEquals('Message 1 (en)', $adapter->translate('Message 1'));
         $this->assertEquals('Message 6', $adapter->translate('Message 6'));
-        $adapter->addTranslation(dirname(__FILE__) . '/_files/translation_en2.mo', 'de', array('clear' => true));
+        $adapter->addTranslation(dirname(__FILE__) . '/_files/translation_en2.mo', 'de', ['clear' => true]);
         $this->assertEquals('Nachricht 1', $adapter->translate('Message 1'));
         $this->assertEquals('Message 4', $adapter->translate('Message 4'));
     }
@@ -171,10 +181,10 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
             $adapter->setLocale('nolocale');
             $this->fail("exception expected");
         } catch (Zend_Translate_Exception $e) {
-            $this->assertContains('does not exist', $e->getMessage());
+            $this->assertStringContainsString('does not exist', $e->getMessage());
         }
 
-        set_error_handler(array($this, 'errorHandlerIgnore'));
+        set_error_handler([$this, 'errorHandlerIgnore']);
         $adapter->setLocale('de');
         restore_error_handler();
         $this->assertEquals('de', $adapter->getLocale());
@@ -183,9 +193,9 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
     public function testList()
     {
         $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/translation_en.mo', 'en');
-        $this->assertEquals(array('en' => 'en'), $adapter->getList());
+        $this->assertEquals(['en' => 'en'], $adapter->getList());
         $adapter->addTranslation(dirname(__FILE__) . '/_files/translation_en.mo', 'de');
-        $this->assertEquals(array('en' => 'en', 'de' => 'de'), $adapter->getList());
+        $this->assertEquals(['en' => 'en', 'de' => 'de'], $adapter->getList());
         $this->assertTrue($adapter->isAvailable('de'));
         $locale = new Zend_Locale('en');
         $this->assertTrue($adapter->isAvailable($locale));
@@ -195,16 +205,16 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
     public function testOptionLocaleDirectory()
     {
         require_once 'Zend/Translate.php';
-        $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/testmo/', 'de_AT', array('scan' => Zend_Translate::LOCALE_DIRECTORY));
-        $this->assertEquals(array('de_AT' => 'de_AT', 'en_GB' => 'en_GB'), $adapter->getList());
+        $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/testmo/', 'de_AT', ['scan' => Zend_Translate::LOCALE_DIRECTORY]);
+        $this->assertEquals(['de_AT' => 'de_AT', 'en_GB' => 'en_GB'], $adapter->getList());
         $this->assertEquals('Nachricht 8', $adapter->translate('Message 8'));
     }
 
     public function testOptionLocaleFilename()
     {
         require_once 'Zend/Translate.php';
-        $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/testmo/', 'de_DE', array('scan' => Zend_Translate::LOCALE_FILENAME));
-        $this->assertEquals(array('de_DE' => 'de_DE', 'en_US' => 'en_US'), $adapter->getList());
+        $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/testmo/', 'de_DE', ['scan' => Zend_Translate::LOCALE_FILENAME]);
+        $this->assertEquals(['de_DE' => 'de_DE', 'en_US' => 'en_US'], $adapter->getList());
         $this->assertEquals('Nachricht 8', $adapter->translate('Message 8'));
     }
 
@@ -219,7 +229,7 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
         $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/translation_en.mo');
         $this->assertEquals('', $adapter->translate(''));
         $info = $adapter->getAdapterInfo();
-        $this->assertContains('Last-Translator: Thomas Weidner <thomas.weidner@voxtronic.com>', $info[dirname(__FILE__) . '/_files/translation_en.mo']);
+        $this->assertStringContainsString('Last-Translator: Thomas Weidner <thomas.weidner@voxtronic.com>', $info[dirname(__FILE__) . '/_files/translation_en.mo']);
     }
 
     public function testOtherEncoding()
@@ -244,14 +254,14 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
             $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/failed2.mo', 'en');
             $this->fail('Exception expected');
         } catch (Zend_Translate_Exception $e) {
-            $this->assertContains('is not a gettext file', $e->getMessage());
+            $this->assertStringContainsString('is not a gettext file', $e->getMessage());
         }
     }
 
     public function testMissingAdapterInfo()
     {
         $adapter = new Zend_Translate_Adapter_Gettext(dirname(__FILE__) . '/_files/failed3.mo', 'en');
-        $this->assertContains('No adapter information available', current($adapter->getAdapterInfo()));
+        $this->assertStringContainsString('No adapter information available', current($adapter->getAdapterInfo()));
     }
 
     /**
@@ -260,7 +270,8 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
     public function testPluralToPlural()
     {
         $adapter = new Zend_Translate_Adapter_Gettext(
-            dirname(__FILE__) . '/_files/translation_plural_fr.mo', 'fr'
+            dirname(__FILE__) . '/_files/translation_plural_fr.mo',
+            'fr'
         );
 
         $this->assertEquals(
@@ -283,7 +294,8 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
     public function testPluralToSingular()
     {
         $adapter = new Zend_Translate_Adapter_Gettext(
-            dirname(__FILE__) . '/_files/translation_plural_tr.mo', 'tr'
+            dirname(__FILE__) . '/_files/translation_plural_tr.mo',
+            'tr'
         );
 
         $this->assertEquals(
@@ -310,13 +322,13 @@ class Zend_Translate_Adapter_GettextTest extends PHPUnit_Framework_TestCase
      * @param  array   $errcontext
      * @return void
      */
-    public function errorHandlerIgnore($errno, $errstr, $errfile, $errline, array $errcontext)
+    public function errorHandlerIgnore($errno, $errstr, $errfile, $errline, array $errcontext = [])
     {
         $this->_errorOccurred = true;
     }
 }
 
 // Call Zend_Translate_Adapter_GettextTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Translate_Adapter_GettextTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Translate_Adapter_GettextTest::main") {
     Zend_Translate_GettextTest::main();
 }

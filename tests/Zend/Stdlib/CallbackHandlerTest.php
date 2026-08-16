@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -37,15 +42,25 @@ require_once 'Zend/Stdlib/TestAsset/SignalHandlers/ObjectCallback.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_Stdlib_CallbackHandlerTest extends PHPUnit_Framework_TestCase
+class Zend_Stdlib_CallbackHandlerTest extends TestCase
 {
+    /**
+     * @var mixed|mixed[]
+     */
+    protected $args;
+
+    /**
+     * @var bool
+     */
+    protected $error;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         if (isset($this->args)) {
             unset($this->args);
@@ -55,9 +70,9 @@ class Zend_Stdlib_CallbackHandlerTest extends PHPUnit_Framework_TestCase
 
     public function testCallbackShouldStoreMetadata()
     {
-        $handler = new Zend_Stdlib_CallbackHandler('rand', array('event' => 'foo'));
+        $handler = new Zend_Stdlib_CallbackHandler('rand', ['event' => 'foo']);
         $this->assertEquals('foo', $handler->getMetadatum('event'));
-        $this->assertEquals(array('event' => 'foo'), $handler->getMetadata());
+        $this->assertEquals(['event' => 'foo'], $handler->getMetadata());
     }
 
     public function testCallbackShouldBeStringIfNoHandlerPassedToConstructor()
@@ -68,44 +83,44 @@ class Zend_Stdlib_CallbackHandlerTest extends PHPUnit_Framework_TestCase
 
     public function testCallbackShouldBeArrayIfHandlerPassedToConstructor()
     {
-        $handler = new Zend_Stdlib_CallbackHandler(array('Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test'));
-        $this->assertSame(array('Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test'), $handler->getCallback());
+        $handler = new Zend_Stdlib_CallbackHandler(['Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test']);
+        $this->assertSame(['Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test'], $handler->getCallback());
     }
 
     public function testCallShouldInvokeCallbackWithSuppliedArguments()
     {
-        $handler = new Zend_Stdlib_CallbackHandler(array( $this, 'handleCall' ));
-        $args   = array('foo', 'bar', 'baz');
+        $handler = new Zend_Stdlib_CallbackHandler([ $this, 'handleCall' ]);
+        $args = ['foo', 'bar', 'baz'];
         $handler->call($args);
         $this->assertSame($args, $this->args);
     }
 
     public function testPassingInvalidCallbackShouldRaiseInvalidCallbackExceptionDuringInstantiation()
     {
-        $this->setExpectedException('Zend_Stdlib_Exception_InvalidCallbackException');
+        $this->expectException('Zend_Stdlib_Exception_InvalidCallbackException');
         $handler = new Zend_Stdlib_CallbackHandler('boguscallback');
     }
 
     public function testCallShouldReturnTheReturnValueOfTheCallback()
     {
-        $handler = new Zend_Stdlib_CallbackHandler(array('Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test'));
-        if (!is_callable(array('Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test'))) {
+        $handler = new Zend_Stdlib_CallbackHandler(['Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test']);
+        if (!is_callable(['Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback', 'test'])) {
             echo "\nClass exists? " . var_export(class_exists('Zend_Stdlib_TestAsset_SignalHandlers_ObjectCallback'), 1) . "\n";
             echo "Include path: " . get_include_path() . "\n";
         }
-        $this->assertEquals('bar', $handler->call(array()));
+        $this->assertEquals('bar', $handler->call([]));
     }
 
     public function testStringCallbackResolvingToClassDefiningInvokeNameShouldRaiseException()
     {
-        $this->setExpectedException('Zend_Stdlib_Exception_InvalidCallbackException');
+        $this->expectException('Zend_Stdlib_Exception_InvalidCallbackException');
         $handler = new Zend_Stdlib_CallbackHandler('Zend_Stdlib_TestAsset_SignalHandlers_Invokable');
     }
 
     public function testStringCallbackReferringToClassWithoutDefinedInvokeShouldRaiseException()
     {
-        $this->setExpectedException('Zend_Stdlib_Exception_InvalidCallbackException');
-        $class   = new Zend_Stdlib_TestAsset_SignalHandlers_InstanceMethod();
+        $this->expectException('Zend_Stdlib_Exception_InvalidCallbackException');
+        $class = new Zend_Stdlib_TestAsset_SignalHandlers_InstanceMethod();
         $handler = new Zend_Stdlib_CallbackHandler($class);
     }
 
@@ -119,8 +134,8 @@ class Zend_Stdlib_CallbackHandlerTest extends PHPUnit_Framework_TestCase
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             $this->markTestSkipped('Behavior of is_callable changes between 5.2 and 5.3');
         }
-        $this->setExpectedException('Zend_Stdlib_Exception_InvalidCallbackException');
-        $handler     = new Zend_Stdlib_CallbackHandler(array('Zend_Stdlib_TestAsset_SignalHandlers_InstanceMethod', 'handler'));
+        $this->expectException('Zend_Stdlib_Exception_InvalidCallbackException');
+        $handler = new Zend_Stdlib_CallbackHandler(['Zend_Stdlib_TestAsset_SignalHandlers_InstanceMethod', 'handler']);
     }
 
     public function testStringCallbackConsistingOfNonStaticMethodShouldRaiseException()
@@ -128,14 +143,14 @@ class Zend_Stdlib_CallbackHandlerTest extends PHPUnit_Framework_TestCase
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             $this->markTestSkipped('Behavior of is_callable changes between 5.2 and 5.3');
         }
-        $this->setExpectedException('Zend_Stdlib_Exception_InvalidCallbackException');
+        $this->expectException('Zend_Stdlib_Exception_InvalidCallbackException');
         $handler = new Zend_Stdlib_CallbackHandler('Zend_Stdlib_TestAsset_SignalHandlers_InstanceMethod::handler');
     }
 
     public function testCallbackToClassImplementingOverloadingButNotInvocableShouldRaiseException()
     {
-        $this->setExpectedException('Zend_Stdlib_Exception_InvalidCallbackException');
-        $handler = new Zend_Stdlib_CallbackHandler('foo', array( 'Zend_Stdlib_TestAsset_SignalHandlers_Overloadable', 'foo' ));
+        $this->expectException('Zend_Stdlib_Exception_InvalidCallbackException');
+        $handler = new Zend_Stdlib_CallbackHandler('foo', [ 'Zend_Stdlib_TestAsset_SignalHandlers_Overloadable', 'foo' ]);
     }
 
     public function handleCall()
@@ -144,6 +159,6 @@ class Zend_Stdlib_CallbackHandlerTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Stdlib_CallbackHandlerTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Stdlib_CallbackHandlerTest::main') {
     Zend_Stdlib_CallbackHandlerTest::main();
 }

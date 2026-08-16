@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -24,7 +27,8 @@ require_once 'Zend/Oauth.php';
 require_once 'Zend/Oauth/Config.php';
 require_once 'Zend/Oauth/Client.php';
 
-class Test_Oauth_Client extends Zend_Oauth_Client {
+class Test_Oauth_Client extends Zend_Oauth_Client
+{
     public function getSignableParametersAsQueryString()
     {
         return $this->_getSignableParametersAsQueryString();
@@ -39,11 +43,16 @@ class Test_Oauth_Client extends Zend_Oauth_Client {
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Oauth
  */
-class Zend_Oauth_ClientTest extends PHPUnit_Framework_TestCase
+class Zend_Oauth_ClientTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \Zend_Oauth_Client|mixed
+     */
+    protected $client;
+
+    protected function set_up()
     {
-        $this->client = new Zend_Oauth_Client(array());
+        $this->client = new Zend_Oauth_Client([]);
     }
 
     /**
@@ -60,12 +69,12 @@ class Zend_Oauth_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testIncludesParametersForSignatureOnPostEncUrlEncoded()
     {
-        $client = new Test_Oauth_Client(array());
+        $client = new Test_Oauth_Client([]);
         $client->setEncType(Zend_Http_Client::ENC_URLENCODED);
-        $params = array(
+        $params = [
             'param1' => 'dummy1',
             'param2' => 'dummy2',
-        );
+        ];
         $client->setParameterPost($params);
         $client->setMethod(Zend_Http_Client::POST);
         $this->assertEquals(2, count($client->getSignableParametersAsQueryString()));
@@ -76,12 +85,12 @@ class Zend_Oauth_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testExcludesParametersOnPostEncFormData()
     {
-        $client = new Test_Oauth_Client(array());
+        $client = new Test_Oauth_Client([]);
         $client->setEncType(Zend_Http_Client::ENC_FORMDATA);
-        $params = array(
+        $params = [
             'param1' => 'dummy1',
             'param2' => 'dummy2',
-        );
+        ];
         $client->setParameterPost($params);
         $client->setMethod(Zend_Http_Client::POST);
         $this->assertEquals(0, count($client->getSignableParametersAsQueryString()));

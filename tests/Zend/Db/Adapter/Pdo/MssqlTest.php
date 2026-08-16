@@ -42,22 +42,21 @@ require_once 'Zend/Db/Adapter/Pdo/Mysql.php';
  */
 class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
 {
-
-    protected $_numericDataTypes = array(
-        Zend_Db::INT_TYPE    => Zend_Db::INT_TYPE,
+    protected $_numericDataTypes = [
+        Zend_Db::INT_TYPE => Zend_Db::INT_TYPE,
         Zend_Db::BIGINT_TYPE => Zend_Db::BIGINT_TYPE,
-        Zend_Db::FLOAT_TYPE  => Zend_Db::FLOAT_TYPE,
-        'INT'                => Zend_Db::INT_TYPE,
-        'SMALLINT'           => Zend_Db::INT_TYPE,
-        'TINYINT'            => Zend_Db::INT_TYPE,
-        'BIGINT'             => Zend_Db::BIGINT_TYPE,
-        'DECIMAL'            => Zend_Db::FLOAT_TYPE,
-        'FLOAT'              => Zend_Db::FLOAT_TYPE,
-        'MONEY'              => Zend_Db::FLOAT_TYPE,
-        'NUMERIC'            => Zend_Db::FLOAT_TYPE,
-        'REAL'               => Zend_Db::FLOAT_TYPE,
-        'SMALLMONEY'         => Zend_Db::FLOAT_TYPE
-    );
+        Zend_Db::FLOAT_TYPE => Zend_Db::FLOAT_TYPE,
+        'INT' => Zend_Db::INT_TYPE,
+        'SMALLINT' => Zend_Db::INT_TYPE,
+        'TINYINT' => Zend_Db::INT_TYPE,
+        'BIGINT' => Zend_Db::BIGINT_TYPE,
+        'DECIMAL' => Zend_Db::FLOAT_TYPE,
+        'FLOAT' => Zend_Db::FLOAT_TYPE,
+        'MONEY' => Zend_Db::FLOAT_TYPE,
+        'NUMERIC' => Zend_Db::FLOAT_TYPE,
+        'REAL' => Zend_Db::FLOAT_TYPE,
+        'SMALLMONEY' => Zend_Db::FLOAT_TYPE
+    ];
 
     /**
      * Test AUTO_QUOTE_IDENTIFIERS option
@@ -67,9 +66,9 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
     {
         $params = $this->_util->getParams();
 
-        $params['options'] = array(
+        $params['options'] = [
             Zend_Db::AUTO_QUOTE_IDENTIFIERS => true
-        );
+        ];
         $db = Zend_Db::factory($this->getDriver(), $params);
         $db->getConnection();
 
@@ -86,33 +85,33 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
     {
         $desc = $this->_db->describeTable('zfproducts');
 
-        $this->assertEquals('zfproducts',        $desc['product_name']['TABLE_NAME']);
-        $this->assertEquals('product_name',      $desc['product_name']['COLUMN_NAME']);
-        $this->assertEquals(2,                   $desc['product_name']['COLUMN_POSITION']);
-        $this->assertRegExp('/varchar/i',        $desc['product_name']['DATA_TYPE']);
-        $this->assertEquals('',                  $desc['product_name']['DEFAULT']);
-        $this->assertFalse(                      $desc['product_name']['NULLABLE'], 'Expected product_name not to be nullable');
-        $this->assertNull(                       $desc['product_name']['SCALE'], 'scale is not 0');
+        $this->assertEquals('zfproducts', $desc['product_name']['TABLE_NAME']);
+        $this->assertEquals('product_name', $desc['product_name']['COLUMN_NAME']);
+        $this->assertEquals(2, $desc['product_name']['COLUMN_POSITION']);
+        $this->assertMatchesRegularExpression('/varchar/i', $desc['product_name']['DATA_TYPE']);
+        $this->assertEquals('', $desc['product_name']['DEFAULT']);
+        $this->assertFalse($desc['product_name']['NULLABLE'], 'Expected product_name not to be nullable');
+        $this->assertNull($desc['product_name']['SCALE'], 'scale is not 0');
         // MS SQL Server reports varchar length in the PRECISION field.  Whaaa?!?
-        $this->assertEquals(100,                 $desc['product_name']['PRECISION'], 'precision is not 100');
-        $this->assertFalse(                      $desc['product_name']['PRIMARY'], 'Expected product_name not to be a primary key');
-        $this->assertNull(                       $desc['product_name']['PRIMARY_POSITION'], 'Expected product_name to return null for PRIMARY_POSITION');
-        $this->assertFalse(                      $desc['product_name']['IDENTITY'], 'Expected product_name to return false for IDENTITY');
+        $this->assertEquals(100, $desc['product_name']['PRECISION'], 'precision is not 100');
+        $this->assertFalse($desc['product_name']['PRIMARY'], 'Expected product_name not to be a primary key');
+        $this->assertNull($desc['product_name']['PRIMARY_POSITION'], 'Expected product_name to return null for PRIMARY_POSITION');
+        $this->assertFalse($desc['product_name']['IDENTITY'], 'Expected product_name to return false for IDENTITY');
     }
 
     public function testAdapterDescribeTablePrimaryKeyColumn()
     {
         $desc = $this->_db->describeTable('zfproducts');
 
-        $this->assertEquals('zfproducts',        $desc['product_id']['TABLE_NAME']);
-        $this->assertEquals('product_id',        $desc['product_id']['COLUMN_NAME']);
-        $this->assertEquals(1,                   $desc['product_id']['COLUMN_POSITION']);
-        $this->assertEquals('',                  $desc['product_id']['DEFAULT']);
-        $this->assertFalse(                      $desc['product_id']['NULLABLE'], 'Expected product_id not to be nullable');
-        $this->assertEquals(0,                   $desc['product_id']['SCALE'], 'scale is not 0');
-        $this->assertEquals(10,                  $desc['product_id']['PRECISION'], 'precision is not 10');
-        $this->assertTrue(                       $desc['product_id']['PRIMARY'], 'Expected product_id to be a primary key');
-        $this->assertEquals(1,                   $desc['product_id']['PRIMARY_POSITION']);
+        $this->assertEquals('zfproducts', $desc['product_id']['TABLE_NAME']);
+        $this->assertEquals('product_id', $desc['product_id']['COLUMN_NAME']);
+        $this->assertEquals(1, $desc['product_id']['COLUMN_POSITION']);
+        $this->assertEquals('', $desc['product_id']['DEFAULT']);
+        $this->assertFalse($desc['product_id']['NULLABLE'], 'Expected product_id not to be nullable');
+        $this->assertEquals(0, $desc['product_id']['SCALE'], 'scale is not 0');
+        $this->assertEquals(10, $desc['product_id']['PRECISION'], 'precision is not 10');
+        $this->assertTrue($desc['product_id']['PRIMARY'], 'Expected product_id to be a primary key');
+        $this->assertEquals(1, $desc['product_id']['PRIMARY_POSITION']);
     }
 
     /**
@@ -121,7 +120,7 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
      */
     public function testAdapterQuoteArray()
     {
-        $array = array("it's", 'all', 'right!');
+        $array = ["it's", 'all', 'right!'];
         $value = $this->_db->quote($array);
         $this->assertEquals("'it''s', 'all', 'right!'", $value);
     }
@@ -184,16 +183,16 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
 
         $expr = new Zend_Db_Expr('2+3');
 
-        $row = array (
-            'bug_id'          => $expr,
+        $row = [
+            'bug_id' => $expr,
             'bug_description' => 'New bug',
-            'bug_status'      => 'NEW',
-            'created_on'      => '2007-04-02',
-            'updated_on'      => '2007-04-02',
-            'reported_by'     => 'micky',
-            'assigned_to'     => 'goofy',
-            'verified_by'     => 'dduck'
-        );
+            'bug_status' => 'NEW',
+            'created_on' => '2007-04-02',
+            'updated_on' => '2007-04-02',
+            'reported_by' => 'micky',
+            'assigned_to' => 'goofy',
+            'verified_by' => 'dduck'
+        ];
 
         $this->_db->query("SET IDENTITY_INSERT $bugs ON");
 
@@ -274,21 +273,24 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
      */
     public function testAdapterInsert()
     {
-        $row = array (
+        $row = [
             'bug_description' => 'New bug',
-            'bug_status'      => 'NEW',
-            'created_on'      => '2007-04-02',
-            'updated_on'      => '2007-04-02',
-            'reported_by'     => 'micky',
-            'assigned_to'     => 'goofy',
-            'verified_by'     => 'dduck'
-        );
+            'bug_status' => 'NEW',
+            'created_on' => '2007-04-02',
+            'updated_on' => '2007-04-02',
+            'reported_by' => 'micky',
+            'assigned_to' => 'goofy',
+            'verified_by' => 'dduck'
+        ];
         $rowsAffected = $this->_db->insert('zfbugs', $row);
         $this->assertEquals(1, $rowsAffected);
         $lastInsertId = $this->_db->lastInsertId();
         $this->assertTrue(is_int($lastInsertId));
-        $this->assertEquals('5', (string) $lastInsertId,
-            'Expected new id to be 5');
+        $this->assertEquals(
+            '5',
+            (string) $lastInsertId,
+            'Expected new id to be 5'
+        );
     }
 
     /**
@@ -297,23 +299,23 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
     public function testAdapterLimitWorksWithOrderByClause()
     {
         // more values
-        $this->_db->insert('zfproducts', array('product_name' => 'Unix'));
-        $this->_db->insert('zfproducts', array('product_name' => 'Windows'));
-        $this->_db->insert('zfproducts', array('product_name' => 'AIX'));
-        $this->_db->insert('zfproducts', array('product_name' => 'I5'));
-        $this->_db->insert('zfproducts', array('product_name' => 'Linux'));
+        $this->_db->insert('zfproducts', ['product_name' => 'Unix']);
+        $this->_db->insert('zfproducts', ['product_name' => 'Windows']);
+        $this->_db->insert('zfproducts', ['product_name' => 'AIX']);
+        $this->_db->insert('zfproducts', ['product_name' => 'I5']);
+        $this->_db->insert('zfproducts', ['product_name' => 'Linux']);
 
         $select = $this->_db->select();
         $select->from('zfproducts')
-           ->order(array('product_name ASC', 'product_id DESC'))
+           ->order(['product_name ASC', 'product_id DESC'])
            ->limit(4, 4);
         $products = $this->_db->fetchAll($select);
-        $expectedProducts = array(
-            0 => array('product_id' => '3', 'product_name' => 'OS X'),
-            1 => array('product_id' => '4', 'product_name' => 'Unix'),
-            2 => array('product_id' => '5', 'product_name' => 'Windows'),
-            3 => array ('product_id' => '1', 'product_name' => 'Windows')
-            );
+        $expectedProducts = [
+            0 => ['product_id' => '3', 'product_name' => 'OS X'],
+            1 => ['product_id' => '4', 'product_name' => 'Unix'],
+            2 => ['product_id' => '5', 'product_name' => 'Windows'],
+            3 => ['product_id' => '1', 'product_name' => 'Windows']
+            ];
         $this->assertEquals($expectedProducts, $products);
     }
 
@@ -322,20 +324,20 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
      */
     public function testAdapterLimitWorksWithDistinctClause()
     {
-        $this->_db->insert('zfproducts', array('product_name' => 'Unix'));
-        $this->_db->insert('zfproducts', array('product_name' => 'Windows'));
-        $this->_db->insert('zfproducts', array('product_name' => 'AIX'));
-        $this->_db->insert('zfproducts', array('product_name' => 'I5'));
-        $this->_db->insert('zfproducts', array('product_name' => 'Linux'));
+        $this->_db->insert('zfproducts', ['product_name' => 'Unix']);
+        $this->_db->insert('zfproducts', ['product_name' => 'Windows']);
+        $this->_db->insert('zfproducts', ['product_name' => 'AIX']);
+        $this->_db->insert('zfproducts', ['product_name' => 'I5']);
+        $this->_db->insert('zfproducts', ['product_name' => 'Linux']);
 
         $sql = 'SELECT DISTINCT product_name FROM zfproducts ORDER BY product_name DESC';
         $sql = $this->_db->limit($sql, 3, 3);
         $products = $this->_db->fetchAll($sql);
-        $expectedProducts = array(
-           0 => array('product_name' => 'Linux'),
-           1 => array('product_name' => 'I5'),
-           2 => array('product_name' => 'AIX')
-           );
+        $expectedProducts = [
+           0 => ['product_name' => 'Linux'],
+           1 => ['product_name' => 'I5'],
+           2 => ['product_name' => 'AIX']
+           ];
         $this->assertEquals($expectedProducts, $products);
     }
 
@@ -368,7 +370,7 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
     public function testAdapterQuoteNullByteCharacter()
     {
         $string = "1\0";
-        $value  = $this->_db->quote($string);
+        $value = $this->_db->quote($string);
         $this->assertEquals("'1\\000'", $value);
     }
 
@@ -376,5 +378,4 @@ class Zend_Db_Adapter_Pdo_MssqlTest extends Zend_Db_Adapter_Pdo_TestCommon
     {
         return 'Pdo_Mssql';
     }
-
 }

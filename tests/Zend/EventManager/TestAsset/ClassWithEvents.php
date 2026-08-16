@@ -34,7 +34,7 @@ class Zend_EventManager_TestAsset_ClassWithEvents
 {
     protected $events;
 
-    public function events(Zend_EventManager_EventCollection $events = null)
+    public function events(?Zend_EventManager_EventCollection $events = null)
     {
         if (null !== $events) {
             $this->events = $events;
@@ -47,6 +47,6 @@ class Zend_EventManager_TestAsset_ClassWithEvents
 
     public function foo()
     {
-        $this->events()->trigger(__FUNCTION__, $this, array());
+        $this->events()->trigger(__FUNCTION__, $this, []);
     }
 }

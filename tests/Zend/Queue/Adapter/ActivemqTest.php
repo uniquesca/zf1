@@ -43,12 +43,12 @@ class Zend_Queue_Adapter_ActivemqTest extends Zend_Queue_Adapter_AdapterTest
     /**
      * Test setup
      */
-    public function setUp()
+    protected function set_up()
     {
         if (!TESTS_ZEND_QUEUE_ACTIVEMQ_ENABLED) {
             $this->markTestSkipped('TESTS_ZEND_QUEUE_ACTIVEMQ_ENABLED is not enabled in TestConfiguration.php');
         }
-        parent::setUp();
+        parent::set_up();
     }
 
 
@@ -67,7 +67,7 @@ class Zend_Queue_Adapter_ActivemqTest extends Zend_Queue_Adapter_AdapterTest
 
     public function getTestConfig()
     {
-        $driverOptions = array();
+        $driverOptions = [];
         if (defined('TESTS_ZEND_QUEUE_ACTIVEMQ_HOST')) {
             $driverOptions['host'] = TESTS_ZEND_QUEUE_ACTIVEMQ_HOST;
         }
@@ -77,7 +77,7 @@ class Zend_Queue_Adapter_ActivemqTest extends Zend_Queue_Adapter_AdapterTest
         if (defined('TESTS_ZEND_QUEUE_ACTIVEMQ_SCHEME')) {
             $driverOptions['scheme'] = TESTS_ZEND_QUEUE_ACTIVEMQ_SCHEME;
         }
-        return array('driverOptions' => $driverOptions);
+        return ['driverOptions' => $driverOptions];
     }
 
     /**
@@ -104,7 +104,7 @@ class Zend_Queue_Adapter_ActivemqTest extends Zend_Queue_Adapter_AdapterTest
      */
     public function testReceiveWillRetrieveZeroItems()
     {
-        $options = array('driverOptions' => $this->getTestConfig());
+        $options = ['driverOptions' => $this->getTestConfig()];
 
         $queue = new Zend_Queue('Activemq', $options);
         $queue2 = $queue->createQueue('queue');

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -38,13 +41,17 @@ require_once 'Zend/Mail/Transport/File.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Mail
  */
-class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
+class Zend_Mail_FileTransportTest extends TestCase
 {
+    /**
+     * @var bool|mixed
+     */
+    protected $createdTmpDir;
     protected $_params;
     protected $_transport;
     protected $_tmpdir;
 
-    public function setUp()
+    protected function set_up()
     {
         $this->createdTmpDir = false;
 
@@ -67,7 +74,7 @@ class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
         $this->_cleanDir($this->_tmpdir);
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         $this->_cleanDir($this->_tmpdir);
         if ($this->createdTmpDir) {
@@ -93,15 +100,15 @@ class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
             }
         }
     }
-
+    /** @doesNotPerformAssertions */
     public function testTransportSetup()
     {
         $transport = new Zend_Mail_Transport_File();
 
-        $transport = new Zend_Mail_Transport_File(array(
-            'path'     => $this->_tmpdir,
+        $transport = new Zend_Mail_Transport_File([
+            'path' => $this->_tmpdir,
             'callback' => 'test_function'
-        ));
+        ]);
     }
 
     protected function _prepareMail()
@@ -117,19 +124,19 @@ class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
 
     public function testNotWritablePathFailure()
     {
-        $transport = new Zend_Mail_Transport_File(array(
-            'callback' => array($this, 'directoryNotExisting')
-        ));
+        $transport = new Zend_Mail_Transport_File([
+            'callback' => [$this, 'directoryNotExisting']
+        ]);
 
         $mail = $this->_prepareMail();
 
-        $this->setExpectedException('Zend_Mail_Transport_Exception');
+        $this->expectException('Zend_Mail_Transport_Exception');
         $mail->send($transport);
     }
 
     public function testTransportSendMail()
     {
-        $transport = new Zend_Mail_Transport_File(array('path' => $this->_tmpdir));
+        $transport = new Zend_Mail_Transport_File(['path' => $this->_tmpdir]);
 
         $mail = $this->_prepareMail();
         $mail->send($transport);
@@ -144,10 +151,10 @@ class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
         }
 
         $email = file_get_contents($filename);
-        $this->assertContains('To: Oleg Lobach <oleg@example.com>', $email);
-        $this->assertContains('Subject: TestSubject', $email);
-        $this->assertContains('From: Alexander Steshenko <alexander@example.com>', $email);
-        $this->assertContains("This is the text of the mail.", $email);
+        $this->assertStringContainsString('To: Oleg Lobach <oleg@example.com>', $email);
+        $this->assertStringContainsString('Subject: TestSubject', $email);
+        $this->assertStringContainsString('From: Alexander Steshenko <alexander@example.com>', $email);
+        $this->assertStringContainsString("This is the text of the mail.", $email);
     }
 
     public function prependCallback($transport)
@@ -158,10 +165,10 @@ class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
 
     public function testPrependToCallback()
     {
-        $transport = new Zend_Mail_Transport_File(array(
+        $transport = new Zend_Mail_Transport_File([
             'path' => $this->_tmpdir,
-            'callback' => array($this, 'prependCallback')
-        ));
+            'callback' => [$this, 'prependCallback']
+        ]);
 
         $mail = $this->_prepareMail();
         $mail->send($transport);
@@ -177,9 +184,9 @@ class Zend_Mail_FileTransportTest extends PHPUnit_Framework_TestCase
         }
 
         // file name should now contain recipient email address
-        $this->assertContains('oleg@example.com', $entry);
+        $this->assertStringContainsString('oleg@example.com', $entry);
         // and default callback part
-        $this->assertContains('ZendMail', $entry);
+        $this->assertStringContainsString('ZendMail', $entry);
     }
 
     public function directoryNotExisting($transport)

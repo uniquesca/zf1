@@ -50,8 +50,8 @@ class Zend_Http_Client_SocketKeepaliveTest extends Zend_Http_Client_SocketTest
      *
      * @var array
      */
-    protected $config = array(
-        'adapter'     => 'Zend_Http_Client_Adapter_Socket',
-        'keepalive'   => true
-    );
+    protected $config = [
+        'adapter' => 'Zend_Http_Client_Adapter_Socket',
+        'keepalive' => true
+    ];
 }

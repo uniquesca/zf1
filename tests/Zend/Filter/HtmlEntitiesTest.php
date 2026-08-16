@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,7 +36,7 @@ require_once 'Zend/Filter/HtmlEntities.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Filter
  */
-class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
+class Zend_Filter_HtmlEntitiesTest extends TestCase
 {
     /**
      * Zend_Filter_HtmlEntities object
@@ -47,7 +50,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_filter = new Zend_Filter_HtmlEntities();
     }
@@ -59,14 +62,14 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $valuesExpected = array(
+        $valuesExpected = [
             'string' => 'string',
-            '<'      => '&lt;',
-            '>'      => '&gt;',
-            '\''     => '\'',
-            '"'      => '&quot;',
-            '&'      => '&amp;'
-            );
+            '<' => '&lt;',
+            '>' => '&gt;',
+            '\'' => '\'',
+            '"' => '&quot;',
+            '&' => '&amp;'
+            ];
         foreach ($valuesExpected as $input => $output) {
             $this->assertEquals($output, $this->_filter->filter($input));
         }
@@ -153,8 +156,8 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
     public function testConfigObject()
     {
         require_once 'Zend/Config.php';
-        $options = array('quotestyle' => 5, 'encoding' => 'ISO-8859-1');
-        $config  = new Zend_Config($options);
+        $options = ['quotestyle' => 5, 'encoding' => 'ISO-8859-1'];
+        $config = new Zend_Config($options);
 
         $filter = new Zend_Filter_HtmlEntities(
             $config
@@ -172,7 +175,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
      */
     public function testQuoteStyleQuotesEncodeBoth()
     {
-        $input  = "A 'single' and " . '"double"';
+        $input = "A 'single' and " . '"double"';
         $result = 'A &#039;single&#039; and &quot;double&quot;';
 
         $this->_filter->setQuoteStyle(ENT_QUOTES);
@@ -187,7 +190,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
      */
     public function testQuoteStyleQuotesEncodeDouble()
     {
-        $input  = "A 'single' and " . '"double"';
+        $input = "A 'single' and " . '"double"';
         $result = "A 'single' and &quot;double&quot;";
 
         $this->_filter->setQuoteStyle(ENT_COMPAT);
@@ -202,7 +205,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
      */
     public function testQuoteStyleQuotesEncodeNone()
     {
-        $input  = "A 'single' and " . '"double"';
+        $input = "A 'single' and " . '"double"';
         $result = "A 'single' and " . '"double"';
 
         $this->_filter->setQuoteStyle(ENT_NOQUOTES);
@@ -222,7 +225,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
 
         // restore_error_handler can emit an E_WARNING; let's ignore that, as
         // we want to test the returned value
-        set_error_handler(array($this, 'errorHandler'), E_NOTICE | E_WARNING);
+        set_error_handler([$this, 'errorHandler'], E_NOTICE | E_WARNING);
         $result = $this->_filter->filter($string);
         restore_error_handler();
 
@@ -234,7 +237,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
      */
     public function testStripsUnknownCharactersWhenEncodingMismatchDetected()
     {
-        if (version_compare(phpversion(), '5.4', '>=')) {
+        if (PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70100) {
             $this->markTestIncomplete('Tested feature ZF-11344 is not available because of PHP bug #63450');
         }
 
@@ -242,11 +245,11 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
 
         // restore_error_handler can emit an E_WARNING; let's ignore that, as
         // we want to test the returned value
-        set_error_handler(array($this, 'errorHandler'), E_NOTICE | E_WARNING);
+        set_error_handler([$this, 'errorHandler'], E_NOTICE | E_WARNING);
         $result = $this->_filter->filter($string);
         restore_error_handler();
 
-        $this->assertContains('&quot;&quot;', $result);
+        $this->assertStringContainsString('&quot;&quot;', $result);
     }
 
     /**
@@ -259,7 +262,7 @@ class Zend_Filter_HtmlEntitiesTest extends PHPUnit_Framework_TestCase
         // restore_error_handler can emit an E_WARNING; let's ignore that, as
         // we want to test the returned value
         // Also, explicit try, so that we don't mess up PHPUnit error handlers
-        set_error_handler(array($this, 'errorHandler'), E_NOTICE | E_WARNING);
+        set_error_handler([$this, 'errorHandler'], E_NOTICE | E_WARNING);
         try {
             $result = $this->_filter->filter($string);
             $this->fail('Expected exception from single non-utf-8 character');

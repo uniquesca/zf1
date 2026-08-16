@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -43,22 +48,22 @@ require_once 'Zend/Xml/Exception.php';
  * @group      Zend_Xml
  * @group      ZF2015-06
  */
-class Zend_Xml_MultibyteTest extends PHPUnit_Framework_TestCase
+class Zend_Xml_MultibyteTest extends TestCase
 {
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
  
     public function multibyteEncodings()
     {
-        return array(
-            'UTF-16LE' => array('UTF-16LE', pack('CC', 0xff, 0xfe), 3),
-            'UTF-16BE' => array('UTF-16BE', pack('CC', 0xfe, 0xff), 3),
-            'UTF-32LE' => array('UTF-32LE', pack('CCCC', 0xff, 0xfe, 0x00, 0x00), 4),
-            'UTF-32BE' => array('UTF-32BE', pack('CCCC', 0x00, 0x00, 0xfe, 0xff), 4),
-        );
+        return [
+            'UTF-16LE' => ['UTF-16LE', pack('CC', 0xff, 0xfe), 3],
+            'UTF-16BE' => ['UTF-16BE', pack('CC', 0xfe, 0xff), 3],
+            'UTF-32LE' => ['UTF-32LE', pack('CCCC', 0xff, 0xfe, 0x00, 0x00), 4],
+            'UTF-32BE' => ['UTF-32BE', pack('CCCC', 0x00, 0x00, 0xfe, 0xff), 4],
+        ];
     }
 
     public function getXmlWithXXE()
@@ -96,7 +101,8 @@ XML;
         $xml = str_replace('{ENCODING}', $encoding, $xml);
         $xml = iconv('UTF-8', $encoding, $xml);
         $this->assertNotSame(0, strncmp($xml, $bom, $bomLength));
-        $this->setExpectedException('Zend_Xml_Exception', 'ENTITY');
+        $this->expectException('Zend_Xml_Exception');
+        $this->expectExceptionMessage('ENTITY');
         $this->invokeHeuristicScan($xml);
     }
 
@@ -105,11 +111,12 @@ XML;
      */
     public function testDetectsMultibyteXXEVectorsUnderFPMWithEncodedStringUsingBOM($encoding, $bom)
     {
-        $xml  = $this->getXmlWithXXE();
-        $xml  = str_replace('{ENCODING}', $encoding, $xml);
+        $xml = $this->getXmlWithXXE();
+        $xml = str_replace('{ENCODING}', $encoding, $xml);
         $orig = iconv('UTF-8', $encoding, $xml);
-        $xml  = $bom . $orig;
-        $this->setExpectedException('Zend_Xml_Exception', 'ENTITY');
+        $xml = $bom . $orig;
+        $this->expectException('Zend_Xml_Exception');
+        $this->expectExceptionMessage('ENTITY');
         $this->invokeHeuristicScan($xml);
     }
 
@@ -149,11 +156,12 @@ XML;
         $xml = str_replace('{ENCODING}', 'UTF-8', $xml);
         $xml = iconv('UTF-8', $encoding, $xml);
         $xml = $bom . $xml;
-        $this->setExpectedException('Zend_Xml_Exception', 'ENTITY');
+        $this->expectException('Zend_Xml_Exception');
+        $this->expectExceptionMessage('ENTITY');
         $this->invokeHeuristicScan($xml);
     }
 }
 
-if (PHPUnit_MAIN_METHOD == "Zend_Xml_MultibyteTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Xml_MultibyteTest::main") {
     Zend_Xml_MultibyteTest::main();
 }

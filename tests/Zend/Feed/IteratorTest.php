@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,12 +36,12 @@ require_once 'Zend/Feed.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Feed
  */
-class Zend_Feed_IteratorTest extends PHPUnit_Framework_TestCase
+class Zend_Feed_IteratorTest extends TestCase
 {
     private $_feed;
     private $_nsfeed;
 
-    public function setUp()
+    protected function set_up()
     {
         $this->_feed = Zend_Feed::importFile(dirname(__FILE__) . '/_files/TestAtomFeed.xml');
         $this->_nsfeed = Zend_Feed::importFile(dirname(__FILE__) . '/_files/TestAtomFeedNamespaced.xml');
@@ -92,17 +95,17 @@ class Zend_Feed_IteratorTest extends PHPUnit_Framework_TestCase
 
     public function testKey()
     {
-        $keys = array();
+        $keys = [];
         foreach ($this->_feed as $k => $f) {
             $keys[] = $k;
         }
-        $this->assertEquals($keys, array(0, 1), 'Feed should have keys 0 and 1');
+        $this->assertEquals($keys, [0, 1], 'Feed should have keys 0 and 1');
 
-        $keys = array();
+        $keys = [];
         foreach ($this->_nsfeed as $k => $f) {
             $keys[] = $k;
         }
-        $this->assertEquals($keys, array(0, 1), 'Feed should have keys 0 and 1');
+        $this->assertEquals($keys, [0, 1], 'Feed should have keys 0 and 1');
     }
 
     public function testNext()
@@ -119,5 +122,4 @@ class Zend_Feed_IteratorTest extends PHPUnit_Framework_TestCase
             $last = $current;
         }
     }
-
 }

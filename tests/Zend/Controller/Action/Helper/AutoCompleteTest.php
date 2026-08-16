@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -49,8 +54,33 @@ require_once 'Zend/Layout.php';
  * @group      Zend_Controller_Action
  * @group      Zend_Controller_Action_Helper
  */
-class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_TestCase
+class Zend_Controller_Action_Helper_AutoCompleteTest extends TestCase
 {
+    /**
+     * @var \Zend_Controller_Request_Http|mixed
+     */
+    protected $request;
+
+    /**
+     * @var \Zend_Controller_Response_Cli|mixed
+     */
+    protected $response;
+
+    /**
+     * @var \Zend_Controller_Front|mixed
+     */
+    protected $front;
+
+    /**
+     * @var \Zend_Controller_Action_Helper_Abstract|mixed
+     */
+    protected $viewRenderer;
+
+    /**
+     * @var \Zend_Layout|mixed
+     */
+    protected $layout;
+
     /**
      * Runs the test methods of this class.
      *
@@ -59,9 +89,8 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Controller_Action_Helper_AutoCompleteTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Controller_Action_Helper_AutoCompleteTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -70,7 +99,7 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         Zend_Controller_Action_Helper_AutoCompleteTest_LayoutOverride::resetMvcInstance();
         Zend_Controller_Action_HelperBroker::resetHelpers();
@@ -92,7 +121,7 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -107,11 +136,11 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
 
     public function testEncodeJsonProxiesToJsonActionHelper()
     {
-        $dojo    = new Zend_Controller_Action_Helper_AutoCompleteDojo();
-        $data    = array('foo', 'bar', 'baz');
+        $dojo = new Zend_Controller_Action_Helper_AutoCompleteDojo();
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $dojo->prepareAutoCompletion($data);
         $decoded = Zend_Json::decode($encoded);
-        $test    = array();
+        $test = [];
         foreach ($decoded['items'] as $item) {
             $test[] = $item['name'];
         }
@@ -133,14 +162,14 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     public function testDojoHelperEncodesToJson()
     {
         $dojo = new Zend_Controller_Action_Helper_AutoCompleteDojo();
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $dojo->direct($data, false);
         $decoded = Zend_Json::decode($encoded);
         $this->assertContains('items', array_keys($decoded));
         $this->assertContains('identifier', array_keys($decoded));
         $this->assertEquals('name', $decoded['identifier']);
 
-        $test = array();
+        $test = [];
         foreach ($decoded['items'] as $item) {
             $test[] = $item['label'];
         }
@@ -151,10 +180,10 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $dojo = new Zend_Controller_Action_Helper_AutoCompleteDojo();
         $dojo->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $dojo->direct($data);
         $decoded = Zend_Json::decode($encoded);
-        $test    = array();
+        $test = [];
         foreach ($decoded['items'] as $item) {
             $test[] = $item['name'];
         }
@@ -167,7 +196,7 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $dojo = new Zend_Controller_Action_Helper_AutoCompleteDojo();
         $dojo->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $dojo->direct($data);
         $this->assertFalse($this->layout->isEnabled());
         $this->assertTrue($this->viewRenderer->getNoRender());
@@ -177,7 +206,7 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $dojo = new Zend_Controller_Action_Helper_AutoCompleteDojo();
         $dojo->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $dojo->direct($data, false, true);
         $this->assertTrue($this->layout->isEnabled());
         $this->assertFalse($this->viewRenderer->getNoRender());
@@ -189,11 +218,11 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $dojo = new Zend_Controller_Action_Helper_AutoCompleteDojo();
         $dojo->suppressExit = true;
-        $data = array ('garçon', 'schließen', 'Helgi Þormar Þorbjörnsson');
+        $data = ['garçon', 'schließen', 'Helgi Þormar Þorbjörnsson'];
         $encoded = $dojo->direct($data);
         $body = $this->response->getBody();
         $decoded = Zend_Json::decode($encoded);
-        $test = array ();
+        $test = [];
         foreach ($decoded['items'] as $item) {
             $test[] = $item['name'];
         }
@@ -205,14 +234,14 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $scriptaculous = new Zend_Controller_Action_Helper_AutoCompleteScriptaculous();
 
-        $data = new stdClass;
+        $data = new stdClass();
         $data->foo = 'bar';
         $data->bar = 'baz';
         try {
             $encoded = $scriptaculous->encodeJson($data);
             $this->fail('Objects should be considered invalid');
         } catch (Zend_Controller_Action_Exception $e) {
-            $this->assertContains('Invalid data', $e->getMessage());
+            $this->assertStringContainsString('Invalid data', $e->getMessage());
         }
     }
 
@@ -220,20 +249,20 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $scriptaculous = new Zend_Controller_Action_Helper_AutoCompleteScriptaculous();
         $scriptaculous->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $formatted = $scriptaculous->direct($data);
-        $this->assertContains('<ul>', $formatted);
+        $this->assertStringContainsString('<ul>', $formatted);
         foreach ($data as $value) {
-            $this->assertContains('<li>' . $value . '</li>', $formatted);
+            $this->assertStringContainsString('<li>' . $value . '</li>', $formatted);
         }
-        $this->assertContains('</ul>', $formatted);
+        $this->assertStringContainsString('</ul>', $formatted);
     }
 
     public function testScriptaculousHelperSendsResponseByDefault()
     {
         $scriptaculous = new Zend_Controller_Action_Helper_AutoCompleteScriptaculous();
         $scriptaculous->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $scriptaculous->direct($data);
         $body = $this->response->getBody();
         $this->assertSame($encoded, $body);
@@ -243,7 +272,7 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $scriptaculous = new Zend_Controller_Action_Helper_AutoCompleteScriptaculous();
         $scriptaculous->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $scriptaculous->direct($data);
         $this->assertFalse($this->layout->isEnabled());
         $this->assertTrue($this->viewRenderer->getNoRender());
@@ -253,7 +282,7 @@ class Zend_Controller_Action_Helper_AutoCompleteTest extends PHPUnit_Framework_T
     {
         $scriptaculous = new Zend_Controller_Action_Helper_AutoCompleteScriptaculous();
         $scriptaculous->suppressExit = true;
-        $data = array('foo', 'bar', 'baz');
+        $data = ['foo', 'bar', 'baz'];
         $encoded = $scriptaculous->direct($data, false, true);
         $this->assertTrue($this->layout->isEnabled());
         $this->assertFalse($this->viewRenderer->getNoRender());
@@ -269,6 +298,6 @@ class Zend_Controller_Action_Helper_AutoCompleteTest_LayoutOverride extends Zend
 }
 
 // Call Zend_Controller_Action_Helper_AutoCompleteTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Controller_Action_Helper_AutoCompleteTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Controller_Action_Helper_AutoCompleteTest::main") {
     Zend_Controller_Action_Helper_AutoCompleteTest::main();
 }

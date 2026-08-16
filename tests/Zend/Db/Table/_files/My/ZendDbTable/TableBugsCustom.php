@@ -46,37 +46,37 @@ class My_ZendDbTable_TableBugsCustom extends My_ZendDbTable_TableBugs
 
     protected $_metadataCacheInClass = false;
 
-    protected $_rowClass    = 'My_ZendDbTable_Row_TestMyRow';
+    protected $_rowClass = 'My_ZendDbTable_Row_TestMyRow';
     protected $_rowsetClass = 'My_ZendDbTable_Rowset_TestMyRowset';
 
-    protected $_dependentTables = array('My_ZendDbTable_TableBugsProductsCustom');
+    protected $_dependentTables = ['My_ZendDbTable_TableBugsProductsCustom'];
 
-    protected $_referenceMap    = array(
-        'Reporter' => array(
-            'columns'           => array('reported_by'),
-            'refTableClass'     => 'My_ZendDbTable_TableAccountsCustom',
-            'refColumns'        => array('account_name'),
-            'onDelete'          => self::CASCADE,
-            'onUpdate'          => self::CASCADE
-        ),
-        'Engineer' => array(
-            'columns'           => 'assigned_to',
-            'refTableClass'     => 'My_ZendDbTable_TableAccountsCustom',
-            'refColumns'        => 'account_name'
-        ),
-        'Verifier' => array(
-            'columns'           => 'verified_by',
-            'refTableClass'     => 'My_ZendDbTable_TableAccountsCustom',
-            'refColumns'        => 'account_name'
-        )
-    );
+    protected $_referenceMap = [
+        'Reporter' => [
+            'columns' => ['reported_by'],
+            'refTableClass' => 'My_ZendDbTable_TableAccountsCustom',
+            'refColumns' => ['account_name'],
+            'onDelete' => self::CASCADE,
+            'onUpdate' => self::CASCADE
+        ],
+        'Engineer' => [
+            'columns' => 'assigned_to',
+            'refTableClass' => 'My_ZendDbTable_TableAccountsCustom',
+            'refColumns' => 'account_name'
+        ],
+        'Verifier' => [
+            'columns' => 'verified_by',
+            'refTableClass' => 'My_ZendDbTable_TableAccountsCustom',
+            'refColumns' => 'account_name'
+        ]
+    ];
 
     /**
      * Public proxy to setup functionality
      *
      * @return void
      */
-    public function setup()
+    public function set_up()
     {
         $this->_setup();
     }

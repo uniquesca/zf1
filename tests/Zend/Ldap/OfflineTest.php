@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -39,7 +42,7 @@ require_once 'Zend/Ldap/Exception.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Ldap
  */
-class Zend_Ldap_OfflineTest extends PHPUnit_Framework_TestCase
+class Zend_Ldap_OfflineTest extends TestCase
 {
     /**
      * Zend_Ldap instance
@@ -55,7 +58,7 @@ class Zend_Ldap_OfflineTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         if (!extension_loaded('ldap')) {
             $this->markTestSkipped('LDAP is not enabled');
@@ -70,7 +73,7 @@ class Zend_Ldap_OfflineTest extends PHPUnit_Framework_TestCase
     {
         $optionName = 'invalid';
         try {
-            $this->_ldap->setOptions(array($optionName => 'irrelevant'));
+            $this->_ldap->setOptions([$optionName => 'irrelevant']);
             $this->fail('Expected Zend_Ldap_Exception not thrown');
         } catch (Zend_Ldap_Exception $e) {
             $this->assertEquals("Unknown Zend_Ldap option: $optionName", $e->getMessage());
@@ -92,30 +95,30 @@ class Zend_Ldap_OfflineTest extends PHPUnit_Framework_TestCase
 
     public function testOptionsGetter()
     {
-        $options = array(
+        $options = [
             'host' => TESTS_ZEND_LDAP_HOST,
             'username' => TESTS_ZEND_LDAP_USERNAME,
             'password' => TESTS_ZEND_LDAP_PASSWORD,
             'baseDn' => TESTS_ZEND_LDAP_BASE_DN,
-        );
+        ];
         $ldap = new Zend_Ldap($options);
-        $this->assertEquals(array(
-            'host'                   => TESTS_ZEND_LDAP_HOST,
-            'port'                   => 0,
-            'useSsl'                 => false,
-            'username'               => TESTS_ZEND_LDAP_USERNAME,
-            'password'               => TESTS_ZEND_LDAP_PASSWORD,
-            'bindRequiresDn'         => false,
-            'baseDn'                 => TESTS_ZEND_LDAP_BASE_DN,
-            'accountCanonicalForm'   => null,
-            'accountDomainName'      => null,
+        $this->assertEquals([
+            'host' => TESTS_ZEND_LDAP_HOST,
+            'port' => 0,
+            'useSsl' => false,
+            'username' => TESTS_ZEND_LDAP_USERNAME,
+            'password' => TESTS_ZEND_LDAP_PASSWORD,
+            'bindRequiresDn' => false,
+            'baseDn' => TESTS_ZEND_LDAP_BASE_DN,
+            'accountCanonicalForm' => null,
+            'accountDomainName' => null,
             'accountDomainNameShort' => null,
-            'accountFilterFormat'    => null,
-            'allowEmptyPassword'     => false,
-            'useStartTls'            => false,
-            'optReferrals'           => false,
-            'tryUsernameSplit'       => true
-        ), $ldap->getOptions());
+            'accountFilterFormat' => null,
+            'allowEmptyPassword' => false,
+            'useStartTls' => false,
+            'optReferrals' => false,
+            'tryUsernameSplit' => true
+        ], $ldap->getOptions());
     }
 
     public function testConfigObject()
@@ -124,29 +127,29 @@ class Zend_Ldap_OfflineTest extends PHPUnit_Framework_TestCase
          * @see Zend_Config
          */
         require_once 'Zend/Config.php';
-        $config = new Zend_Config(array(
+        $config = new Zend_Config([
             'host' => TESTS_ZEND_LDAP_HOST,
             'username' => TESTS_ZEND_LDAP_USERNAME,
             'password' => TESTS_ZEND_LDAP_PASSWORD,
             'baseDn' => TESTS_ZEND_LDAP_BASE_DN,
-        ));
+        ]);
         $ldap = new Zend_Ldap($config);
-        $this->assertEquals(array(
-            'host'                   => TESTS_ZEND_LDAP_HOST,
-            'port'                   => 0,
-            'useSsl'                 => false,
-            'username'               => TESTS_ZEND_LDAP_USERNAME,
-            'password'               => TESTS_ZEND_LDAP_PASSWORD,
-            'bindRequiresDn'         => false,
-            'baseDn'                 => TESTS_ZEND_LDAP_BASE_DN,
-            'accountCanonicalForm'   => null,
-            'accountDomainName'      => null,
+        $this->assertEquals([
+            'host' => TESTS_ZEND_LDAP_HOST,
+            'port' => 0,
+            'useSsl' => false,
+            'username' => TESTS_ZEND_LDAP_USERNAME,
+            'password' => TESTS_ZEND_LDAP_PASSWORD,
+            'bindRequiresDn' => false,
+            'baseDn' => TESTS_ZEND_LDAP_BASE_DN,
+            'accountCanonicalForm' => null,
+            'accountDomainName' => null,
             'accountDomainNameShort' => null,
-            'accountFilterFormat'    => null,
-            'allowEmptyPassword'     => false,
-            'useStartTls'            => false,
-            'optReferrals'           => false,
-            'tryUsernameSplit'       => true
-        ), $ldap->getOptions());
+            'accountFilterFormat' => null,
+            'allowEmptyPassword' => false,
+            'useStartTls' => false,
+            'optReferrals' => false,
+            'tryUsernameSplit' => true
+        ], $ldap->getOptions());
     }
 }

@@ -79,7 +79,7 @@ class Zend_Queue_Adapter_ArrayTest extends Zend_Queue_Adapter_AdapterTest
 
     public function getTestConfig()
     {
-        return array('driverOptions' => array());
+        return ['driverOptions' => []];
     }
 
     // test the constants
@@ -105,7 +105,7 @@ class Zend_Queue_Adapter_ArrayTest extends Zend_Queue_Adapter_AdapterTest
         $queue = $this->createQueue(__FUNCTION__);
         $adapter = $queue->getAdapter();
 
-        $data = array('test' => 1);
+        $data = ['test' => 1];
         $adapter->setData($data);
         $got = $adapter->getData();
         $this->assertEquals($data['test'], $got['test']);
@@ -125,5 +125,13 @@ class Zend_Queue_Adapter_ArrayTest extends Zend_Queue_Adapter_AdapterTest
 
         $messages = $queue->receive(0);
         $this->assertEquals(0, count($messages));
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testIsSupportException()
+    {
+        parent::testIsSupportException();
     }
 }

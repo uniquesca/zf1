@@ -60,7 +60,7 @@ class Zend_Gdata_Gapps_GroupEntry extends Zend_Gdata_Entry
      *
      * @var Zend_Gdata_Gapps_Extension_Property
      */
-    protected $_property = array();
+    protected $_property = [];
 
     /**
      * Create a new instance.
@@ -105,7 +105,7 @@ class Zend_Gdata_Gapps_GroupEntry extends Zend_Gdata_Entry
 
         switch ($absoluteNodeName) {
 
-            case $this->lookupNamespace('apps') . ':' . 'property';
+            case $this->lookupNamespace('apps') . ':' . 'property':
                 $property = new Zend_Gdata_Gapps_Extension_Property();
                 $property->transferFromDOM($child);
                 $this->_property[] = $property;
@@ -146,7 +146,7 @@ class Zend_Gdata_Gapps_GroupEntry extends Zend_Gdata_Entry
      *
      * @param array $value A collection of
      *          Zend_Gdata_Gapps_Extension_Property objects.
-     * @return Zend_Gdata_Gapps_GroupEntry Provides a fluent interface.
+     * @return $this
      */
     public function setProperty($value)
     {

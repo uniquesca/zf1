@@ -39,33 +39,32 @@ require_once 'Zend/Db/Select/TestCommon.php';
  */
 abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
 {
-
     protected $_runtimeIncludePath = null;
 
     /**
      * @var array of Zend_Db_Table_Abstract
      */
-    protected $_table = array();
+    protected $_table = [];
 
-    public function setUp()
+    protected function set_up()
     {
-        parent::setUp();
+        parent::set_up();
 
-        $this->_table['accounts']      = $this->_getTable('My_ZendDbTable_TableAccounts');
-        $this->_table['bugs']          = $this->_getTable('My_ZendDbTable_TableBugs');
+        $this->_table['accounts'] = $this->_getTable('My_ZendDbTable_TableAccounts');
+        $this->_table['bugs'] = $this->_getTable('My_ZendDbTable_TableBugs');
         $this->_table['bugs_products'] = $this->_getTable('My_ZendDbTable_TableBugsProducts');
-        $this->_table['products']      = $this->_getTable('My_ZendDbTable_TableProducts');
+        $this->_table['products'] = $this->_getTable('My_ZendDbTable_TableProducts');
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         if ($this->_runtimeIncludePath) {
             $this->_restoreIncludePath();
         }
-        parent::tearDown();
+        parent::tear_down();
     }
 
-    protected function _getTable($tableClass, $options = array())
+    protected function _getTable($tableClass, $options = [])
     {
         if (is_array($options) && !isset($options['db'])) {
             $options['db'] = $this->_db;
@@ -123,13 +122,13 @@ abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
      */
     public function testSelectForReadOnly()
     {
-        $select = $this->_selectForReadOnly(array('count' => 'COUNT(*)'));
+        $select = $this->_selectForReadOnly(['count' => 'COUNT(*)']);
         $this->assertTrue($select->isReadOnly());
 
-        $select = $this->_selectForReadOnly(array());
+        $select = $this->_selectForReadOnly([]);
         $this->assertFalse($select->isReadOnly());
 
-        $select = $this->_selectForReadOnly(array('*'));
+        $select = $this->_selectForReadOnly(['*']);
         $this->assertFalse($select->isReadOnly());
     }
 
@@ -141,7 +140,7 @@ abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
         $table = $this->_getSelectTable('products');
 
         $select = $table->select()
-            ->join(array('p' => 'zfbugs_products'), 'p.product_id = zfproduct.id', 'p.bug_id');
+            ->join(['p' => 'zfbugs_products'], 'p.product_id = zfproduct.id', 'p.bug_id');
         return $select;
     }
 
@@ -165,7 +164,7 @@ abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
     /**
      * Test adding a FOR UPDATE clause to a Zend_Db_Select object.
      */
-    protected function _selectForToString1($tableName = null, $fields = array('*'), $useTable = true)
+    protected function _selectForToString1($tableName = null, $fields = ['*'], $useTable = true)
     {
         $table = $this->_getSelectTable($tableName);
 
@@ -181,7 +180,7 @@ abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
     /**
      * Test adding a FOR UPDATE clause to a Zend_Db_Select object.
      */
-    protected function _selectForToString2($tableName, $fields = array('*'))
+    protected function _selectForToString2($tableName, $fields = ['*'])
     {
         $select = $this->_db->select()
             ->from($tableName, $fields);
@@ -206,8 +205,8 @@ abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
         $this->assertEquals($select1->assemble(), $select2->assemble());
 
         // Test for selected fields
-        $select1 = $this->_selectForToString1('products', array('product_id', 'DISTINCT(product_name)'));
-        $select2 = $this->_selectForToString2('zfproducts', array('product_id', 'DISTINCT(product_name)'));
+        $select1 = $this->_selectForToString1('products', ['product_id', 'DISTINCT(product_name)']);
+        $select2 = $this->_selectForToString2('zfproducts', ['product_id', 'DISTINCT(product_name)']);
         $this->assertEquals($select1->assemble(), $select2->assemble());
     }
 
@@ -243,24 +242,27 @@ abstract class Zend_Db_Table_Select_TestCommon extends Zend_Db_Select_TestCommon
         $select3->setIntegrityCheck(false);
         $select3->joinLeft('tableB', 'tableA.id=tableB.id');
         $select3Text = $select3->__toString();
-        $this->assertNotContains('zfaccounts', $select3Text);
+        $this->assertStringNotContainsString('zfaccounts', $select3Text);
 
         $select4 = $table->select(Zend_Db_Table_Abstract::SELECT_WITH_FROM_PART);
         $select4->setIntegrityCheck(false);
         $select4->joinLeft('tableB', 'tableA.id=tableB.id');
         $select4Text = $select4->__toString();
-        $this->assertContains('zfaccounts', $select4Text);
-        $this->assertContains('tableA', $select4Text);
-        $this->assertContains('tableB', $select4Text);
+        $this->assertStringContainsString('zfaccounts', $select4Text);
+        $this->assertStringContainsString('tableA', $select4Text);
+        $this->assertStringContainsString('tableB', $select4Text);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testAssembleDbTableUnionSelect()
     {
         $table = $this->_getSelectTable('accounts');
         $select1 = $table->select();
         $select2 = $table->select();
 
-        $selectUnion = $table->select()->union(array($select1, $select2));
+        $selectUnion = $table->select()->union([$select1, $select2]);
         $selectUnionSql = $selectUnion->assemble();
     }
 

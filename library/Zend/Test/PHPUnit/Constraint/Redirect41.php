@@ -35,9 +35,9 @@ class Zend_Test_PHPUnit_Constraint_Redirect41 extends PHPUnit_Framework_Constrai
     /**#@+
      * Assertion type constants
      */
-    const ASSERT_REDIRECT       = 'assertRedirect';
-    const ASSERT_REDIRECT_TO    = 'assertRedirectTo';
-    const ASSERT_REDIRECT_REGEX = 'assertRedirectRegex';
+    public const ASSERT_REDIRECT       = 'assertRedirect';
+    public const ASSERT_REDIRECT_TO    = 'assertRedirectTo';
+    public const ASSERT_REDIRECT_REGEX = 'assertRedirectRegex';
     /**#@-*/
 
     /**
@@ -50,18 +50,18 @@ class Zend_Test_PHPUnit_Constraint_Redirect41 extends PHPUnit_Framework_Constrai
      * Available assertion types
      * @var array
      */
-    protected $_assertTypes     = array(
+    protected $_assertTypes     = [
         self::ASSERT_REDIRECT,
         self::ASSERT_REDIRECT_TO,
         self::ASSERT_REDIRECT_REGEX,
-    );
+    ];
 
     /**
      * Pattern to match against
      * @var string
      */
     protected $_match             = null;
-    
+
     /**
      * What is actual redirect
      */
@@ -97,7 +97,7 @@ class Zend_Test_PHPUnit_Constraint_Redirect41 extends PHPUnit_Framework_Constrai
      * Evaluate an object to see if it fits the constraints
      *
      * @param  string $other String to examine
-     * @param  null|string Assertion type
+     * @param  null|string $assertType Assertion type
      * @return bool
      * NOTE:
      * Drastic changes up to PHPUnit 3.5.15 this was:
@@ -178,7 +178,7 @@ class Zend_Test_PHPUnit_Constraint_Redirect41 extends PHPUnit_Framework_Constrai
      * NOTE 2:
      * Interface changed again in PHPUnit 4.1.0 because of refactoring to SebastianBergmann\Comparator
      */
-    public function fail($other, $description, \SebastianBergmann\Comparator\ComparisonFailure $cannot_be_used = NULL)
+    public function fail($other, $description, ?\SebastianBergmann\Comparator\ComparisonFailure $cannot_be_used = NULL)
     {
         require_once 'Zend/Test/PHPUnit/Constraint/Exception.php';
         switch ($this->_assertType) {

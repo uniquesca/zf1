@@ -38,7 +38,7 @@ abstract class Zend_Controller_Router_Abstract implements Zend_Controller_Router
     /**
      * URI delimiter
      */
-    const URI_DELIMITER = '/';
+    public const URI_DELIMITER = '/';
 
     /**
      * Front controller instance
@@ -53,14 +53,14 @@ abstract class Zend_Controller_Router_Abstract implements Zend_Controller_Router
      *
      * @var array
      */
-    protected $_invokeParams = array();
+    protected $_invokeParams = [];
 
     /**
      * Constructor
      *
      * @param array $params
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         $this->setParams($params);
     }
@@ -70,7 +70,7 @@ abstract class Zend_Controller_Router_Abstract implements Zend_Controller_Router
      *
      * @param string $name
      * @param mixed  $value
-     * @return Zend_Controller_Router_Abstract
+     * @return $this
      */
     public function setParam($name, $value)
     {
@@ -84,7 +84,7 @@ abstract class Zend_Controller_Router_Abstract implements Zend_Controller_Router
      * Set parameters to pass to action controller constructors
      *
      * @param array $params
-     * @return Zend_Controller_Router_Abstract
+     * @return $this
      */
     public function setParams(array $params)
     {
@@ -125,13 +125,13 @@ abstract class Zend_Controller_Router_Abstract implements Zend_Controller_Router
      * only that parameter; if an array of parameter names is provided, clears
      * each.
      *
-     * @param null|string|array single key or array of keys for params to clear
-     * @return Zend_Controller_Router_Abstract
+     * @param null|string|array $name single key or array of keys for params to clear
+     * @return $this
      */
     public function clearParams($name = null)
     {
         if (null === $name) {
-            $this->_invokeParams = array();
+            $this->_invokeParams = [];
         } elseif (is_string($name) && isset($this->_invokeParams[$name])) {
             unset($this->_invokeParams[$name]);
         } elseif (is_array($name)) {
@@ -167,7 +167,7 @@ abstract class Zend_Controller_Router_Abstract implements Zend_Controller_Router
      * Set Front Controller
      *
      * @param Zend_Controller_Front $controller
-     * @return Zend_Controller_Router_Interface
+     * @return $this
      */
     public function setFrontController(Zend_Controller_Front $controller)
     {

@@ -73,11 +73,11 @@ class Zend_Filter_RealPath implements Zend_Filter_Interface
 
         if (is_array($exists)) {
             if (isset($exists['exists'])) {
-                $exists = (boolean) $exists['exists'];
+                $exists = (bool) $exists['exists'];
             }
         }
 
-        $this->_exists = (boolean) $exists;
+        $this->_exists = (bool) $exists;
         return $this;
     }
 
@@ -117,7 +117,7 @@ class Zend_Filter_RealPath implements Zend_Filter_Interface
             $path = getcwd() . DIRECTORY_SEPARATOR . $path;
         }
 
-        $stack = array();
+        $stack = [];
         $parts = explode(DIRECTORY_SEPARATOR, $path);
         foreach ($parts as $dir) {
             if (strlen($dir) && $dir !== '.') {

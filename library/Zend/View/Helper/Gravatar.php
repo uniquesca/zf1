@@ -38,40 +38,40 @@ class Zend_View_Helper_Gravatar extends Zend_View_Helper_HtmlElement
     /**
      * URL to gravatar service
      */
-    const GRAVATAR_URL = 'http://www.gravatar.com/avatar';
+    public const GRAVATAR_URL = 'http://www.gravatar.com/avatar';
     /**
      * Secure URL to gravatar service
      */
-    const GRAVATAR_URL_SECURE = 'https://secure.gravatar.com/avatar';
+    public const GRAVATAR_URL_SECURE = 'https://secure.gravatar.com/avatar';
 
     /**
      * Gravatar rating
      */
-    const RATING_G  = 'g';
-    const RATING_PG = 'pg';
-    const RATING_R  = 'r';
-    const RATING_X  = 'x';
+    public const RATING_G  = 'g';
+    public const RATING_PG = 'pg';
+    public const RATING_R  = 'r';
+    public const RATING_X  = 'x';
 
     /**
      * Default gravatar image value constants
      */
-    const DEFAULT_404       = '404';
-    const DEFAULT_MM        = 'mm';
-    const DEFAULT_IDENTICON = 'identicon';
-    const DEFAULT_MONSTERID = 'monsterid';
-    const DEFAULT_WAVATAR   = 'wavatar';
+    public const DEFAULT_404       = '404';
+    public const DEFAULT_MM        = 'mm';
+    public const DEFAULT_IDENTICON = 'identicon';
+    public const DEFAULT_MONSTERID = 'monsterid';
+    public const DEFAULT_WAVATAR   = 'wavatar';
 
     /**
      * Options
      *
      * @var array
      */
-    protected $_options = array(
+    protected $_options = [
         'img_size'    => 80,
         'default_img' => self::DEFAULT_MM,
         'rating'      => self::RATING_G,
         'secure'      => null,
-    );
+    ];
 
     /**
      * Email Adress
@@ -103,7 +103,7 @@ class Zend_View_Helper_Gravatar extends Zend_View_Helper_HtmlElement
      * @param  array $attribs Attributes for image tag (title, alt etc.)
      * @return Zend_View_Helper_Gravatar
      */
-    public function gravatar($email = "", $options = array(), $attribs = array())
+    public function gravatar($email = "", $options = [], $attribs = [])
     {
         $this->setEmail($email);
         $this->setOptions($options);
@@ -308,16 +308,15 @@ class Zend_View_Helper_Gravatar extends Zend_View_Helper_HtmlElement
      */
     protected function _getAvatarUrl()
     {
-        $src = $this->_getGravatarUrl()
+        return $this->_getGravatarUrl()
              . '/'
-             . md5(strtolower(trim($this->getEmail())))
+             . md5(strtolower(trim($this->getEmail() ?: '')))
              . '?s='
              . $this->getImgSize()
              . '&d='
              . $this->getDefaultImg()
              . '&r='
              . $this->getRating();
-        return $src;
     }
 
     /**
@@ -343,11 +342,10 @@ class Zend_View_Helper_Gravatar extends Zend_View_Helper_HtmlElement
     public function getImgTag()
     {
         $this->_setSrcAttribForImg();
-        $html = '<img'
+
+        return '<img'
               . $this->_htmlAttribs($this->getAttribs())
               . $this->getClosingBracket();
-
-        return $html;
     }
 
     /**

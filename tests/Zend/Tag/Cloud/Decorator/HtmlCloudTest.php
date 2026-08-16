@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -36,27 +41,27 @@ require_once 'Zend/Tag/Cloud/Decorator/HtmlCloud.php';
  * @group      Zend_Tag
  * @group      Zend_Tag_Cloud
  */
-class Zend_Tag_Cloud_Decorator_HtmlCloudTest extends PHPUnit_Framework_TestCase
+class Zend_Tag_Cloud_Decorator_HtmlCloudTest extends TestCase
 {
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
     public function testDefaultOutput()
     {
         $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud();
 
-        $this->assertEquals('<ul class="Zend_Tag_Cloud">foo bar</ul>', $decorator->render(array('foo', 'bar')));
+        $this->assertEquals('<ul class="Zend_Tag_Cloud">foo bar</ul>', $decorator->render(['foo', 'bar']));
     }
 
     public function testNestedTags()
     {
         $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud();
-        $decorator->setHtmlTags(array('span', 'div' => array('id' => 'tag-cloud')));
+        $decorator->setHtmlTags(['span', 'div' => ['id' => 'tag-cloud']]);
 
-        $this->assertEquals('<div id="tag-cloud"><span>foo bar</span></div>', $decorator->render(array('foo', 'bar')));
+        $this->assertEquals('<div id="tag-cloud"><span>foo bar</span></div>', $decorator->render(['foo', 'bar']));
     }
 
     public function testSeparator()
@@ -64,39 +69,39 @@ class Zend_Tag_Cloud_Decorator_HtmlCloudTest extends PHPUnit_Framework_TestCase
         $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud();
         $decorator->setSeparator('-');
 
-        $this->assertEquals('<ul class="Zend_Tag_Cloud">foo-bar</ul>', $decorator->render(array('foo', 'bar')));
+        $this->assertEquals('<ul class="Zend_Tag_Cloud">foo-bar</ul>', $decorator->render(['foo', 'bar']));
     }
 
     public function testConstructorWithArray()
     {
-        $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud(array('htmlTags' => array('div'), 'separator' => ' '));
+        $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud(['htmlTags' => ['div'], 'separator' => ' ']);
 
-        $this->assertEquals('<div>foo bar</div>', $decorator->render(array('foo', 'bar')));
+        $this->assertEquals('<div>foo bar</div>', $decorator->render(['foo', 'bar']));
     }
 
     public function testConstructorWithConfig()
     {
-        $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud(new Zend_Config(array('htmlTags' => array('div'), 'separator' => ' ')));
+        $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud(new Zend_Config(['htmlTags' => ['div'], 'separator' => ' ']));
 
-        $this->assertEquals('<div>foo bar</div>', $decorator->render(array('foo', 'bar')));
+        $this->assertEquals('<div>foo bar</div>', $decorator->render(['foo', 'bar']));
     }
 
     public function testSetOptions()
     {
         $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud();
-        $decorator->setOptions(array('htmlTags' => array('div'), 'separator' => ' '));
+        $decorator->setOptions(['htmlTags' => ['div'], 'separator' => ' ']);
 
-        $this->assertEquals('<div>foo bar</div>', $decorator->render(array('foo', 'bar')));
+        $this->assertEquals('<div>foo bar</div>', $decorator->render(['foo', 'bar']));
     }
-
+    /** @doesNotPerformAssertions */
     public function testSkipOptions()
     {
-        $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud(array('options' => 'foobar'));
+        $decorator = new Zend_Tag_Cloud_Decorator_HtmlCloud(['options' => 'foobar']);
         // In case would fail due to an error
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Tag_Cloud_Decorator_HtmlCloudTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Tag_Cloud_Decorator_HtmlCloudTest::main') {
     Zend_Tag_Cloud_Decorator_HtmlCloudTest::main();
 }
 /**

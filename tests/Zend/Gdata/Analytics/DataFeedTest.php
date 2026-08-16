@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,18 +35,18 @@ require_once 'Zend/Http/Client.php';
  * @group      Zend_Gdata
  * @group      Zend_Gdata_Analytics
  */
-class Zend_Gdata_Analytics_DataFeedTest extends PHPUnit_Framework_TestCase
+class Zend_Gdata_Analytics_DataFeedTest extends TestCase
 {
-    public $testData = array(
+    public $testData = [
         'foobarbaz.de' => 12,
         'foobar.de' => 3,
         'foobarbaz.ch' => 1,
         'baz.ch' => 1,
-    );
+    ];
     /** @var DataFeed */
     public $dataFeed;
 
-    public function setUp()
+    protected function set_up()
     {
         $this->dataFeed = new Zend_Gdata_Analytics_DataFeed(
             file_get_contents(dirname(__FILE__) . '/_files/TestDataFeed.xml')

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,15 +35,17 @@ require_once 'Zend/Service/ReCaptcha/Response.php';
  * @group      Zend_Service
  * @group      Zend_Service_ReCaptcha
  */
-class Zend_Service_ReCaptcha_ResponseTest extends PHPUnit_Framework_TestCase
+class Zend_Service_ReCaptcha_ResponseTest extends TestCase
 {
     protected $_response = null;
 
-    public function setUp() {
+    protected function set_up()
+    {
         $this->_response = new Zend_Service_ReCaptcha_Response();
     }
 
-    public function testSetAndGet() {
+    public function testSetAndGet()
+    {
         /* Set and get status */
         $status = 'true';
         $this->_response->setStatus($status);
@@ -56,19 +61,22 @@ class Zend_Service_ReCaptcha_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame($errorCode, $this->_response->getErrorCode());
     }
 
-    public function testIsValid() {
+    public function testIsValid()
+    {
         $this->_response->setStatus('true');
         $this->assertSame(true, $this->_response->isValid());
     }
 
-    public function testIsInvalid() {
+    public function testIsInvalid()
+    {
         $this->_response->setStatus('false');
         $this->assertSame(false, $this->_response->isValid());
     }
 
-    public function testSetFromHttpResponseWhenResponseContentIsMissing() {
+    public function testSetFromHttpResponseWhenResponseContentIsMissing()
+    {
         $responseBody = 'true';
-        $httpResponse = new Zend_Http_Response(200, array('Content-Type' => 'text/html'), $responseBody);
+        $httpResponse = new Zend_Http_Response(200, ['Content-Type' => 'text/html'], $responseBody);
 
         $this->_response->setFromHttpResponse($httpResponse);
 
@@ -76,11 +84,12 @@ class Zend_Service_ReCaptcha_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame('', $this->_response->getErrorCode());
     }
 
-    public function testSetFromHttpResponse() {
+    public function testSetFromHttpResponse()
+    {
         $status = 'false';
         $errorCode = 'foobar';
         $responseBody = $status . "\n" . $errorCode;
-        $httpResponse = new Zend_Http_Response(200, array('Content-Type' => 'text/html'), $responseBody);
+        $httpResponse = new Zend_Http_Response(200, ['Content-Type' => 'text/html'], $responseBody);
 
         $this->_response->setFromHttpResponse($httpResponse);
 
@@ -88,11 +97,12 @@ class Zend_Service_ReCaptcha_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame($errorCode, $this->_response->getErrorCode());
     }
 
-    public function testSetFromHttpResponseWhenResponseHasSeveralLinesOfContent() {
+    public function testSetFromHttpResponseWhenResponseHasSeveralLinesOfContent()
+    {
         $status = 'false';
         $errorCode = 'foobar';
         $responseBody = $status . "\n" . $errorCode . "\nSome data\nEven more data";
-        $httpResponse = new Zend_Http_Response(200, array('Content-Type' => 'text/html'), $responseBody);
+        $httpResponse = new Zend_Http_Response(200, ['Content-Type' => 'text/html'], $responseBody);
 
         $this->_response->setFromHttpResponse($httpResponse);
 
@@ -100,7 +110,8 @@ class Zend_Service_ReCaptcha_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame($errorCode, $this->_response->getErrorCode());
     }
 
-    public function testConstructor() {
+    public function testConstructor()
+    {
         $status = 'true';
         $errorCode = 'ok';
 
@@ -110,11 +121,12 @@ class Zend_Service_ReCaptcha_ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertSame($errorCode, $response->getErrorCode());
     }
 
-    public function testConstructorWithHttpResponse() {
+    public function testConstructorWithHttpResponse()
+    {
         $status = 'false';
         $errorCode = 'foobar';
         $responseBody = $status . "\n" . $errorCode;
-        $httpResponse = new Zend_Http_Response(200, array('Content-Type' => 'text/html'), $responseBody);
+        $httpResponse = new Zend_Http_Response(200, ['Content-Type' => 'text/html'], $responseBody);
 
         $response = new Zend_Service_ReCaptcha_Response(null, null, $httpResponse);
 

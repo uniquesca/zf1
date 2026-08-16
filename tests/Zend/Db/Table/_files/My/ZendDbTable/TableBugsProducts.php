@@ -46,23 +46,22 @@ require_once 'TableProducts.php';
  */
 class My_ZendDbTable_TableBugsProducts extends Zend_Db_Table_Abstract
 {
-    protected $_name    = 'zfbugs_products';
+    protected $_name = 'zfbugs_products';
 
-    protected $_referenceMap    = array(
-        'Bug' => array(
-            'columns'           => 'bug_id', // Deliberate non-array value
-            'refTableClass'     => 'My_ZendDbTable_TableBugs',
-            'refColumns'        => array('bug_id'),
-            'onDelete'          => -1, // Deliberate false value
-            'onUpdate'          => -1 // Deliberate false value
-        ),
-        'Product' => array(
-            'columns'           => array('product_id'),
-            'refTableClass'     => 'My_ZendDbTable_TableProducts',
-            'refColumns'        => array('product_id'),
-            'onDelete'          => self::CASCADE,
-            'onUpdate'          => self::CASCADE
-        )
-    );
-
+    protected $_referenceMap = [
+        'Bug' => [
+            'columns' => 'bug_id', // Deliberate non-array value
+            'refTableClass' => 'My_ZendDbTable_TableBugs',
+            'refColumns' => ['bug_id'],
+            'onDelete' => -1, // Deliberate false value
+            'onUpdate' => -1 // Deliberate false value
+        ],
+        'Product' => [
+            'columns' => ['product_id'],
+            'refTableClass' => 'My_ZendDbTable_TableProducts',
+            'refColumns' => ['product_id'],
+            'onDelete' => self::CASCADE,
+            'onUpdate' => self::CASCADE
+        ]
+    ];
 }

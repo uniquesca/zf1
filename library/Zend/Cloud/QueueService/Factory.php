@@ -30,7 +30,7 @@ require_once 'Zend/Cloud/AbstractFactory.php';
  */
 class Zend_Cloud_QueueService_Factory extends Zend_Cloud_AbstractFactory
 {
-    const QUEUE_ADAPTER_KEY = 'queue_adapter';
+    public const QUEUE_ADAPTER_KEY = 'queue_adapter';
 
     /**
      * @var string Interface which adapter must implement to be considered valid
@@ -52,7 +52,7 @@ class Zend_Cloud_QueueService_Factory extends Zend_Cloud_AbstractFactory
      * @return null|Zend_Cloud_DocumentService_Adapter|Zend_Cloud_QueueService_Adapter|Zend_Cloud_StorageService_Adapter
      * @throws Zend_Cloud_QueueService_Exception
      */
-    public static function getAdapter($options = array())
+    public static function getAdapter($options = [])
     {
         $adapter = parent::_getAdapter(self::QUEUE_ADAPTER_KEY, $options);
         if (!$adapter) {

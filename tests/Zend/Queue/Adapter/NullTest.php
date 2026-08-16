@@ -79,10 +79,13 @@ class Zend_Queue_Adapter_NullTest extends Zend_Queue_Adapter_AdapterTest
 
     public function getTestConfig()
     {
-        return array('driverOptions' => array());
+        return ['driverOptions' => []];
     }
 
     // test the constants
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConst()
     {
     }

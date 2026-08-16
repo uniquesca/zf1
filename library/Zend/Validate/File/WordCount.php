@@ -37,19 +37,19 @@ class Zend_Validate_File_WordCount extends Zend_Validate_File_Count
     /**#@+
      * @const string Error constants
      */
-    const TOO_MUCH  = 'fileWordCountTooMuch';
-    const TOO_LESS  = 'fileWordCountTooLess';
-    const NOT_FOUND = 'fileWordCountNotFound';
+    public const TOO_MUCH  = 'fileWordCountTooMuch';
+    public const TOO_LESS  = 'fileWordCountTooLess';
+    public const NOT_FOUND = 'fileWordCountNotFound';
     /**#@-*/
 
     /**
      * @var array Error message templates
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::TOO_MUCH => "Too much words, maximum '%max%' are allowed but '%count%' were counted",
         self::TOO_LESS => "Too less words, minimum '%min%' are expected but '%count%' were counted",
         self::NOT_FOUND => "File '%value%' is not readable or does not exist",
-    );
+    ];
 
     /**
      * Defined by Zend_Validate_Interface

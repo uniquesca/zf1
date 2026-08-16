@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -25,22 +28,22 @@
  */
 require_once 'Zend/Mail/Header/HeaderName.php';
 
-class Zend_Mail_Header_HeaderNameTest extends PHPUnit_Framework_TestCase
+class Zend_Mail_Header_HeaderNameTest extends TestCase
 {
     /**
      * Data for filter name
      */
     public function getFilterNames()
     {
-        return array(
-            array('Subject', 'Subject'),
-            array('Subject:', 'Subject'),
-            array(':Subject:', 'Subject'),
-            array('Subject' . chr(32), 'Subject'),
-            array('Subject' . chr(33), 'Subject' . chr(33)),
-            array('Subject' . chr(126), 'Subject' . chr(126)),
-            array('Subject' . chr(127), 'Subject'),
-        );
+        return [
+            ['Subject', 'Subject'],
+            ['Subject:', 'Subject'],
+            [':Subject:', 'Subject'],
+            ['Subject' . chr(32), 'Subject'],
+            ['Subject' . chr(33), 'Subject' . chr(33)],
+            ['Subject' . chr(126), 'Subject' . chr(126)],
+            ['Subject' . chr(127), 'Subject'],
+        ];
     }
 
     /**
@@ -54,15 +57,15 @@ class Zend_Mail_Header_HeaderNameTest extends PHPUnit_Framework_TestCase
 
     public function validateNames()
     {
-        return array(
-            array('Subject', 'assertTrue'),
-            array('Subject:', 'assertFalse'),
-            array(':Subject:', 'assertFalse'),
-            array('Subject' . chr(32), 'assertFalse'),
-            array('Subject' . chr(33), 'assertTrue'),
-            array('Subject' . chr(126), 'assertTrue'),
-            array('Subject' . chr(127), 'assertFalse'),
-        );
+        return [
+            ['Subject', 'assertTrue'],
+            ['Subject:', 'assertFalse'],
+            [':Subject:', 'assertFalse'],
+            ['Subject' . chr(32), 'assertFalse'],
+            ['Subject' . chr(33), 'assertTrue'],
+            ['Subject' . chr(126), 'assertTrue'],
+            ['Subject' . chr(127), 'assertFalse'],
+        ];
     }
 
     /**
@@ -76,12 +79,12 @@ class Zend_Mail_Header_HeaderNameTest extends PHPUnit_Framework_TestCase
 
     public function assertNames()
     {
-        return array(
-            array('Subject:'),
-            array(':Subject:'),
-            array('Subject' . chr(32)),
-            array('Subject' . chr(127)),
-        );
+        return [
+            ['Subject:'],
+            [':Subject:'],
+            ['Subject' . chr(32)],
+            ['Subject' . chr(127)],
+        ];
     }
 
     /**
@@ -90,7 +93,8 @@ class Zend_Mail_Header_HeaderNameTest extends PHPUnit_Framework_TestCase
      */
     public function testAssertValidRaisesExceptionForInvalidNames($name)
     {
-        $this->setExpectedException('Zend_Mail_Exception', 'Invalid');
+        $this->expectException('Zend_Mail_Exception');
+        $this->expectExceptionMessage('Invalid');
         Zend_Mail_Header_HeaderName::assertValid($name);
     }
 }

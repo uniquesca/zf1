@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -39,9 +42,8 @@ require_once 'Zend/Queue/Stomp/Frame.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Queue
  */
-class Zend_Queue_Stomp_FrameTest extends PHPUnit_Framework_TestCase
+class Zend_Queue_Stomp_FrameTest extends TestCase
 {
-
     protected $body = 'hello world'; // 11 characters
 
     public function test_to_fromFrame()
@@ -76,7 +78,7 @@ class Zend_Queue_Stomp_FrameTest extends PHPUnit_Framework_TestCase
     public function test_setHeaders()
     {
         $frame = new Zend_Queue_Stomp_Frame();
-        $frame->setHeaders(array('testing' => 1));
+        $frame->setHeaders(['testing' => 1]);
         $this->assertEquals(1, $frame->getHeader('testing'));
     }
 
@@ -85,58 +87,58 @@ class Zend_Queue_Stomp_FrameTest extends PHPUnit_Framework_TestCase
         $frame = new Zend_Queue_Stomp_Frame();
 
         try {
-            $frame->setAutoContentLength(array());
+            $frame->setAutoContentLength([]);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
-            $frame->setHeader(array(), 1);
+            $frame->setHeader([], 1);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
-            $frame->setHeader('testing', array());
+            $frame->setHeader('testing', []);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
-            $frame->getHeader(array());
+            $frame->getHeader([]);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
-            $frame->setBody(array());
+            $frame->setBody([]);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
-            $frame->setCommand(array());
+            $frame->setCommand([]);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
             $frame->toFrame();
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
         try {
-            $frame->fromFrame(array());
+            $frame->fromFrame([]);
             $this->fail('Exception should have been thrown');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
     }
@@ -147,5 +149,4 @@ class Zend_Queue_Stomp_FrameTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_string(Zend_Queue_Stomp_Frame::CONTENT_LENGTH));
         $this->assertTrue(is_string(Zend_Queue_Stomp_Frame::EOL));
     }
-
 }

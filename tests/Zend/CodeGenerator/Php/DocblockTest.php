@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -35,20 +38,19 @@ require_once 'Zend/CodeGenerator/Php/Docblock.php';
  * @group Zend_CodeGenerator
  * @group Zend_CodeGenerator_Php
  */
-class Zend_CodeGenerator_Php_DocblockTest extends PHPUnit_Framework_TestCase
+class Zend_CodeGenerator_Php_DocblockTest extends TestCase
 {
-
     /**
      * @var Zend_CodeGenerator_Php_Docblock
      */
     protected $_docblock = null;
 
-    public function setup()
+    protected function set_up()
     {
         $this->_docblock = new Zend_CodeGenerator_Php_Docblock();
     }
 
-    public function teardown()
+    protected function tear_down()
     {
         $this->_docblock = null;
     }
@@ -67,9 +69,9 @@ class Zend_CodeGenerator_Php_DocblockTest extends PHPUnit_Framework_TestCase
 
     public function testTagGettersAndSetters()
     {
-        $this->_docblock->setTag(array('name' => 'blah'));
-        $this->_docblock->setTag(new Zend_CodeGenerator_Php_Docblock_Tag_Param(array('datatype' => 'string')));
-        $this->_docblock->setTag(new Zend_CodeGenerator_Php_Docblock_Tag_Return(array('datatype' => 'int')));
+        $this->_docblock->setTag(['name' => 'blah']);
+        $this->_docblock->setTag(new Zend_CodeGenerator_Php_Docblock_Tag_Param(['datatype' => 'string']));
+        $this->_docblock->setTag(new Zend_CodeGenerator_Php_Docblock_Tag_Return(['datatype' => 'int']));
         $this->assertEquals(3, count($this->_docblock->getTags()));
 
         $target = <<<EOS
@@ -82,7 +84,5 @@ class Zend_CodeGenerator_Php_DocblockTest extends PHPUnit_Framework_TestCase
 EOS;
 
         $this->assertEquals($target, $this->_docblock->generate());
-
     }
-
 }

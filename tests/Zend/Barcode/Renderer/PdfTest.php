@@ -36,7 +36,6 @@ require_once 'Zend/Barcode/Object/Code39.php';
  */
 class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
 {
-
     protected function _getRendererObject($options = null)
     {
         return new Zend_Barcode_Renderer_Pdf($options);
@@ -47,17 +46,16 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
         $this->assertSame('pdf', $this->_renderer->getType());
     }
 
+    /** @doesNotPerformAssertions */
     public function testGoodPdfResource()
     {
         $pdfResource = new Zend_Pdf();
         $this->_renderer->setResource($pdfResource, 10);
     }
 
-    /**
-     * @expectedException Zend_Barcode_Renderer_Exception
-     */
     public function testObjectPdfResource()
     {
+        $this->expectException(Zend_Barcode_Renderer_Exception::class);
         $pdfResource = new StdClass();
         $this->_renderer->setResource($pdfResource);
     }
@@ -65,7 +63,7 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
     public function testDrawReturnResource()
     {
         Zend_Barcode::setBarcodeFont(dirname(__FILE__) . '/../Object/_fonts/Vera.ttf');
-        $barcode = new Zend_Barcode_Object_Code39(array('text' => '0123456789'));
+        $barcode = new Zend_Barcode_Object_Code39(['text' => '0123456789']);
         $this->_renderer->setBarcode($barcode);
         $resource = $this->_renderer->draw();
         $this->assertTrue($resource instanceof Zend_Pdf);
@@ -75,7 +73,7 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
     public function testDrawWithExistantResourceReturnResource()
     {
         Zend_Barcode::setBarcodeFont(dirname(__FILE__) . '/../Object/_fonts/Vera.ttf');
-        $barcode = new Zend_Barcode_Object_Code39(array('text' => '0123456789'));
+        $barcode = new Zend_Barcode_Object_Code39(['text' => '0123456789']);
         $this->_renderer->setBarcode($barcode);
         $pdfResource = new Zend_Pdf();
         $this->_renderer->setResource($pdfResource);
@@ -95,7 +93,7 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
     public function testHorizontalPositionToCenter()
     {
         $renderer = $this->_getRendererWithWidth500AndHeight300();
-        $barcode = new Zend_Barcode_Object_Code39(array('text' => '0123456789'));
+        $barcode = new Zend_Barcode_Object_Code39(['text' => '0123456789']);
         $this->assertEquals(211, $barcode->getWidth());
         $renderer->setBarcode($barcode);
         $renderer->setHorizontalPosition('center');
@@ -106,7 +104,7 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
     public function testHorizontalPositionToRight()
     {
         $renderer = $this->_getRendererWithWidth500AndHeight300();
-        $barcode = new Zend_Barcode_Object_Code39(array('text' => '0123456789'));
+        $barcode = new Zend_Barcode_Object_Code39(['text' => '0123456789']);
         $this->assertEquals(211, $barcode->getWidth());
         $renderer->setBarcode($barcode);
         $renderer->setHorizontalPosition('right');
@@ -117,7 +115,7 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
     public function testVerticalPositionToMiddle()
     {
         $renderer = $this->_getRendererWithWidth500AndHeight300();
-        $barcode = new Zend_Barcode_Object_Code39(array('text' => '0123456789'));
+        $barcode = new Zend_Barcode_Object_Code39(['text' => '0123456789']);
         $this->assertEquals(62, $barcode->getHeight());
         $renderer->setBarcode($barcode);
         $renderer->setVerticalPosition('middle');
@@ -128,7 +126,7 @@ class Zend_Barcode_Renderer_PdfTest extends Zend_Barcode_Renderer_TestCommon
     public function testVerticalPositionToBottom()
     {
         $renderer = $this->_getRendererWithWidth500AndHeight300();
-        $barcode = new Zend_Barcode_Object_Code39(array('text' => '0123456789'));
+        $barcode = new Zend_Barcode_Object_Code39(['text' => '0123456789']);
         $this->assertEquals(62, $barcode->getHeight());
         $renderer->setBarcode($barcode);
         $renderer->setVerticalPosition('bottom');

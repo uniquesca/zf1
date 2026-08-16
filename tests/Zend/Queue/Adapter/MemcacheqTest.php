@@ -53,7 +53,7 @@ class Zend_Queue_Adapter_MemcacheqTest extends Zend_Queue_Adapter_AdapterTest
     /**
      * Test setup
      */
-    public function setUp()
+    protected function set_up()
     {
         if (!TESTS_ZEND_QUEUE_MEMCACHEQ_ENABLED) {
             $this->markTestSkipped('TESTS_ZEND_QUEUE_MEMCACHEQ_ENABLED is not enabled in TestConfiguration.php');
@@ -62,7 +62,7 @@ class Zend_Queue_Adapter_MemcacheqTest extends Zend_Queue_Adapter_AdapterTest
             $this->markTestSkipped('memcache extension not loaded');
         }
         date_default_timezone_set('GMT');
-        parent::setUp();
+        parent::set_up();
     }
     
     /**
@@ -94,14 +94,14 @@ class Zend_Queue_Adapter_MemcacheqTest extends Zend_Queue_Adapter_AdapterTest
 
     public function getTestConfig()
     {
-        $driverOptions = array();
+        $driverOptions = [];
         if (defined('TESTS_ZEND_QUEUE_MEMCACHEQ_HOST')) {
             $driverOptions['host'] = TESTS_ZEND_QUEUE_MEMCACHEQ_HOST;
         }
         if (defined('TESTS_ZEND_QUEUE_MEMCACHEQ_PORT')) {
             $driverOptions['port'] = TESTS_ZEND_QUEUE_MEMCACHEQ_PORT;
         }
-        return array('driverOptions' => $driverOptions);
+        return ['driverOptions' => $driverOptions];
     }
 
     // test the constants
@@ -121,7 +121,7 @@ class Zend_Queue_Adapter_MemcacheqTest extends Zend_Queue_Adapter_AdapterTest
      */
     public function testReceiveWillRetrieveZeroItems()
     {
-        $options = array('name' => 'ZF7650', 'driverOptions' => $this->getTestConfig());
+        $options = ['name' => 'ZF7650', 'driverOptions' => $this->getTestConfig()];
 
         $queue = new Zend_Queue('Memcacheq', $options);
         $queue2 = $queue->createQueue('queue');

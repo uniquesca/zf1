@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -36,14 +39,38 @@ require_once 'Zend/Db/Table/Rowset/Abstract.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_TestCase
+class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends TestCase
 {
-
     protected $_originalServer = null;
 
-    public function setUp()
+    /**
+     * @var array
+     */
+    protected $_get;
+
+    /**
+     * @var Zend_Feed_Pubsubhubbub_Subscriber_Callback
+     */
+    protected $_callback;
+
+    /**
+     * @var MockObject
+     */
+    protected $_adapter;
+
+    /**
+     * @var MockObject
+     */
+    protected $_tableGateway;
+
+    /**
+     * @var MockObject
+     */
+    protected $_rowset;
+
+    protected function set_up()
     {
-        $this->_callback = new Zend_Feed_Pubsubhubbub_Subscriber_Callback;
+        $this->_callback = new Zend_Feed_Pubsubhubbub_Subscriber_Callback();
 
         $this->_adapter = $this->_getCleanMock(
             'Zend_Db_Adapter_Abstract'
@@ -60,21 +87,21 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
         $storage = new Zend_Feed_Pubsubhubbub_Model_Subscription($this->_tableGateway);
         $this->_callback->setStorage($storage);
 
-        $this->_get = array(
+        $this->_get = [
             'hub_mode' => 'subscribe',
             'hub_topic' => 'http://www.example.com/topic',
             'hub_challenge' => 'abc',
             'hub_verify_token' => 'cba',
             'hub_mode' => 'subscribe',
             'hub_lease_seconds' => '1234567'
-        );
+        ];
 
         $this->_originalServer = $_SERVER;
         $_SERVER['REQUEST_METHOD'] = 'get';
         $_SERVER['QUERY_STRING'] = 'xhub.subscription=verifytokenkey';
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         $_SERVER = $this->_originalServer;
     }
@@ -82,7 +109,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
 
     public function testCanSetHttpResponseObject()
     {
-        $this->_callback->setHttpResponse(new Zend_Feed_Pubsubhubbub_HttpResponse);
+        $this->_callback->setHttpResponse(new Zend_Feed_Pubsubhubbub_HttpResponse());
         $this->assertTrue($this->_callback->getHttpResponse() instanceof Zend_Feed_Pubsubhubbub_HttpResponse);
     }
 
@@ -93,18 +120,14 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
 
     public function testThrowsExceptionOnInvalidHttpResponseObjectSet()
     {
-        try {
-            $this->_callback->setHttpResponse(new stdClass);
-            $this->fail('Should not fail as an Exception would be raised and caught');
-        } catch (Zend_Feed_Pubsubhubbub_Exception $e) {}
+        $this->expectException(Zend_Feed_Pubsubhubbub_Exception::class);
+        $this->_callback->setHttpResponse(new stdClass());
     }
 
     public function testThrowsExceptionIfNonObjectSetAsHttpResponseObject()
     {
-        try {
-            $this->_callback->setHttpResponse('');
-            $this->fail('Should not fail as an Exception would be raised and caught');
-        } catch (Zend_Feed_Pubsubhubbub_Exception $e) {}
+        $this->expectException(Zend_Feed_Pubsubhubbub_Exception::class);
+        $this->_callback->setHttpResponse('');
     }
 
     public function testCanSetSubscriberCount()
@@ -120,43 +143,36 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
 
     public function testThrowsExceptionOnSettingZeroAsSubscriberCount()
     {
-        try {
-            $this->_callback->setSubscriberCount(0);
-            $this->fail('Should not fail as an Exception would be raised and caught');
-        } catch (Zend_Feed_Pubsubhubbub_Exception $e) {}
+        $this->expectException(Zend_Feed_Pubsubhubbub_Exception::class);
+        $this->_callback->setSubscriberCount(0);
     }
 
     public function testThrowsExceptionOnSettingLessThanZeroAsSubscriberCount()
     {
-        try {
-            $this->_callback->setSubscriberCount(-1);
-            $this->fail('Should not fail as an Exception would be raised and caught');
-        } catch (Zend_Feed_Pubsubhubbub_Exception $e) {}
+        $this->expectException(Zend_Feed_Pubsubhubbub_Exception::class);
+        $this->_callback->setSubscriberCount(-1);
     }
 
     public function testThrowsExceptionOnSettingAnyScalarTypeCastToAZeroOrLessIntegerAsSubscriberCount()
     {
-        try {
-            $this->_callback->setSubscriberCount('0aa');
-            $this->fail('Should not fail as an Exception would be raised and caught');
-        } catch (Zend_Feed_Pubsubhubbub_Exception $e) {}
+        $this->expectException(Zend_Feed_Pubsubhubbub_Exception::class);
+        $this->_callback->setSubscriberCount('0aa');
     }
 
 
     public function testCanSetStorageImplementation()
     {
-	    $storage = new Zend_Feed_Pubsubhubbub_Model_Subscription($this->_tableGateway);
+        $storage = new Zend_Feed_Pubsubhubbub_Model_Subscription($this->_tableGateway);
         $this->_callback->setStorage($storage);
         $this->assertThat($this->_callback->getStorage(), $this->identicalTo($storage));
     }
 
     public function testValidatesValidHttpGetData()
     {
-
-        $mockReturnValue = $this->getMock('Result', array('toArray'));
-        $mockReturnValue->expects($this->any())->method('toArray')->will($this->returnValue(array(
+        $mockReturnValue = $this->createMock('Zend_Db_Table_Row');
+        $mockReturnValue->expects($this->any())->method('toArray')->will($this->returnValue([
                 'verify_token' => hash('sha256', 'cba')
-            )));
+            ]));
 
         $this->_tableGateway->expects($this->any())
             ->method('find')
@@ -204,11 +220,10 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
 
     public function testReturnsTrueIfModeSetAsUnsubscribeFromHttpGetData()
     {
-
-        $mockReturnValue = $this->getMock('Result', array('toArray'));
-        $mockReturnValue->expects($this->any())->method('toArray')->will($this->returnValue(array(
+        $mockReturnValue = $this->createMock('Zend_Db_Table_Row');
+        $mockReturnValue->expects($this->any())->method('toArray')->will($this->returnValue([
                 'verify_token' => hash('sha256', 'cba')
-            )));
+            ]));
 
         $this->_get['hub_mode'] = 'unsubscribe';
         $this->_tableGateway->expects($this->any())
@@ -277,15 +292,15 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->with($this->equalTo('verifytokenkey'))
             ->will($this->returnValue($this->_rowset));
 
-        $t = new Zend_Date;
-        $rowdata = array(
+        $t = new Zend_Date();
+        $rowdata = [
             'id' => 'verifytokenkey',
             'verify_token' => hash('sha256', 'cba'),
             'created_time' => $t->get(Zend_Date::TIMESTAMP),
             'lease_seconds' => 10000
-            );
+            ];
 
-        $row = new Zend_Db_Table_Row(array('data' => $rowdata));
+        $row = new Zend_Db_Table_Row(['data' => $rowdata]);
 
         $this->_rowset->expects($this->any())
             ->method('current')
@@ -298,7 +313,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
         $this->_tableGateway->expects($this->once())
             ->method('update')
             ->with(
-                $this->equalTo(array('id'=>'verifytokenkey','verify_token'=>hash('sha256', 'cba'),'created_time'=>$t->get(Zend_Date::TIMESTAMP),'lease_seconds'=>1234567,'subscription_state'=>'verified','expiration_time'=>$t->add(1234567,Zend_Date::SECOND)->get('yyyy-MM-dd HH:mm:ss'))),
+                $this->equalTo(['id' => 'verifytokenkey', 'verify_token' => hash('sha256', 'cba'), 'created_time' => $t->get(Zend_Date::TIMESTAMP), 'lease_seconds' => 1234567, 'subscription_state' => 'verified', 'expiration_time' => $t->add(1234567, Zend_Date::SECOND)->get('yyyy-MM-dd HH:mm:ss')]),
                 $this->equalTo('id = \'verifytokenkey\'')
             );
         $this->_adapter->expects($this->once())
@@ -323,15 +338,15 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->with($this->equalTo('verifytokenkey'))
             ->will($this->returnValue($this->_rowset));
 
-        $t = new Zend_Date;
-        $rowdata = array(
+        $t = new Zend_Date();
+        $rowdata = [
             'id' => 'verifytokenkey',
             'verify_token' => hash('sha256', 'cba'),
             'created_time' => $t->get(Zend_Date::TIMESTAMP),
             'lease_seconds' => 10000
-            );
+            ];
 
-        $row = new Zend_Db_Table_Row(array('data' => $rowdata));
+        $row = new Zend_Db_Table_Row(['data' => $rowdata]);
 
         $this->_rowset->expects($this->any())
             ->method('current')
@@ -344,7 +359,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
         $this->_tableGateway->expects($this->once())
             ->method('update')
             ->with(
-                $this->equalTo(array('id'=>'verifytokenkey','verify_token'=>hash('sha256', 'cba'),'created_time'=>$t->get(Zend_Date::TIMESTAMP),'lease_seconds'=>1234567,'subscription_state'=>'verified','expiration_time'=>$t->add(1234567,Zend_Date::SECOND)->get('yyyy-MM-dd HH:mm:ss'))),
+                $this->equalTo(['id' => 'verifytokenkey', 'verify_token' => hash('sha256', 'cba'), 'created_time' => $t->get(Zend_Date::TIMESTAMP), 'lease_seconds' => 1234567, 'subscription_state' => 'verified', 'expiration_time' => $t->add(1234567, Zend_Date::SECOND)->get('yyyy-MM-dd HH:mm:ss')]),
                 $this->equalTo('id = \'verifytokenkey\'')
             );
         $this->_adapter->expects($this->once())
@@ -368,14 +383,14 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->with($this->equalTo('verifytokenkey'))
             ->will($this->returnValue($this->_rowset));
 
-        $t = new Zend_Date;
-        $rowdata = array(
+        $t = new Zend_Date();
+        $rowdata = [
             'id' => 'verifytokenkey',
             'verify_token' => hash('sha256', 'cba'),
             'created_time' => time()
-            );
+            ];
 
-        $row = new Zend_Db_Table_Row(array('data' => $rowdata));
+        $row = new Zend_Db_Table_Row(['data' => $rowdata]);
 
         $this->_rowset->expects($this->any())
             ->method('current')
@@ -385,7 +400,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->method('count')
             ->will($this->returnValue(1));
 
-        $this->_callback->handle(array());
+        $this->_callback->handle([]);
         $this->assertTrue($this->_callback->getHttpResponse()->getHttpResponseCode() == 200);
     }
 
@@ -397,7 +412,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
         $feedXml = file_get_contents(dirname(__FILE__) . '/_files/atom10.xml');
         $GLOBALS['HTTP_RAW_POST_DATA'] = $feedXml;
 
-        $this->_callback->handle(array());
+        $this->_callback->handle([]);
         $this->assertTrue($this->_callback->getHttpResponse()->getHttpResponseCode() == 404);
     }
 
@@ -408,7 +423,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
         $_SERVER['CONTENT_TYPE'] = 'application/kml+xml';
         $feedXml = file_get_contents(dirname(__FILE__) . '/_files/atom10.xml');
         $GLOBALS['HTTP_RAW_POST_DATA'] = $feedXml;
-        $this->_callback->handle(array());
+        $this->_callback->handle([]);
         $this->assertTrue($this->_callback->getHttpResponse()->getHttpResponseCode() == 404);
     }
 
@@ -431,14 +446,14 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->with($this->equalTo('verifytokenkey'))
             ->will($this->returnValue($this->_rowset));
 
-        $rowdata = array(
+        $rowdata = [
             'id' => 'verifytokenkey',
             'verify_token' => hash('sha256', 'cba'),
             'created_time' => time(),
             'lease_seconds' => 10000
-            );
+            ];
 
-        $row = new Zend_Db_Table_Row(array('data' => $rowdata));
+        $row = new Zend_Db_Table_Row(['data' => $rowdata]);
 
         $this->_rowset->expects($this->any())
             ->method('current')
@@ -448,7 +463,7 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->method('count')
             ->will($this->returnValue(1));
 
-        $this->_callback->handle(array());
+        $this->_callback->handle([]);
         $this->assertTrue($this->_callback->getHttpResponse()->getHttpResponseCode() == 200);
     }
 
@@ -465,14 +480,14 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->with($this->equalTo('verifytokenkey'))
             ->will($this->returnValue($this->_rowset));
 
-        $rowdata = array(
+        $rowdata = [
             'id' => 'verifytokenkey',
             'verify_token' => hash('sha256', 'cba'),
             'created_time' => time(),
             'lease_seconds' => 10000
-            );
+            ];
 
-        $row = new Zend_Db_Table_Row(array('data' => $rowdata));
+        $row = new Zend_Db_Table_Row(['data' => $rowdata]);
 
         $this->_rowset->expects($this->any())
             ->method('current')
@@ -482,30 +497,26 @@ class Zend_Feed_Pubsubhubbub_Subscriber_CallbackTest extends PHPUnit_Framework_T
             ->method('count')
             ->will($this->returnValue(1));
 
-        $this->_callback->handle(array());
+        $this->_callback->handle([]);
         $this->assertTrue($this->_callback->getHttpResponse()->getHeader('X-Hub-On-Behalf-Of') == 1);
     }
 
-    protected function _getCleanMock($className) {
+    protected function _getCleanMock($className)
+    {
         $class = new ReflectionClass($className);
         $methods = $class->getMethods();
-        $stubMethods = array();
+        $stubMethods = [];
         foreach ($methods as $method) {
             if ($method->isPublic() || ($method->isProtected()
             && $method->isAbstract())) {
-            $stubMethods[] = $method->getName();
+                $stubMethods[] = $method->getName();
             }
         }
-        $mocked = $this->getMock(
-            $className,
-            $stubMethods,
-            array(),
-            $className . '_PubsubSubscriberMock_' . uniqid(),
-            false
+        $mocked = $this->createMock(
+            $className
         );
         return $mocked;
     }
-
 }
 
 /**

@@ -33,8 +33,8 @@ require_once 'Zend/Markup/TokenList.php';
  */
 class Zend_Markup_Token
 {
-    const TYPE_NONE    = 'none';
-    const TYPE_TAG     = 'tag';
+    public const TYPE_NONE    = 'none';
+    public const TYPE_TAG     = 'tag';
 
     /**
      * Children of this token
@@ -69,7 +69,7 @@ class Zend_Markup_Token
      *
      * @var array
      */
-    protected $_attributes = array();
+    protected $_attributes = [];
 
     /**
      * The used tag stopper (empty when none is found)
@@ -100,8 +100,8 @@ class Zend_Markup_Token
         $tag,
         $type,
         $name = '',
-        array $attributes = array(),
-        Zend_Markup_Token $parent = null
+        array $attributes = [],
+        ?Zend_Markup_Token $parent = null
     ) {
         $this->_tag        = $tag;
         $this->_type       = $type;

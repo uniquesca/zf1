@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -44,7 +47,7 @@ require_once 'Zend/Http/Client/Adapter/Socket.php';
  * @group      Zend_Service
  * @group      Zend_Service_Amazon
  */
-class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
+class Zend_Service_Amazon_OnlineTest extends TestCase
 {
     /**
      * Reference to Amazon service consumer object
@@ -72,9 +75,9 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
-        if(!defined('TESTS_ZEND_SERVICE_AMAZON_ONLINE_ACCESSKEYID') || !defined('TESTS_ZEND_SERVICE_AMAZON_ONLINE_SECRETKEY')) {
+        if (!defined('TESTS_ZEND_SERVICE_AMAZON_ONLINE_ACCESSKEYID') || !defined('TESTS_ZEND_SERVICE_AMAZON_ONLINE_SECRETKEY')) {
             $this->markTestSkipped('Constants AccessKeyId and SecretKey have to be set.');
         }
 
@@ -107,12 +110,12 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
      */
     public function testItemSearchBooksPhp()
     {
-        $resultSet = $this->_amazon->itemSearch(array(
-            'SearchIndex'   => 'Books',
-            'Keywords'      => 'php',
+        $resultSet = $this->_amazon->itemSearch([
+            'SearchIndex' => 'Books',
+            'Keywords' => 'php',
             'ResponseGroup' => 'Small,ItemAttributes,Images,SalesRank,Reviews,EditorialReview,Similarities,'
                              . 'ListmaniaLists'
-            ));
+            ]);
 
         $this->assertTrue(10 < $resultSet->totalResults());
         $this->assertTrue(1 < $resultSet->totalPages());
@@ -122,7 +125,7 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
             $resultSet->seek(-1);
             $this->fail('Expected OutOfBoundsException not thrown');
         } catch (OutOfBoundsException $e) {
-            $this->assertContains('Illegal index', $e->getMessage());
+            $this->assertStringContainsString('Illegal index', $e->getMessage());
         }
 
         $resultSet->seek(9);
@@ -131,7 +134,7 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
             $resultSet->seek(10);
             $this->fail('Expected OutOfBoundsException not thrown');
         } catch (OutOfBoundsException $e) {
-            $this->assertContains('Illegal index', $e->getMessage());
+            $this->assertStringContainsString('Illegal index', $e->getMessage());
         }
 
         foreach ($resultSet as $item) {
@@ -148,11 +151,11 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
      */
     public function testItemSearchMusicMozart()
     {
-        $resultSet = $this->_amazon->itemSearch(array(
-            'SearchIndex'   => 'Music',
-            'Keywords'      => 'Mozart',
+        $resultSet = $this->_amazon->itemSearch([
+            'SearchIndex' => 'Music',
+            'Keywords' => 'Mozart',
             'ResponseGroup' => 'Small,Tracks,Offers'
-            ));
+            ]);
 
         foreach ($resultSet as $item) {
             $this->assertTrue($item instanceof Zend_Service_Amazon_Item);
@@ -166,11 +169,11 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
      */
     public function testItemSearchElectronicsDigitalCamera()
     {
-        $resultSet = $this->_amazon->itemSearch(array(
-            'SearchIndex'   => 'Electronics',
-            'Keywords'      => 'digital camera',
+        $resultSet = $this->_amazon->itemSearch([
+            'SearchIndex' => 'Electronics',
+            'Keywords' => 'digital camera',
             'ResponseGroup' => 'Accessories'
-            ));
+            ]);
 
         foreach ($resultSet as $item) {
             $this->assertTrue($item instanceof Zend_Service_Amazon_Item);
@@ -184,11 +187,11 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
      */
     public function testItemSearchBooksPHPSort()
     {
-        $resultSet = $this->_amazon->itemSearch(array(
+        $resultSet = $this->_amazon->itemSearch([
             'SearchIndex' => 'Books',
-            'Keywords'    => 'php',
-            'Sort'        => '-titlerank'
-            ));
+            'Keywords' => 'php',
+            'Sort' => '-titlerank'
+            ]);
 
         foreach ($resultSet as $item) {
             $this->assertTrue($item instanceof Zend_Service_Amazon_Item);
@@ -199,15 +202,16 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
      * Ensures that itemSearch() throws an exception when provided an invalid city
      *
      * @return void
+     * @doesNotPerformAssertions
      */
     public function testItemSearchExceptionCityInvalid()
     {
         try {
-            $this->_amazon->itemSearch(array(
+            $this->_amazon->itemSearch([
                 'SearchIndex' => 'Restaurants',
-                'Keywords'    => 'seafood',
-                'City'        => 'Des Moines'
-                ));
+                'Keywords' => 'seafood',
+                'City' => 'Des Moines'
+                ]);
             $this->fail('Expected Zend_Service_Exception not thrown');
         } catch (Zend_Service_Exception $e) {
         }
@@ -235,7 +239,7 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
             $this->_amazon->itemLookup('oops');
             $this->fail('Expected Zend_Service_Exception not thrown');
         } catch (Zend_Service_Exception $e) {
-            $this->assertContains('not a valid value for ItemId', $e->getMessage());
+            $this->assertStringContainsString('not a valid value for ItemId', $e->getMessage());
         }
     }
 
@@ -265,10 +269,10 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
     public function testItemLookupExceptionSearchIndex()
     {
         try {
-            $this->_amazon->itemLookup('oops', array('SearchIndex' => 'Books'));
+            $this->_amazon->itemLookup('oops', ['SearchIndex' => 'Books']);
             $this->fail('Expected Zend_Service_Exception not thrown');
         } catch (Zend_Service_Exception $e) {
-            $this->assertContains('restricted parameter combination', $e->getMessage());
+            $this->assertStringContainsString('restricted parameter combination', $e->getMessage());
         }
     }
 
@@ -297,7 +301,7 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
             $this->_query->Keywords('php');
             $this->fail('Expected Zend_Service_Exception not thrown');
         } catch (Zend_Service_Exception $e) {
-            $this->assertContains('set a category', $e->getMessage());
+            $this->assertStringContainsString('set a category', $e->getMessage());
         }
     }
 
@@ -312,7 +316,7 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
             $this->_query->category('oops')->search();
             $this->fail('Expected Zend_Service_Exception not thrown');
         } catch (Zend_Service_Exception $e) {
-            $this->assertContains('SearchIndex is invalid', $e->getMessage());
+            $this->assertStringContainsString('SearchIndex is invalid', $e->getMessage());
         }
     }
 
@@ -338,14 +342,17 @@ class Zend_Service_Amazon_OnlineTest extends PHPUnit_Framework_TestCase
  * @group      Zend_Service
  * @group      Zend_Service_Amazon
  */
-class Zend_Service_Amazon_OnlineTest_Skip extends PHPUnit_Framework_TestCase
+class Zend_Service_Amazon_OnlineTest_Skip extends TestCase
 {
-    public function setUp()
+    protected function set_up()
     {
         $this->markTestSkipped('Zend_Service_Amazon online tests not enabled with an access key ID in '
                              . 'TestConfiguration.php');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testNothing()
     {
     }

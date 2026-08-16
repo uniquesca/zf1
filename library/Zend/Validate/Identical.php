@@ -34,24 +34,24 @@ class Zend_Validate_Identical extends Zend_Validate_Abstract
      * Error codes
      * @const string
      */
-    const NOT_SAME      = 'notSame';
-    const MISSING_TOKEN = 'missingToken';
+    public const NOT_SAME      = 'notSame';
+    public const MISSING_TOKEN = 'missingToken';
 
     /**
      * Error messages
      * @var array
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::NOT_SAME      => "The two given tokens do not match",
         self::MISSING_TOKEN => 'No token was provided to match against',
-    );
+    ];
 
     /**
      * @var array
      */
-    protected $_messageVariables = array(
+    protected $_messageVariables = [
         'token' => '_tokenString'
-    );
+    ];
 
     /**
      * Original token against which to validate
@@ -119,12 +119,12 @@ class Zend_Validate_Identical extends Zend_Validate_Abstract
     /**
      * Sets the strict parameter
      *
-     * @param Zend_Validate_Identical
+     * @param Zend_Validate_Identical $strict
      * @return $this
      */
     public function setStrict($strict)
     {
-        $this->_strict = (boolean) $strict;
+        $this->_strict = (bool) $strict;
         return $this;
     }
 

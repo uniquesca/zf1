@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -27,12 +30,20 @@ require_once 'Zend/Cache.php';
 
 
 require_once 'Zend/Cache/Backend/File.php';
-class Zend_Cache_Backend_FooBarTest extends Zend_Cache_Backend_File { }
-class FooBarTestBackend extends Zend_Cache_Backend_File { }
+class Zend_Cache_Backend_FooBarTest extends Zend_Cache_Backend_File
+{
+}
+class FooBarTestBackend extends Zend_Cache_Backend_File
+{
+}
 
 require_once 'Zend/Cache/Core.php';
-class Zend_Cache_Frontend_FooBarTest extends Zend_Cache_Core { }
-class FooBarTestFrontend extends Zend_Cache_Core { }
+class Zend_Cache_Frontend_FooBarTest extends Zend_Cache_Core
+{
+}
+class FooBarTestFrontend extends Zend_Cache_Core
+{
+}
 
 /**
  * @category   Zend
@@ -42,14 +53,13 @@ class FooBarTestFrontend extends Zend_Cache_Core { }
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Cache
  */
-class Zend_Cache_FactoryTest extends PHPUnit_Framework_TestCase
+class Zend_Cache_FactoryTest extends TestCase
 {
-
-    public function setUp()
+    protected function set_up()
     {
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -61,27 +71,33 @@ class Zend_Cache_FactoryTest extends PHPUnit_Framework_TestCase
 
     public function testFactoryCorrectCallWithCustomBackend()
     {
-        $generated_frontend = Zend_Cache::factory('Core', 'FooBarTest', array(), array(), false, false, true);
+        $generated_frontend = Zend_Cache::factory('Core', 'FooBarTest', [], [], false, false, true);
         $this->assertEquals('Zend_Cache_Core', get_class($generated_frontend));
     }
 
     public function testFactoryCorrectCallWithCustomBackend2()
     {
-        $generated_frontend = Zend_Cache::factory('Core', 'FooBarTestBackend', array(), array(), false, true, true);
+        $generated_frontend = Zend_Cache::factory('Core', 'FooBarTestBackend', [], [], false, true, true);
         $this->assertEquals('Zend_Cache_Core', get_class($generated_frontend));
     }
 
     public function testFactoryCorrectCallWithCustomFrontend()
     {
-        $generated_frontend = Zend_Cache::factory('FooBarTest', 'File', array(), array(), false, false, true);
+        $generated_frontend = Zend_Cache::factory('FooBarTest', 'File', [], [], false, false, true);
         $this->assertEquals('Zend_Cache_Frontend_FooBarTest', get_class($generated_frontend));
     }
 
     public function testFactoryCorrectCallWithCustomFrontend2()
     {
-        $generated_frontend = Zend_Cache::factory('FooBarTestFrontend', 'File', array(), array(), true, false, true);
+        $generated_frontend = Zend_Cache::factory('FooBarTestFrontend', 'File', [], [], true, false, true);
         $this->assertEquals('FooBarTestFrontend', get_class($generated_frontend));
     }
+
+    /**
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
     public function testFactoryLoadsPlatformBackend()
     {
         try {
@@ -94,6 +110,11 @@ class Zend_Cache_FactoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
     public function testBadFrontend()
     {
         try {
@@ -104,6 +125,11 @@ class Zend_Cache_FactoryTest extends PHPUnit_Framework_TestCase
         $this->fail('Zend_Exception was expected but not thrown');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
     public function testBadBackend()
     {
         try {
@@ -120,9 +146,9 @@ class Zend_Cache_FactoryTest extends PHPUnit_Framework_TestCase
     public function testNamespacedFrontendClassAccepted()
     {
         try {
-            Zend_Cache::factory('ZF11988\Frontend', 'File', array(), array(), true, false, false);
+            Zend_Cache::factory('ZF11988\Frontend', 'File', [], [], true, false, false);
             $this->fail('Zend_Cache_Exception was expected but not thrown');
-        } catch ( Zend_Cache_Exception $e ) {
+        } catch (Zend_Cache_Exception $e) {
             $this->assertNotEquals('Invalid frontend name [ZF11988\Frontend]', $e->getMessage());
         }
     }
@@ -133,11 +159,10 @@ class Zend_Cache_FactoryTest extends PHPUnit_Framework_TestCase
     public function testNamespacedBackendClassAccepted()
     {
         try {
-            Zend_Cache::factory('Output', 'ZF11988\Backend', array(), array(), false, true, false);
+            Zend_Cache::factory('Output', 'ZF11988\Backend', [], [], false, true, false);
             $this->fail('Zend_Cache_Exception was expected but not thrown');
-        } catch ( Zend_Cache_Exception $e ) {
+        } catch (Zend_Cache_Exception $e) {
             $this->assertNotEquals('Invalid backend name [ZF11988\Backend]', $e->getMessage());
         }
     }
-
 }

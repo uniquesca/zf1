@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,7 +36,7 @@ require_once 'Zend/Search/Lucene/Storage/Directory/Filesystem.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Search_Lucene
  */
-class Zend_Search_Lucene_Storage_DirectoryTest extends PHPUnit_Framework_TestCase
+class Zend_Search_Lucene_Storage_DirectoryTest extends TestCase
 {
     public function testFilesystem()
     {
@@ -60,7 +63,7 @@ class Zend_Search_Lucene_Storage_DirectoryTest extends PHPUnit_Framework_TestCas
         unset($fileObject);
         $this->assertEquals($directory->fileLength('file1'), 0);
 
-        $this->assertEquals(count(array_diff($directory->fileList(), array('file1'))), 0);
+        $this->assertEquals(count(array_diff($directory->fileList(), ['file1'])), 0);
 
         $directory->deleteFile('file1');
         $this->assertEquals(count($directory->fileList()), 0);
@@ -74,7 +77,7 @@ class Zend_Search_Lucene_Storage_DirectoryTest extends PHPUnit_Framework_TestCas
         $this->assertEquals($directory->fileLength('file2'), 10);
 
         $directory->renameFile('file2', 'file3');
-        $this->assertEquals(count(array_diff($directory->fileList(), array('file3'))), 0);
+        $this->assertEquals(count(array_diff($directory->fileList(), ['file3'])), 0);
 
         $modifiedAt1 = $directory->fileModified('file3');
         clearstatcache();
@@ -86,7 +89,7 @@ class Zend_Search_Lucene_Storage_DirectoryTest extends PHPUnit_Framework_TestCas
         $modifiedAt3 = $directory->fileModified('file3');
 
         $this->assertTrue($modifiedAt2 >= $modifiedAt1);
-        $this->assertTrue($modifiedAt3 >  $modifiedAt2);
+        $this->assertTrue($modifiedAt3 > $modifiedAt2);
 
         $fileObject = $directory->getFileObject('file3');
         $this->assertEquals($fileObject->readBytes($directory->fileLength('file3')), '0123456789');
@@ -113,4 +116,3 @@ class Zend_Search_Lucene_Storage_DirectoryTest extends PHPUnit_Framework_TestCas
         rmdir(dirname(__FILE__) . '/_tempFiles/_files/dir1');
     }
 }
-
