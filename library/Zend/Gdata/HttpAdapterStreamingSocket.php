@@ -44,7 +44,7 @@ class Zend_Gdata_HttpAdapterStreamingSocket extends Zend_Http_Client_Adapter_Soc
      *
      * @var integer
      */
-    const CHUNK_SIZE = 1024;
+    public const CHUNK_SIZE = 1024;
 
     /**
      * Send request to the remote server with streaming support.
@@ -56,7 +56,7 @@ class Zend_Gdata_HttpAdapterStreamingSocket extends Zend_Http_Client_Adapter_Soc
      * @param string        $body
      * @return string Request as string
      */
-    public function write($method, $uri, $http_ver = '1.1', $headers = array(),
+    public function write($method, $uri, $http_ver = '1.1', $headers = [],
         $body = '')
     {
         // Make sure we're properly connected

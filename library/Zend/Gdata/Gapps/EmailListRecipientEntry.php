@@ -107,7 +107,7 @@ class Zend_Gdata_Gapps_EmailListRecipientEntry extends Zend_Gdata_Entry
         $absoluteNodeName = $child->namespaceURI . ':' . $child->localName;
 
         switch ($absoluteNodeName) {
-            case $this->lookupNamespace('gd') . ':' . 'who';
+            case $this->lookupNamespace('gd') . ':' . 'who':
                 $who = new Zend_Gdata_Extension_Who();
                 $who->transferFromDOM($child);
                 $this->_who = $who;
@@ -135,7 +135,7 @@ class Zend_Gdata_Gapps_EmailListRecipientEntry extends Zend_Gdata_Entry
      *
      * @param Zend_Gdata_Extension_Who $value The desired value for this
      *          instance's who property.
-     * @return Zend_Gdata_Gapps_EventEntry Provides a fluent interface.
+     * @return $this
      */
     public function setWho($value)
     {

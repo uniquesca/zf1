@@ -48,7 +48,7 @@ class Zend_Mobile_Push_Gcm extends Zend_Mobile_Push_Abstract
     /**
      * @const string Server URI
      */
-    const SERVER_URI = 'https://android.googleapis.com/gcm/send';
+    public const SERVER_URI = 'https://android.googleapis.com/gcm/send';
 
     /**
      * Http Client
@@ -99,9 +99,9 @@ class Zend_Mobile_Push_Gcm extends Zend_Mobile_Push_Abstract
     {
         if (!$this->_httpClient) {
             $this->_httpClient = new Zend_Http_Client();
-            $this->_httpClient->setConfig(array(
+            $this->_httpClient->setConfig([
                 'strictredirects' => true,
-            ));
+            ]);
         }
         return $this->_httpClient;
     }

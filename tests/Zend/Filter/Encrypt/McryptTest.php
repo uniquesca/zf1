@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,12 +36,15 @@ require_once 'Zend/Filter/Encrypt/Mcrypt.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Filter
  */
-class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
+class Zend_Filter_Encrypt_McryptTest extends TestCase
 {
-    public function setUp()
+    protected function set_up()
     {
         if (!extension_loaded('mcrypt')) {
             $this->markTestSkipped('This adapter needs the mcrypt extension');
+        }
+        if (extension_loaded('mcrypt') && version_compare(PHP_VERSION, '7.1.0', '>=')) {
+            $this->markTestSkipped('mcrypt_* function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.');
         }
     }
 
@@ -49,12 +55,12 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
      */
     public function testBasicMcrypt()
     {
-        $filter = new Zend_Filter_Encrypt_Mcrypt(array('key' => 'testkey'));
-        $valuesExpected = array(
+        $filter = new Zend_Filter_Encrypt_Mcrypt(['key' => 'testkey']);
+        $valuesExpected = [
             'STRING' => 'STRING',
             'ABC1@3' => 'ABC1@3',
-            'A b C'  => 'A B C'
-        );
+            'A b C' => 'A B C'
+        ];
 
         $enc = $filter->getEncryption();
         $filter->setVector('testvect');
@@ -71,7 +77,7 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
      */
     public function testGetSetVector()
     {
-        $filter = new Zend_Filter_Encrypt_Mcrypt(array('key' => 'testkey'));
+        $filter = new Zend_Filter_Encrypt_Mcrypt(['key' => 'testkey']);
         $filter->setVector('testvect');
         $this->assertEquals('testvect', $filter->getVector());
 
@@ -79,7 +85,7 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
             $filter->setVector('1');
             $this->fail();
         } catch (Zend_Filter_Exception $e) {
-            $this->assertContains('wrong size', $e->getMessage());
+            $this->assertStringContainsString('wrong size', $e->getMessage());
         }
     }
 
@@ -90,16 +96,16 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
      */
     public function testDefaultEncryption()
     {
-        $filter = new Zend_Filter_Encrypt_Mcrypt(array('key' => 'testkey'));
+        $filter = new Zend_Filter_Encrypt_Mcrypt(['key' => 'testkey']);
         $filter->setVector('testvect');
         $this->assertEquals(
-            array('key' => 'testkey',
+            ['key' => 'testkey',
                   'algorithm' => MCRYPT_BLOWFISH,
                   'algorithm_directory' => '',
                   'mode' => MCRYPT_MODE_CBC,
                   'mode_directory' => '',
                   'vector' => 'testvect',
-                  'salt' => false),
+                  'salt' => false],
             $filter->getEncryption()
         );
     }
@@ -111,19 +117,20 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
      */
     public function testGetSetEncryption()
     {
-        $filter = new Zend_Filter_Encrypt_Mcrypt(array('key' => 'testkey'));
+        $filter = new Zend_Filter_Encrypt_Mcrypt(['key' => 'testkey']);
         $filter->setVector('testvect');
         $filter->setEncryption(
-            array('mode' => MCRYPT_MODE_ECB,
-                  'algorithm' => MCRYPT_3DES));
+            ['mode' => MCRYPT_MODE_ECB,
+                  'algorithm' => MCRYPT_3DES]
+        );
         $this->assertEquals(
-            array('key' => 'testkey',
+            ['key' => 'testkey',
                   'algorithm' => MCRYPT_3DES,
                   'algorithm_directory' => '',
                   'mode' => MCRYPT_MODE_ECB,
                   'mode_directory' => '',
                   'vector' => 'testvect',
-                  'salt' => false),
+                  'salt' => false],
             $filter->getEncryption()
         );
     }
@@ -135,7 +142,7 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
      */
     public function testEncryptionWithDecryptionMcrypt()
     {
-        $filter = new Zend_Filter_Encrypt_Mcrypt(array('key' => 'testkey'));
+        $filter = new Zend_Filter_Encrypt_Mcrypt(['key' => 'testkey']);
         $filter->setVector('testvect');
         $output = $filter->encrypt('teststring');
 
@@ -164,7 +171,7 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
             $filter = new Zend_Filter_Encrypt_Mcrypt(1234);
             $this->fail();
         } catch (Zend_Filter_Exception $e) {
-            $this->assertContains('Invalid options argument', $e->getMessage());
+            $this->assertStringContainsString('Invalid options argument', $e->getMessage());
         }
     }
 
@@ -191,21 +198,21 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
             $filter->setEncryption(1234);
             $filter->fail();
         } catch (Zend_Filter_Exception $e) {
-            $this->assertContains('Invalid options argument', $e->getMessage());
+            $this->assertStringContainsString('Invalid options argument', $e->getMessage());
         }
 
         try {
-            $filter->setEncryption(array('algorithm' => 'unknown'));
+            $filter->setEncryption(['algorithm' => 'unknown']);
             $filter->fail();
         } catch (Zend_Filter_Exception $e) {
-            $this->assertContains('The algorithm', $e->getMessage());
+            $this->assertStringContainsString('The algorithm', $e->getMessage());
         }
 
         try {
-            $filter->setEncryption(array('mode' => 'unknown'));
+            $filter->setEncryption(['mode' => 'unknown']);
             $filter->fail();
         } catch (Zend_Filter_Exception $e) {
-            $this->assertContains('The mode', $e->getMessage());
+            $this->assertStringContainsString('The mode', $e->getMessage());
         }
     }
 
@@ -229,7 +236,7 @@ class Zend_Filter_Encrypt_McryptTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('This adapter needs the bz2 extension');
         }
 
-        $filter = new Zend_Filter_Encrypt_Mcrypt(array('key' => 'testkey'));
+        $filter = new Zend_Filter_Encrypt_Mcrypt(['key' => 'testkey']);
         $filter->setVector('testvect');
         $filter->setCompression('bz2');
         $output = $filter->encrypt('teststring');

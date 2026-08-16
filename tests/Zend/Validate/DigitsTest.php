@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,7 +37,7 @@ require_once 'Zend/Validate/Digits.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_DigitsTest extends TestCase
 {
     /**
      * Zend_Validate_Digits object
@@ -48,7 +51,7 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_validator = new Zend_Validate_Digits();
     }
@@ -60,17 +63,17 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
      */
     public function testExpectedResultsWithBasicInputValues()
     {
-        $valuesExpected = array(
-            'abc123'  => false,
+        $valuesExpected = [
+            'abc123' => false,
             'abc 123' => false,
-            'abcxyz'  => false,
+            'abcxyz' => false,
             'AZ@#4.3' => false,
-            '1.23'    => false,
-            '0x9f'    => false,
-            '123'     => true,
-            '09'      => true,
-            ''        => false
-            );
+            '1.23' => false,
+            '0x9f' => false,
+            '123' => true,
+            '09' => true,
+            '' => false
+            ];
         foreach ($valuesExpected as $input => $result) {
             $this->assertEquals($result, $this->_validator->isValid($input));
         }
@@ -83,7 +86,7 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
      */
     public function testMessagesEmptyInitially()
     {
-        $this->assertEquals(array(), $this->_validator->getMessages());
+        $this->assertEquals([], $this->_validator->getMessages());
     }
 
     /**
@@ -93,9 +96,9 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->_validator->isValid(''));
         $messages = $this->_validator->getMessages();
-        $arrayExpected = array(
+        $arrayExpected = [
             Zend_Validate_Digits::STRING_EMPTY => '\'\' is an empty string'
-            );
+            ];
         $this->assertThat($messages, $this->identicalTo($arrayExpected));
     }
 
@@ -107,9 +110,9 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->_validator->isValid(''));
         $errors = $this->_validator->getErrors();
-        $arrayExpected = array(
+        $arrayExpected = [
             Zend_Validate_Digits::STRING_EMPTY
-            );
+            ];
         $this->assertThat($errors, $this->identicalTo($arrayExpected));
     }
 
@@ -120,9 +123,9 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->_validator->isValid('#'));
         $messages = $this->_validator->getMessages();
-        $arrayExpected = array(
+        $arrayExpected = [
             Zend_Validate_Digits::NOT_DIGITS => '\'#\' must contain only digits'
-            );
+            ];
         $this->assertThat($messages, $this->identicalTo($arrayExpected));
     }
 
@@ -134,9 +137,9 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->_validator->isValid('#'));
         $errors = $this->_validator->getErrors();
-        $arrayExpected = array(
+        $arrayExpected = [
             Zend_Validate_Digits::NOT_DIGITS
-            );
+            ];
         $this->assertThat($errors, $this->identicalTo($arrayExpected));
     }
 
@@ -145,6 +148,6 @@ class Zend_Validate_DigitsTest extends PHPUnit_Framework_TestCase
      */
     public function testNonStringValidation()
     {
-        $this->assertFalse($this->_validator->isValid(array(1 => 1)));
+        $this->assertFalse($this->_validator->isValid([1 => 1]));
     }
 }

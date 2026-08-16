@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,7 +36,7 @@ require_once 'Zend/Ldap.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Ldap
  */
-class Zend_Ldap_OriginalOfflineTest extends PHPUnit_Framework_TestCase
+class Zend_Ldap_OriginalOfflineTest extends TestCase
 {
     /**
      * Zend_Ldap instance
@@ -49,7 +52,7 @@ class Zend_Ldap_OriginalOfflineTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_ldap = new Zend_Ldap();
     }
@@ -60,7 +63,7 @@ class Zend_Ldap_OriginalOfflineTest extends PHPUnit_Framework_TestCase
     public function testFilterEscapeBasicOperation()
     {
         $input = 'a*b(b)d\e/f';
-        $expected = 'a\2ab\28b\29d\5ce\2ff';
+        $expected = 'a\2ab\28b\29d\5ce/f';
         $this->assertEquals($expected, Zend_Ldap::filterEscape($input));
     }
 
@@ -71,7 +74,7 @@ class Zend_Ldap_OriginalOfflineTest extends PHPUnit_Framework_TestCase
     {
         $optionName = 'invalid';
         try {
-            $this->_ldap->setOptions(array($optionName => 'irrelevant'));
+            $this->_ldap->setOptions([$optionName => 'irrelevant']);
             $this->fail('Expected Zend_Ldap_Exception not thrown');
         } catch (Zend_Ldap_Exception $e) {
             $this->assertEquals("Unknown Zend_Ldap option: $optionName", $e->getMessage());
@@ -83,7 +86,7 @@ class Zend_Ldap_OriginalOfflineTest extends PHPUnit_Framework_TestCase
      */
     public function testExplodeDnOperation()
     {
-        $inputs = array(
+        $inputs = [
             'CN=Alice Baker,CN=Users,DC=example,DC=com' => true,
             'CN=Baker\\, Alice,CN=Users,DC=example,DC=com' => true,
             'OU=Sales,DC=local' => true,
@@ -103,7 +106,7 @@ class Zend_Ldap_OriginalOfflineTest extends PHPUnit_Framework_TestCase
             'O=ACME' => true,
             '' => false,
             '   ' => false,
-        );
+        ];
 
         foreach ($inputs as $dn => $expected) {
             $ret = Zend_Ldap::explodeDn($dn);

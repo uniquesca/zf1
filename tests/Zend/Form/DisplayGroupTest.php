@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -46,15 +51,30 @@ require_once 'Zend/View.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Form
  */
-class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
+class Zend_Form_DisplayGroupTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected $error;
+
+    /**
+     * @var \Zend_Loader_PluginLoader|mixed
+     */
+    protected $loader;
+
+    /**
+     * @var \Zend_Form_DisplayGroup|mixed
+     */
+    protected $group;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite('Zend_Form_DisplayGroupTest');
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite('Zend_Form_DisplayGroupTest');
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         Zend_Registry::_unsetInstance();
         Zend_Form::setDefaultTranslator(null);
@@ -65,7 +85,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
         Zend_Controller_Action_HelperBroker::resetHelpers();
         $this->loader = new Zend_Loader_PluginLoader(
-            array('Zend_Form_Decorator' => 'Zend/Form/Decorator')
+            ['Zend_Form_Decorator' => 'Zend/Form/Decorator']
         );
         $this->group = new Zend_Form_DisplayGroup(
             'test',
@@ -73,7 +93,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -101,7 +121,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
             $this->group->setName('%\^&*)\(%$#@!.}{;-,');
             $this->fail('Empty names should raise exception');
         } catch (Zend_Form_Exception $e) {
-            $this->assertContains('Invalid name provided', $e->getMessage());
+            $this->assertStringContainsString('Invalid name provided', $e->getMessage());
         }
     }
 
@@ -144,12 +164,12 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function testPassingInvalidElementsToAddElementsThrowsException()
     {
-        $elements = array('foo' => true);
+        $elements = ['foo' => true];
         try {
             $this->group->addElements($elements);
             $this->fail('Invalid elements should raise exception');
         } catch (Zend_Form_Exception $e) {
-            $this->assertContains('must be Zend_Form_Elements only', $e->getMessage());
+            $this->assertStringContainsString('must be Zend_Form_Elements only', $e->getMessage());
         }
     }
 
@@ -165,18 +185,18 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     {
         $foo = new Zend_Form_Element('foo');
         $bar = new Zend_Form_Element('bar');
-        $this->group->addElements(array($foo, $bar));
+        $this->group->addElements([$foo, $bar]);
         $elements = $this->group->getElements();
-        $this->assertEquals(array('foo' => $foo, 'bar' => $bar), $elements);
+        $this->assertEquals(['foo' => $foo, 'bar' => $bar], $elements);
     }
 
     public function testSetElementsOverWritesExistingElements()
     {
         $this->testCanAddMultipleElements();
         $baz = new Zend_Form_Element('baz');
-        $this->group->setElements(array($baz));
+        $this->group->setElements([$baz]);
         $elements = $this->group->getElements();
-        $this->assertEquals(array('baz' => $baz), $elements);
+        $this->assertEquals(['baz' => $baz], $elements);
     }
 
     public function testCanRemoveSingleElements()
@@ -226,10 +246,10 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $group = new Zend_Form_DisplayGroup(
             'test',
             $this->loader,
-            array('disableLoadDefaultDecorators' => true)
+            ['disableLoadDefaultDecorators' => true]
         );
         $decorators = $group->getDecorators();
-        $this->assertEquals(array(), $decorators);
+        $this->assertEquals([], $decorators);
     }
 
     public function testAddingInvalidDecoratorThrowsException()
@@ -238,7 +258,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
             $this->group->addDecorator(123);
             $this->fail('Invalid decorator should raise exception');
         } catch (Zend_Form_Exception $e) {
-            $this->assertContains('Invalid decorator', $e->getMessage());
+            $this->assertStringContainsString('Invalid decorator', $e->getMessage());
         }
     }
 
@@ -264,7 +284,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->group->clearDecorators();
         $this->assertFalse($this->group->getDecorator('form'));
 
-        $decorator = new Zend_Form_Decorator_ViewHelper;
+        $decorator = new Zend_Form_Decorator_ViewHelper();
         $this->group->addDecorator($decorator);
         $test = $this->group->getDecorator('Zend_Form_Decorator_ViewHelper');
         $this->assertSame($decorator, $test);
@@ -277,7 +297,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->group->clearDecorators();
         $this->assertFalse($this->group->getDecorator('form'));
 
-        $decorator = new Zend_Form_Decorator_Form;
+        $decorator = new Zend_Form_Decorator_Form();
         $this->group->addDecorator($decorator);
         $test = $this->group->getDecorator('form');
         $this->assertSame($decorator, $test);
@@ -290,11 +310,11 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->group->clearDecorators();
         $this->assertFalse($this->group->getDecorator('form'));
 
-        $testDecorator = new Zend_Form_Decorator_HtmlTag;
-        $this->group->addDecorators(array(
+        $testDecorator = new Zend_Form_Decorator_HtmlTag();
+        $this->group->addDecorators([
             'ViewHelper',
             $testDecorator
-        ));
+        ]);
 
         $viewHelper = $this->group->getDecorator('viewHelper');
         $this->assertTrue($viewHelper instanceof Zend_Form_Decorator_ViewHelper);
@@ -317,11 +337,11 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     public function testRemovingNamedDecoratorsShouldWork()
     {
         $this->_checkZf2794();
-        $this->group->setDecorators(array(
+        $this->group->setDecorators([
             'FormElements',
-            array(array('div' => 'HtmlTag'), array('tag' => 'div')),
-            array(array('div2' => 'HtmlTag'), array('tag' => 'div')),
-        ));
+            [['div' => 'HtmlTag'], ['tag' => 'div']],
+            [['div2' => 'HtmlTag'], ['tag' => 'div']],
+        ]);
         $decorators = $this->group->getDecorators();
         $this->assertTrue(array_key_exists('div', $decorators));
         $this->assertTrue(array_key_exists('div2', $decorators));
@@ -346,10 +366,10 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     {
         $this->_checkZf2794();
 
-        $this->group->setDecorators(array(
-            array('HtmlTag', array('tag' => 'fieldset')),
-            array('decorator' => array('FooBar' => 'HtmlTag'), 'options' => array('tag' => 'dd')),
-        ));
+        $this->group->setDecorators([
+            ['HtmlTag', ['tag' => 'fieldset']],
+            ['decorator' => ['FooBar' => 'HtmlTag'], 'options' => ['tag' => 'dd']],
+        ]);
         $decorator = $this->group->getDecorator('FooBar');
         $this->assertTrue($decorator instanceof Zend_Form_Decorator_HtmlTag);
         $this->assertEquals('dd', $decorator->getOption('tag'));
@@ -373,17 +393,17 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function testRetrievingNamedDecoratorShouldNotReorderDecorators()
     {
-        $this->group->setDecorators(array(
+        $this->group->setDecorators([
             'FormElements',
-            array(array('dl' => 'HtmlTag'), array('tag' => 'dl')),
-            array(array('div' => 'HtmlTag'), array('tag' => 'div')),
-            array(array('fieldset' => 'HtmlTag'), array('tag' => 'fieldset')),
-        ));
+            [['dl' => 'HtmlTag'], ['tag' => 'dl']],
+            [['div' => 'HtmlTag'], ['tag' => 'div']],
+            [['fieldset' => 'HtmlTag'], ['tag' => 'fieldset']],
+        ]);
 
-        $decorator  = $this->group->getDecorator('div');
+        $decorator = $this->group->getDecorator('div');
         $decorators = $this->group->getDecorators();
-        $i          = 0;
-        $order      = array();
+        $i = 0;
+        $order = [];
 
         foreach (array_keys($decorators) as $name) {
             $order[$name] = $i;
@@ -394,29 +414,29 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function testRenderingRendersAllElementsWithinFieldsetByDefault()
     {
-        $foo  = new Zend_Form_Element_Text('foo');
-        $bar  = new Zend_Form_Element_Text('bar');
+        $foo = new Zend_Form_Element_Text('foo');
+        $bar = new Zend_Form_Element_Text('bar');
 
-        $this->group->addElements(array($foo, $bar));
+        $this->group->addElements([$foo, $bar]);
         $html = $this->group->render($this->getView());
-        $this->assertRegexp('#^<dt[^>]*>&\#160;</dt><dd[^>]*><fieldset.*?</fieldset></dd>$#s', $html, $html);
-        $this->assertContains('<input', $html, $html);
-        $this->assertContains('"foo"', $html);
-        $this->assertContains('"bar"', $html);
+        $this->assertMatchesRegularExpression('#^<dt[^>]*>&\#160;</dt><dd[^>]*><fieldset.*?</fieldset></dd>$#s', $html, $html);
+        $this->assertStringContainsString('<input', $html, $html);
+        $this->assertStringContainsString('"foo"', $html);
+        $this->assertStringContainsString('"bar"', $html);
     }
 
     public function testToStringProxiesToRender()
     {
-        $foo  = new Zend_Form_Element_Text('foo');
-        $bar  = new Zend_Form_Element_Text('bar');
+        $foo = new Zend_Form_Element_Text('foo');
+        $bar = new Zend_Form_Element_Text('bar');
 
-        $this->group->addElements(array($foo, $bar))
+        $this->group->addElements([$foo, $bar])
                     ->setView($this->getView());
         $html = $this->group->__toString();
-        $this->assertRegexp('#^<dt[^>]*>&\#160;</dt><dd[^>]*><fieldset.*?</fieldset></dd>$#s', $html, $html);
-        $this->assertContains('<input', $html);
-        $this->assertContains('"foo"', $html);
-        $this->assertContains('"bar"', $html);
+        $this->assertMatchesRegularExpression('#^<dt[^>]*>&\#160;</dt><dd[^>]*><fieldset.*?</fieldset></dd>$#s', $html, $html);
+        $this->assertStringContainsString('<input', $html);
+        $this->assertStringContainsString('"foo"', $html);
+        $this->assertStringContainsString('"bar"', $html);
     }
 
     public function raiseDecoratorException($content, $element, $options)
@@ -424,20 +444,20 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         throw new Exception('Raising exception in decorator callback');
     }
 
-    public function handleDecoratorErrors($errno, $errstr, $errfile = '', $errline = 0, array $errcontext = array())
+    public function handleDecoratorErrors($errno, $errstr, $errfile = '', $errline = 0, array $errcontext = [])
     {
         $this->error = $errstr;
     }
 
     public function testToStringRaisesErrorWhenExceptionCaught()
     {
-        $this->group->setDecorators(array(
-            array(
+        $this->group->setDecorators([
+            [
                 'decorator' => 'Callback',
-                'options'   => array('callback' => array($this, 'raiseDecoratorException'))
-            ),
-        ));
-        $origErrorHandler = set_error_handler(array($this, 'handleDecoratorErrors'), E_USER_WARNING);
+                'options' => ['callback' => [$this, 'raiseDecoratorException']]
+            ],
+        ]);
+        $origErrorHandler = set_error_handler([$this, 'handleDecoratorErrors'], E_USER_WARNING);
 
         $text = $this->group->__toString();
 
@@ -456,7 +476,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     public function testGetTranslatorRetrievesGlobalDefaultWhenAvailable()
     {
         $this->testNoTranslatorByDefault();
-        $translator = new Zend_Translate('array', array('foo' => 'bar'));
+        $translator = new Zend_Translate('array', ['foo' => 'bar']);
         Zend_Form::setDefaultTranslator($translator);
         $received = $this->group->getTranslator();
         $this->assertSame($translator->getAdapter(), $received);
@@ -464,7 +484,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function testTranslatorAccessorsWorks()
     {
-        $translator = new Zend_Translate('array', array('foo' => 'bar'));
+        $translator = new Zend_Translate('array', ['foo' => 'bar']);
         $this->group->setTranslator($translator);
         $received = $this->group->getTranslator($translator);
         $this->assertSame($translator->getAdapter(), $received);
@@ -484,14 +504,14 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $foo = new Zend_Form_Element('foo');
         $bar = new Zend_Form_Element('bar');
         $baz = new Zend_Form_Element('baz');
-        $this->group->addElements(array($foo, $bar, $baz));
+        $this->group->addElements([$foo, $bar, $baz]);
     }
 
     public function testDisplayGroupIsIterableAndIteratesElements()
     {
         $this->setupIteratorElements();
-        $expected = array('foo', 'bar', 'baz');
-        $received = array();
+        $expected = ['foo', 'bar', 'baz'];
+        $received = [];
         foreach ($this->group as $key => $element) {
             $received[] = $key;
             $this->assertTrue($element instanceof Zend_Form_Element);
@@ -502,10 +522,10 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     public function testDisplayGroupIteratesElementsInExpectedOrder()
     {
         $this->setupIteratorElements();
-        $test = new Zend_Form_Element('checkorder', array('order' => 1));
+        $test = new Zend_Form_Element('checkorder', ['order' => 1]);
         $this->group->addElement($test);
-        $expected = array('foo', 'checkorder', 'bar', 'baz');
-        $received = array();
+        $expected = ['foo', 'checkorder', 'bar', 'baz'];
+        $received = [];
         foreach ($this->group as $key => $element) {
             $received[] = $key;
         }
@@ -514,27 +534,30 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function testDisplayGroupIteratesElementsInExpectedOrderWhenFirstElementHasNoOrderSpecified()
     {
-        $a = new Zend_Form_Element('a',array('label'=>'a'));
-        $b = new Zend_Form_Element('b',array('label'=>'b', 'order' => 0));
-        $c = new Zend_Form_Element('c',array('label'=>'c', 'order' => 1));
+        $a = new Zend_Form_Element('a', ['label' => 'a']);
+        $b = new Zend_Form_Element('b', ['label' => 'b', 'order' => 0]);
+        $c = new Zend_Form_Element('c', ['label' => 'c', 'order' => 1]);
         $this->group->addElement($a)
                     ->addElement($b)
                     ->addElement($c)
                     ->setView($this->getView());
         $test = $this->group->render();
-        $this->assertContains('name="a"', $test);
+        $this->assertStringContainsString('name="a"', $test);
         if (!preg_match_all('/(<input[^>]+>)/', $test, $matches)) {
             $this->fail('Expected markup not found');
         }
-        $order = array();
+        $order = [];
         foreach ($matches[1] as $element) {
             if (preg_match('/name="(a|b|c)"/', $element, $m)) {
                 $order[] = $m[1];
             }
         }
-        $this->assertSame(array('b', 'c', 'a'), $order);
+        $this->assertSame(['b', 'c', 'a'], $order);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemovingElementsShouldNotRaiseExceptionsDuringIteration()
     {
         $this->setupIteratorElements();
@@ -561,12 +584,12 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function getOptions()
     {
-        $options = array(
-            'name'   => 'foo',
+        $options = [
+            'name' => 'foo',
             'legend' => 'Display Group',
-            'order'  => 20,
-            'class'  => 'foobar'
-        );
+            'order' => 20,
+            'class' => 'foobar'
+        ];
         return $options;
     }
 
@@ -579,16 +602,19 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $this->group->getAttrib('class'));
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testSetOptionsOmitsAccessorsRequiringObjectsOrMultipleParams()
     {
         $options = $this->getOptions();
-        $config  = new Zend_Config($options);
-        $options['config']       = $config;
-        $options['options']      = $config->toArray();
+        $config = new Zend_Config($options);
+        $options['config'] = $config;
+        $options['options'] = $config->toArray();
         $options['pluginLoader'] = true;
-        $options['view']         = true;
-        $options['translator']   = true;
-        $options['attrib']       = true;
+        $options['view'] = true;
+        $options['translator'] = true;
+        $options['attrib'] = true;
         $this->group->setOptions($options);
     }
 
@@ -597,7 +623,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->_checkZf2794();
 
         $options = $this->getOptions();
-        $options['decorators'] = array('label', 'form');
+        $options['decorators'] = ['label', 'form'];
         $this->group->setOptions($options);
         $this->assertFalse($this->group->getDecorator('group'));
 
@@ -612,10 +638,10 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->_checkZf2794();
 
         $options = $this->getOptions();
-        $options['decorators'] = array(
-            array('label', array('id' => 'mylabel')),
-            array('form', array('id' => 'form')),
-        );
+        $options['decorators'] = [
+            ['label', ['id' => 'mylabel']],
+            ['form', ['id' => 'form']],
+        ];
         $this->group->setOptions($options);
         $this->assertFalse($this->group->getDecorator('group'));
 
@@ -635,16 +661,16 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
         $this->_checkZf2794();
 
         $options = $this->getOptions();
-        $options['decorators'] = array(
-            array(
-                'options'   => array('id' => 'mylabel'),
+        $options['decorators'] = [
+            [
+                'options' => ['id' => 'mylabel'],
                 'decorator' => 'label',
-            ),
-            array(
-                'options'   => array('id' => 'form'),
+            ],
+            [
+                'options' => ['id' => 'form'],
                 'decorator' => 'form',
-            ),
-        );
+            ],
+        ];
         $this->group->setOptions($options);
         $this->assertFalse($this->group->getDecorator('group'));
 
@@ -672,7 +698,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     public function testPassingConfigObjectToConstructorSetsObjectState()
     {
         $config = new Zend_Config($this->getOptions());
-        $group  = new Zend_Form_DisplayGroup('foo', $this->loader, $config);
+        $group = new Zend_Form_DisplayGroup('foo', $this->loader, $config);
         $this->assertEquals('foo', $group->getName());
         $this->assertEquals('Display Group', $group->getLegend());
         $this->assertEquals(20, $group->getOrder());
@@ -686,11 +712,11 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
 
     public function testCanAddMultipleAttribsSimultaneously()
     {
-        $attribs = array(
+        $attribs = [
             'foo' => 'fooval',
             'bar' => 'barval',
             'baz' => 'bazval'
-        );
+        ];
         $this->group->addAttribs($attribs);
         $this->assertEquals($attribs, $this->group->getAttribs());
     }
@@ -698,10 +724,10 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     public function testSetAttribsOverwritesPreviouslySetAttribs()
     {
         $this->testCanAddMultipleAttribsSimultaneously();
-        $attribs = array(
+        $attribs = [
             'foo' => 'valfoo',
             'bat' => 'batval'
-        );
+        ];
         $this->group->setAttribs($attribs);
         $this->assertEquals($attribs, $this->group->getAttribs());
     }
@@ -717,7 +743,7 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     {
         $this->testCanAddMultipleAttribsSimultaneously();
         $this->group->clearAttribs();
-        $this->assertEquals(array(), $this->group->getAttribs());
+        $this->assertEquals([], $this->group->getAttribs());
     }
 
     // Extension
@@ -737,30 +763,30 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
      */
     public function testGroupShouldOverloadToRenderDecorators()
     {
-        $foo  = new Zend_Form_Element_Text('foo');
-        $bar  = new Zend_Form_Element_Text('bar');
-        $this->group->addElements(array($foo, $bar));
+        $foo = new Zend_Form_Element_Text('foo');
+        $bar = new Zend_Form_Element_Text('bar');
+        $this->group->addElements([$foo, $bar]);
 
         $this->group->setView($this->getView());
         $html = $this->group->renderFormElements();
         foreach ($this->group->getElements() as $element) {
-            $this->assertContains('id="' . $element->getFullyQualifiedName() . '"', $html, 'Received: ' . $html);
+            $this->assertStringContainsString('id="' . $element->getFullyQualifiedName() . '"', $html, 'Received: ' . $html);
         }
-        $this->assertNotContains('<dl', $html);
-        $this->assertNotContains('<form', $html);
+        $this->assertStringNotContainsString('<dl', $html);
+        $this->assertStringNotContainsString('<form', $html);
 
         $html = $this->group->renderFieldset('this is the content');
-        $this->assertContains('<fieldset', $html);
-        $this->assertContains('</fieldset>', $html);
-        $this->assertContains('this is the content', $html);
+        $this->assertStringContainsString('<fieldset', $html);
+        $this->assertStringContainsString('</fieldset>', $html);
+        $this->assertStringContainsString('this is the content', $html);
     }
 
     /**
      * @group ZF-3217
-     * @expectedException Zend_Form_Exception
      */
     public function testOverloadingToInvalidMethodsShouldThrowAnException()
     {
+        $this->expectException(Zend_Form_Exception::class);
         $html = $this->group->bogusMethodCall();
     }
 
@@ -793,11 +819,11 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
      */
     public function testAddDecoratorsKeepsNonNumericKeyNames()
     {
-        $this->group->addDecorators(array(array(array('td'  => 'HtmlTag'),
-                                               array('tag' => 'td')),
-                                         array(array('tr'  => 'HtmlTag'),
-                                               array('tag' => 'tr')),
-                                         array('HtmlTag', array('tag' => 'baz'))));
+        $this->group->addDecorators([[['td' => 'HtmlTag'],
+                                               ['tag' => 'td']],
+                                         [['tr' => 'HtmlTag'],
+                                               ['tag' => 'tr']],
+                                         ['HtmlTag', ['tag' => 'baz']]]);
         $t1 = $this->group->getDecorators();
         $this->group->setDecorators($t1);
         $t2 = $this->group->getDecorators();
@@ -819,12 +845,12 @@ class Zend_Form_DisplayGroupTest extends PHPUnit_Framework_TestCase
     {
         $this->group->setTranslator(
             new Zend_Translate(
-                array(
+                [
                     'adapter' => 'array',
-                    'content' => array(
+                    'content' => [
                         'foo' => 'Foo',
-                    ),
-                )
+                    ],
+                ]
             )
         );
         $this->assertTrue($this->group->hasTranslator());
@@ -839,6 +865,6 @@ class Zend_Form_DisplayGroupTest_DisplayGroup extends Zend_Form_DisplayGroup
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Form_DisplayGroupTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Form_DisplayGroupTest::main') {
     Zend_Form_DisplayGroupTest::main();
 }

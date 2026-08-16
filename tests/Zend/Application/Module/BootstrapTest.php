@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -37,22 +42,37 @@ require_once 'Zend/Loader/Autoloader.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Application
  */
-class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
+class Zend_Application_Module_BootstrapTest extends TestCase
 {
+    /**
+     * @var array
+     */
+    protected $loaders;
+
+    /**
+     * @var Zend_Loader_Autoloader
+     */
+    protected $autoloader;
+
+    /**
+     * @var Zend_Application
+     */
+    protected $application;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         // Store original autoloaders
         $this->loaders = spl_autoload_functions();
         if (!is_array($this->loaders)) {
             // spl_autoload_functions does not return empty array when no
             // autoloaders registered...
-            $this->loaders = array();
+            $this->loaders = [];
         }
 
         Zend_Loader_Autoloader::resetInstance();
@@ -63,7 +83,7 @@ class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
         Zend_Controller_Front::getInstance()->resetInstance();
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         // Restore original autoloaders
         $loaders = spl_autoload_functions();
@@ -91,11 +111,11 @@ class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
 
     public function testConstructorShouldAcceptResourceLoaderInOptions()
     {
-        $loader = new Zend_Loader_Autoloader_Resource(array(
+        $loader = new Zend_Loader_Autoloader_Resource([
             'namespace' => 'Foo',
-            'basePath'  => dirname(__FILE__),
-        ));
-        $this->application->setOptions(array('resourceLoader' => $loader));
+            'basePath' => dirname(__FILE__),
+        ]);
+        $this->application->setOptions(['resourceLoader' => $loader]);
 
         require_once dirname(__FILE__) . '/../_files/ZfModuleBootstrap.php';
         $bootstrap = new ZfModule_Bootstrap($this->application);
@@ -111,12 +131,12 @@ class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
 
     public function testShouldPullModuleNamespacedOptionsWhenPresent()
     {
-        $options = array(
+        $options = [
             'foo' => 'bar',
-            'ZfModule' => array(
+            'ZfModule' => [
                 'foo' => 'baz',
-            )
-        );
+            ]
+        ];
         $this->application->setOptions($options);
         require_once dirname(__FILE__) . '/../_files/ZfModuleBootstrap.php';
         $bootstrap = new ZfModule_Bootstrap($this->application);
@@ -139,23 +159,23 @@ class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
     public function testFrontControllerStateRemainsSameIfNoOptionsPassedToModuleBootstrap()
     {
         require_once dirname(__FILE__) . '/../_files/ZfModuleBootstrap.php';
-        $this->application->setOptions(array(
-            'resources' => array(
-                'frontController' => array(
-                    'baseUrl'             => '/foo',
+        $this->application->setOptions([
+            'resources' => [
+                'frontController' => [
+                    'baseUrl' => '/foo',
                     'controllerDirectory' => dirname(__FILE__),
-                ),
-            ),
-            'bootstrap' => array(
-                'path'  => dirname(__FILE__) . '/../_files/ZfAppBootstrap.php',
+                ],
+            ],
+            'bootstrap' => [
+                'path' => dirname(__FILE__) . '/../_files/ZfAppBootstrap.php',
                 'class' => 'ZfAppBootstrap',
-            ),
-            'ZfModule' => array(
-                'resources' => array(
-                    'FrontController' => array(),
-                ),
-            ),
-        ));
+            ],
+            'ZfModule' => [
+                'resources' => [
+                    'FrontController' => [],
+                ],
+            ],
+        ]);
         $appBootstrap = $this->application->getBootstrap();
         $appBootstrap->bootstrap('FrontController');
         $front = $appBootstrap->getResource('FrontController');
@@ -173,19 +193,19 @@ class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
     public function testModuleBootstrapsShouldNotAcceptModuleResourceInOrderToPreventRecursion()
     {
         require_once dirname(__FILE__) . '/../_files/ZfModuleBootstrap.php';
-        $this->application->setOptions(array(
-            'resources' => array(
-                'modules' => array(),
-                'frontController' => array(
-                    'baseUrl'             => '/foo',
-                    'moduleDirectory'     => dirname(__FILE__) . '/../_files/modules',
-                ),
-            ),
-            'bootstrap' => array(
-                'path'  => dirname(__FILE__) . '/../_files/ZfAppBootstrap.php',
+        $this->application->setOptions([
+            'resources' => [
+                'modules' => [],
+                'frontController' => [
+                    'baseUrl' => '/foo',
+                    'moduleDirectory' => dirname(__FILE__) . '/../_files/modules',
+                ],
+            ],
+            'bootstrap' => [
+                'path' => dirname(__FILE__) . '/../_files/ZfAppBootstrap.php',
                 'class' => 'ZfAppBootstrap',
-            )
-        ));
+            ]
+        ]);
         $appBootstrap = $this->application->getBootstrap();
         $appBootstrap->bootstrap('Modules');
         $modules = $appBootstrap->getResource('Modules');
@@ -205,33 +225,33 @@ class Zend_Application_Module_BootstrapTest extends PHPUnit_Framework_TestCase
     public function testModuleBootstrapShouldInheritApplicationBootstrapPluginPaths()
     {
         require_once dirname(__FILE__) . '/../_files/ZfModuleBootstrap.php';
-        $this->application->setOptions(array(
-            'resources' => array(
-                'modules' => array(),
-                'frontController' => array(
-                    'baseUrl'             => '/foo',
-                    'moduleDirectory'     => dirname(__FILE__) . '/../_files/modules',
-                ),
-            ),
-            'pluginPaths' => array(
+        $this->application->setOptions([
+            'resources' => [
+                'modules' => [],
+                'frontController' => [
+                    'baseUrl' => '/foo',
+                    'moduleDirectory' => dirname(__FILE__) . '/../_files/modules',
+                ],
+            ],
+            'pluginPaths' => [
                 'ZfModuleBootstrap_Resource' => dirname(__FILE__),
-            ),
-            'bootstrap' => array(
-                'path'  => dirname(__FILE__) . '/../_files/ZfAppBootstrap.php',
+            ],
+            'bootstrap' => [
+                'path' => dirname(__FILE__) . '/../_files/ZfAppBootstrap.php',
                 'class' => 'ZfAppBootstrap',
-            )
-        ));
+            ]
+        ]);
         $appBootstrap = $this->application->getBootstrap();
         $appBootstrap->bootstrap('Modules');
         $modules = $appBootstrap->getResource('Modules');
         foreach ($modules as $bootstrap) {
             $loader = $bootstrap->getPluginLoader();
-            $paths  = $loader->getPaths();
+            $paths = $loader->getPaths();
             $this->assertTrue(array_key_exists('ZfModuleBootstrap_Resource_', $paths));
         }
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Application_Module_BootstrapTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Application_Module_BootstrapTest::main') {
     Zend_Application_Module_BootstrapTest::main();
 }

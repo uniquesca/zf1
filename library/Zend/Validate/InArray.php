@@ -32,14 +32,14 @@ require_once 'Zend/Validate/Abstract.php';
  */
 class Zend_Validate_InArray extends Zend_Validate_Abstract
 {
-    const NOT_IN_ARRAY = 'notInArray';
+    public const NOT_IN_ARRAY = 'notInArray';
 
     /**
      * @var array
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::NOT_IN_ARRAY => "'%value%' was not found in the haystack",
-    );
+    ];
 
     /**
      * Haystack of possible values
@@ -77,7 +77,7 @@ class Zend_Validate_InArray extends Zend_Validate_Abstract
             throw new Zend_Validate_Exception('Array expected as parameter');
         } else {
             $count = func_num_args();
-            $temp  = array();
+            $temp  = [];
             if ($count > 1) {
                 $temp['haystack'] = func_get_arg(0);
                 $temp['strict']   = func_get_arg(1);
@@ -85,7 +85,7 @@ class Zend_Validate_InArray extends Zend_Validate_Abstract
             } else {
                 $temp = func_get_arg(0);
                 if (!array_key_exists('haystack', $options)) {
-                    $options = array();
+                    $options = [];
                     $options['haystack'] = $temp;
                 } else {
                     $options = $temp;
@@ -106,7 +106,7 @@ class Zend_Validate_InArray extends Zend_Validate_Abstract
     /**
      * Returns the haystack option
      *
-     * @return mixed
+     * @return array
      */
     public function getHaystack()
     {
@@ -117,7 +117,7 @@ class Zend_Validate_InArray extends Zend_Validate_Abstract
      * Sets the haystack option
      *
      * @param  mixed $haystack
-     * @return Zend_Validate_InArray Provides a fluent interface
+     * @return $this
      */
     public function setHaystack(array $haystack)
     {
@@ -139,11 +139,11 @@ class Zend_Validate_InArray extends Zend_Validate_Abstract
      * Sets the strict option
      *
      * @param  boolean $strict
-     * @return Zend_Validate_InArray Provides a fluent interface
+     * @return $this
      */
     public function setStrict($strict)
     {
-        $this->_strict = (boolean) $strict;
+        $this->_strict = (bool) $strict;
         return $this;
     }
 
@@ -161,11 +161,11 @@ class Zend_Validate_InArray extends Zend_Validate_Abstract
      * Sets the recursive option
      *
      * @param  boolean $recursive
-     * @return Zend_Validate_InArray Provides a fluent interface
+     * @return $this
      */
     public function setRecursive($recursive)
     {
-        $this->_recursive = (boolean) $recursive;
+        $this->_recursive = (bool) $recursive;
         return $this;
     }
 

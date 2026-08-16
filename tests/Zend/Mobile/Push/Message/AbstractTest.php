@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -30,9 +33,14 @@ require_once 'Zend/Mobile/Push/Message/Abstract.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Mobile
  */
-class Zend_Mobile_Push_Message_AbstractTest extends PHPUnit_Framework_TestCase
+class Zend_Mobile_Push_Message_AbstractTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \Zend_Mobile_Push_Message_AbstractProxy|mixed
+     */
+    protected $msg;
+
+    protected function set_up()
     {
         $this->msg = new Zend_Mobile_Push_Message_AbstractProxy();
     }
@@ -45,12 +53,10 @@ class Zend_Mobile_Push_Message_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($token, $this->msg->getToken());
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testSetTokenThrowsExceptionOnNonStringToken()
     {
-        $this->msg->setToken(array('dummy'));
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
+        $this->msg->setToken(['dummy']);
     }
 
     public function testSetId()
@@ -61,12 +67,10 @@ class Zend_Mobile_Push_Message_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($id, $this->msg->getId());
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testSetIdThrowsExceptionOnNonScalar()
     {
-        $this->msg->setId(array('foo'));
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
+        $this->msg->setId(['foo']);
     }
 
     public function testSetOptions()
@@ -74,23 +78,21 @@ class Zend_Mobile_Push_Message_AbstractTest extends PHPUnit_Framework_TestCase
         $token = 'token';
         $id = 'id';
 
-        $ret = $this->msg->setOptions(array(
+        $ret = $this->msg->setOptions([
             'id' => $id,
             'token' => $token
-        ));
+        ]);
         $this->assertEquals($this->msg, $ret);
         $this->assertEquals($token, $this->msg->getToken());
         $this->assertEquals($id, $this->msg->getId());
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testSetOptionsThrowsExceptionOnMissingMethod()
     {
-        $this->msg->setOptions(array(
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
+        $this->msg->setOptions([
             'thisMethodDoesNotExist' => 'value'
-        ));
+        ]);
     }
 
     public function testValidateReturnsTrue()
@@ -101,5 +103,4 @@ class Zend_Mobile_Push_Message_AbstractTest extends PHPUnit_Framework_TestCase
 
 class Zend_Mobile_Push_Message_AbstractProxy extends Zend_Mobile_Push_Message_Abstract
 {
-    
 }

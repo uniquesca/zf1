@@ -64,7 +64,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
      * Stores the byte offsets to the various information tables.
      * @var array
      */
-    protected $_tableDirectory = array();
+    protected $_tableDirectory = [];
 
 
 
@@ -310,7 +310,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
          * use Mac Roman if nothing else is available. We will extract the
          * actual strings later.
          */
-        $nameRecords = array();
+        $nameRecords = [];
         for ($nameIndex = 0; $nameIndex < $nameCount; $nameIndex++) {
 
             $platformID = $this->readUInt(2);
@@ -341,23 +341,26 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
              * exists for both Mac Roman and Microsoft Unicode, the Unicode entry
              * will prevail since it is processed last.
              */
-            $nameRecords[$nameID][$languageCode] = array('platform' => $platformID,
+            $nameRecords[$nameID][$languageCode] = ['platform' => $platformID,
                                                          'offset'   => $nameOffset,
-                                                         'length'   => $nameLength );
+                                                         'length'   => $nameLength ];
         }
 
         /* Now go back and extract the interesting strings.
          */
-        $fontNames = array();
+        $fontNames = [];
+
         foreach ($nameRecords as $name => $languages) {
             foreach ($languages as $language => $attributes) {
                 $stringOffset = $storageOffset + $attributes['offset'];
                 $this->moveToOffset($stringOffset);
+
                 if ($attributes['platform'] == 3) {
                     $string = $this->readStringUTF16($attributes['length']);
                 } else {
                     $string = $this->readStringMacRoman($attributes['length']);
                 }
+
                 $fontNames[$name][$language] = $string;
             }
         }
@@ -549,8 +552,21 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
          *
          * We can understand all four of these table versions.
          */
+        /**
+         * Version 4 is structurally identical to version 3, but there are some 
+         * changes in fields compared to version 3:
+         *
+         * ulUnicodeRange
+         * https://learn.microsoft.com/en-us/typography/opentype/spec/os2#ulunicoderange
+         * 
+         * fsSelection
+         * https://learn.microsoft.com/en-us/typography/opentype/spec/os2#fsselection
+         * 
+         * fsSelection is skipped by default, ulUnicodeRange's implementation
+         * is not corrent and should be marked as bug.
+         */
         $tableVersion = $this->readUInt(2);
-        if (($tableVersion < 0) || ($tableVersion > 3)) {
+        if (($tableVersion < 0) || ($tableVersion > 4)) {
             require_once 'Zend/Pdf/Exception.php';
             throw new Zend_Pdf_Exception("Unable to read version $tableVersion table",
                                          Zend_Pdf_Exception::DONT_UNDERSTAND_TABLE_VERSION);
@@ -762,7 +778,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
          * the glyph's advance width and its left side bearing. We don't use the
          * left side bearing.
          */
-        $glyphWidths = array();
+        $glyphWidths = [];
         for ($i = 0; $i < $this->numberHMetrics; $i++) {
             $glyphWidths[$i] = $this->readUInt(2);
             $this->skipBytes(2);
@@ -818,7 +834,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
         /* Like the name table, there may be many different encoding subtables
          * present. Ideally, we are looking for an acceptable Unicode table.
          */
-        $subtables = array();
+        $subtables = [];
         for ($subtableIndex = 0; $subtableIndex < $subtableCount; $subtableIndex++) {
 
             $platformID = $this->readUInt(2);
@@ -850,7 +866,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
 
         /* In preferred order, find a subtable to use.
          */
-        $offsets = array();
+        $offsets = [];
 
         /* Unicode 2.0 or later semantics
          */
@@ -890,7 +906,6 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
             $cmapOffset = $baseOffset + $offset;
             $this->moveToOffset($cmapOffset);
             $format = $this->readUInt(2);
-            $language = -1;
             switch ($format) {
                 case 0x0:
                     $cmapLength = $this->readUInt(2);
@@ -898,7 +913,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
                     if ($language != 0) {
                         $this->_debugLog('Type 0 cmap tables must be language-independent;'
                                          . ' language: %d; skipping', $language);
-                        continue;
+                        continue 2;
                     }
                     break;
 
@@ -917,7 +932,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
                 case 0xa:    // break intentionally omitted
                 case 0xc:
                     $this->_debugLog('Format: 0x%x currently unsupported; skipping', $format);
-                    continue;
+                    continue 2;
                     //$this->skipBytes(2);
                     //$cmapLength = $this->readUInt(4);
                     //$language = $this->readUInt(4);
@@ -929,7 +944,7 @@ abstract class Zend_Pdf_FileParser_Font_OpenType extends Zend_Pdf_FileParser_Fon
 
                 default:
                     $this->_debugLog('Unknown subtable format: 0x%x; skipping', $format);
-                    continue;
+                    continue 2;
             }
             $cmapType = $format;
             break;

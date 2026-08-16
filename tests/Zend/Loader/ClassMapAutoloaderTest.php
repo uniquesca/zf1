@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -34,22 +39,37 @@ require_once 'Zend/Loader/ClassMapAutoloader.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Loader
  */
-class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
+class Zend_Loader_ClassMapAutoloaderTest extends TestCase
 {
+    /**
+     * @var mixed[]|mixed
+     */
+    protected $loaders;
+
+    /**
+     * @var string|bool|mixed
+     */
+    protected $includePath;
+
+    /**
+     * @var Zend_Loader_ClassMapAutoloader
+     */
+    private $loader;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         // Store original autoloaders
         $this->loaders = spl_autoload_functions();
         if (!is_array($this->loaders)) {
             // spl_autoload_functions does not return empty array when no
             // autoloaders registered...
-            $this->loaders = array();
+            $this->loaders = [];
         }
 
         // Store original include_path
@@ -58,7 +78,7 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
         $this->loader = new Zend_Loader_ClassMapAutoloader();
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         // Restore original autoloaders
         $loaders = spl_autoload_functions();
@@ -79,21 +99,21 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
     public function testRegisteringNonExistentAutoloadMapRaisesInvalidArgumentException()
     {
         $dir = dirname(__FILE__) . '__foobar__';
-        $this->setExpectedException('Zend_Loader_Exception_InvalidArgumentException');
+        $this->expectException('Zend_Loader_Exception_InvalidArgumentException');
         $this->loader->registerAutoloadMap($dir);
     }
 
     public function testValidMapFileNotReturningMapRaisesInvalidArgumentException()
     {
-        $this->setExpectedException('Zend_Loader_Exception_InvalidArgumentException');
+        $this->expectException('Zend_Loader_Exception_InvalidArgumentException');
         $this->loader->registerAutoloadMap(dirname(__FILE__) . '/_files/badmap.php');
     }
 
     public function testAllowsRegisteringArrayAutoloadMapDirectly()
     {
-        $map = array(
+        $map = [
             'Zend_Loader_Exception' => dirname(__FILE__) . '/../../../library/Zend/Loader/Exception.php',
-        );
+        ];
         $this->loader->registerAutoloadMap($map);
         $test = $this->loader->getAutoloadMap();
         $this->assertSame($map, $test);
@@ -101,10 +121,10 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testAllowsRegisteringArrayAutoloadMapViaConstructor()
     {
-        $map = array(
+        $map = [
             'Zend_Loader_Exception' => dirname(__FILE__) . '/../../../library/Zend/Loader/Exception.php',
-        );
-        $loader = new Zend_Loader_ClassMapAutoloader(array($map));
+        ];
+        $loader = new Zend_Loader_ClassMapAutoloader([$map]);
         $test = $loader->getAutoloadMap();
         $this->assertSame($map, $test);
     }
@@ -115,7 +135,7 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
         $map = $this->loader->getAutoloadMap();
         $this->assertTrue(is_array($map));
         $this->assertEquals(2, count($map));
-        // Just to make sure nothing changes after loading the same map again 
+        // Just to make sure nothing changes after loading the same map again
         // (loadMapFromFile should just return)
         $this->loader->registerAutoloadMap(dirname(__FILE__) . '/_files/goodmap.php');
         $map = $this->loader->getAutoloadMap();
@@ -125,10 +145,10 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testRegisteringMultipleMapsMergesThem()
     {
-        $map = array(
+        $map = [
             'Zend_Loader_Exception' => dirname(__FILE__) . '/../../../library/Zend/Loader/Exception.php',
             'Zend_Loader_StandardAutoloaderTest' => 'some/bogus/path.php',
-        );
+        ];
         $this->loader->registerAutoloadMap($map);
         $this->loader->registerAutoloadMap(dirname(__FILE__) . '/_files/goodmap.php');
 
@@ -140,11 +160,11 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testCanRegisterMultipleMapsAtOnce()
     {
-        $map = array(
+        $map = [
             'Zend_Loader_Exception' => dirname(__FILE__) . '/../../../library/Zend/Loader/Exception.php',
             'Zend_Loader_StandardAutoloaderTest' => 'some/bogus/path.php',
-        );
-        $maps = array($map, dirname(__FILE__) . '/_files/goodmap.php');
+        ];
+        $maps = [$map, dirname(__FILE__) . '/_files/goodmap.php'];
         $this->loader->registerAutoloadMaps($maps);
         $test = $this->loader->getAutoloadMap();
         $this->assertTrue(is_array($test));
@@ -153,20 +173,20 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterMapsThrowsExceptionForNonTraversableArguments()
     {
-        $tests = array(true, 'string', 1, 1.0, new stdClass);
+        $tests = [true, 'string', 1, 1.0, new stdClass()];
         foreach ($tests as $test) {
             try {
                 $this->loader->registerAutoloadMaps($test);
                 $this->fail('Should not register non-traversable arguments');
             } catch (Zend_Loader_Exception_InvalidArgumentException $e) {
-                $this->assertContains('array or implement Traversable', $e->getMessage());
+                $this->assertStringContainsString('array or implement Traversable', $e->getMessage());
             }
         }
     }
 
     public function testAutoloadLoadsClasses()
     {
-        $map = array('Zend_UnusualNamespace_ClassMappedClass' => dirname(__FILE__) . '/TestAsset/ClassMappedClass.php');
+        $map = ['Zend_UnusualNamespace_ClassMappedClass' => dirname(__FILE__) . '/TestAsset/ClassMappedClass.php'];
         $this->loader->registerAutoloadMap($map);
         $this->loader->autoload('Zend_UnusualNamespace_ClassMappedClass');
         $this->assertTrue(class_exists('Zend_UnusualNamespace_ClassMappedClass', false));
@@ -174,7 +194,7 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testIgnoresClassesNotInItsMap()
     {
-        $map = array('Zend_UnusualNamespace_ClassMappedClass' => dirname(__FILE__) . '/TestAsset/ClassMappedClass.php');
+        $map = ['Zend_UnusualNamespace_ClassMappedClass' => dirname(__FILE__) . '/TestAsset/ClassMappedClass.php'];
         $this->loader->registerAutoloadMap($map);
         $this->loader->autoload('Zend_UnusualNamespace_UnMappedClass');
         $this->assertFalse(class_exists('Zend_UnusualNamespace_UnMappedClass', false));
@@ -187,7 +207,7 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(count($this->loaders) < count($loaders));
         $found = false;
         foreach ($loaders as $loader) {
-            if ($loader == array($this->loader, 'autoload')) {
+            if ($loader == [$this->loader, 'autoload']) {
                 $found = true;
                 break;
             }
@@ -227,6 +247,6 @@ class Zend_Loader_ClassMapAutoloaderTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Loader_ClassMapAutoloaderTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Loader_ClassMapAutoloaderTest::main') {
     Zend_Loader_ClassMapAutoloaderTest::main();
 }

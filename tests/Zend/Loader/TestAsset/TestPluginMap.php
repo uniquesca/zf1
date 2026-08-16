@@ -21,6 +21,8 @@
 
 namespace ZendTest\Loader\TestAsset;
 
+use ReturnTypeWillChange;
+
 /**
  * @package    Zend_Loader
  * @subpackage UnitTests
@@ -32,20 +34,21 @@ class ZendTest_Loader_TestAsset_TestPluginMap implements IteratorAggregate
 {
     /**
      * Plugin map
-     * 
+     *
      * @var array
      */
-    public $map = array(
-        'map'    => __CLASS__,
-        'test'   => 'Zend_Loader_PluginClassLoaderTest',
+    public $map = [
+        'map' => __CLASS__,
+        'test' => 'Zend_Loader_PluginClassLoaderTest',
         'loader' => 'Zend_Loader_PluginClassLoader',
-    );
+    ];
 
     /**
      * Return iterator
-     * 
-     * @return Traversable
+     *
+     * @return ArrayIterator
      */
+    #[ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->map);

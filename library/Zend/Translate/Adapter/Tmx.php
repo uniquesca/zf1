@@ -47,7 +47,7 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
     private $_tuv     = null;
     private $_seg     = null;
     private $_content = null;
-    private $_data    = array();
+    private $_data    = [];
 
     /**
      * Load translation data (TMX file reader)
@@ -59,24 +59,23 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
      * @throws Zend_Translation_Exception
      * @return array
      */
-    protected function _loadTranslationData($filename, $locale, array $options = array())
+    protected function _loadTranslationData($filename, $locale, array $options = [])
     {
-        $this->_data = array();
+        $this->_data = [];
         if (!is_readable($filename)) {
             require_once 'Zend/Translate/Exception.php';
             throw new Zend_Translate_Exception('Translation file \'' . $filename . '\' is not readable.');
         }
 
         if (isset($options['useId'])) {
-            $this->_useId = (boolean) $options['useId'];
+            $this->_useId = (bool) $options['useId'];
         }
 
         $encoding = $this->_findEncoding($filename);
         $this->_file = xml_parser_create($encoding);
-        xml_set_object($this->_file, $this);
         xml_parser_set_option($this->_file, XML_OPTION_CASE_FOLDING, 0);
-        xml_set_element_handler($this->_file, "_startElement", "_endElement");
-        xml_set_character_data_handler($this->_file, "_contentElement");
+        xml_set_element_handler($this->_file, [$this, '_startElement'], [$this, '_endElement']);
+        xml_set_character_data_handler($this->_file, [$this, '_contentElement']);
 
         try {
             Zend_Xml_Security::scanFile($filename);
@@ -86,7 +85,7 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
                 $e->getMessage()
             );
         }
- 
+
         if (!xml_parse($this->_file, file_get_contents($filename))) {
             $ex = sprintf('XML error: %s at line %d of file %s',
                           xml_error_string(xml_get_error_code($this->_file)),
@@ -156,7 +155,7 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
                         }
 
                         if (!isset($this->_data[$this->_tuv])) {
-                            $this->_data[$this->_tuv] = array();
+                            $this->_data[$this->_tuv] = [];
                         }
                     }
                     break;
@@ -179,7 +178,7 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
      */
     protected function _endElement($file, $name)
     {
-        if (($this->_seg !== null) and ($name !== 'seg')) {
+        if (($this->_seg !== null) && ($name !== 'seg')) {
             $this->_content .= "</".$name.">";
         } else {
             switch (strtolower($name)) {
@@ -195,8 +194,10 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
                         $this->_tu = $this->_content;
                     }
 
-                    if (!empty($this->_content) or (!isset($this->_data[$this->_tuv][$this->_tu]))) {
-                        $this->_data[$this->_tuv][$this->_tu] = $this->_content;
+                    $tuv = $this->_tuv ?? '';
+                    $tu  = $this->_tu ?? '';
+                    if (!empty($this->_content) || (!isset($this->_data[$tuv][$tu]))) {
+                        $this->_data[$tuv][$tu] = $this->_content;
                     }
                     break;
                 default:
@@ -213,7 +214,7 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
      */
     protected function _contentElement($file, $data)
     {
-        if (($this->_seg !== null) and ($this->_tu !== null) and ($this->_tuv !== null)) {
+        if (($this->_seg !== null) && ($this->_tu !== null) && ($this->_tuv !== null)) {
             $this->_content .= $data;
         }
     }
@@ -227,7 +228,7 @@ class Zend_Translate_Adapter_Tmx extends Zend_Translate_Adapter {
      */
     protected function _findEncoding($filename)
     {
-        $file = file_get_contents($filename, null, null, 0, 100);
+        $file = file_get_contents($filename, false, null, 0, 100);
         if (strpos($file, "encoding") !== false) {
             $encoding = substr($file, strpos($file, "encoding") + 9);
             $encoding = substr($encoding, 1, strpos($encoding, $encoding[0], 1) - 1);

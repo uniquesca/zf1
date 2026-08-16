@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -36,20 +39,19 @@ require_once 'Zend/Tool/Framework/Manifest/Metadata.php';
  * @group Zend_Tool_Framework
  * @group Zend_Tool_Framework_Manifest
  */
-class Zend_Tool_Framework_Manifest_MetadataTest extends PHPUnit_Framework_TestCase
+class Zend_Tool_Framework_Manifest_MetadataTest extends TestCase
 {
-
     /**
      * @var Zend_Tool_Framework_Manifest_Metadata
      */
     protected $_metadata = null;
 
-    public function setup()
+    protected function set_up()
     {
         $this->_metadata = new Zend_Tool_Framework_Manifest_Metadata();
     }
 
-    public function teardown()
+    protected function tear_down()
     {
         $this->_metadata = null;
     }
@@ -58,11 +60,11 @@ class Zend_Tool_Framework_Manifest_MetadataTest extends PHPUnit_Framework_TestCa
     {
         $obj1 = new ArrayObject();
 
-        $metadata = new Zend_Tool_Framework_Manifest_Metadata(array(
+        $metadata = new Zend_Tool_Framework_Manifest_Metadata([
             'name' => 'Foo',
             'value' => 'Bar',
             'reference' => $obj1
-            ));
+            ]);
 
         $this->assertEquals('Foo', $metadata->getName());
         $this->assertEquals('Bar', $metadata->getValue());
@@ -73,11 +75,11 @@ class Zend_Tool_Framework_Manifest_MetadataTest extends PHPUnit_Framework_TestCa
     {
         $obj1 = new ArrayObject();
 
-        $this->_metadata->setOptions(array(
+        $this->_metadata->setOptions([
             'name' => 'Foo',
             'value' => 'Bar',
             'reference' => $obj1
-            ));
+            ]);
 
         $this->assertEquals('Foo', $this->_metadata->getName());
         $this->assertEquals('Bar', $this->_metadata->getValue());
@@ -107,11 +109,11 @@ class Zend_Tool_Framework_Manifest_MetadataTest extends PHPUnit_Framework_TestCa
     {
         $obj1 = new ArrayObject();
 
-        $this->_metadata->setOptions(array(
+        $this->_metadata->setOptions([
             'name' => 'Foo',
             'value' => null,
             'reference' => $obj1
-            ));
+            ]);
 
         $attributes = $this->_metadata->getAttributes();
 
@@ -135,20 +137,18 @@ class Zend_Tool_Framework_Manifest_MetadataTest extends PHPUnit_Framework_TestCa
         $this->assertEquals('Foo', $attributes['name']);
         $this->assertEquals('(null)', $attributes['value']);
         $this->assertEquals('(object)', $attributes['reference']);
-
     }
 
     public function testMetadataObjectCanCastToStringRepresentation()
     {
         $obj1 = new ArrayObject();
 
-        $this->_metadata->setOptions(array(
+        $this->_metadata->setOptions([
             'name' => 'Foo',
             'value' => 'Bar',
             'reference' => $obj1
-            ));
+            ]);
 
         $this->assertEquals('Type: Global, Name: Foo, Value: Bar', (string) $this->_metadata);
     }
-
 }

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -36,16 +39,16 @@ require_once dirname(__FILE__) . '/../_files/My/ZendDbTable/Row/TestMockRow.php'
  * @group      Zend_Db_Table
  * @group      Zend_Db_Table_Row
  */
-class Zend_Db_Table_Row_StaticTest extends PHPUnit_Framework_TestCase
+class Zend_Db_Table_Row_StaticTest extends TestCase
 {
     public function testTableRowTransformColumnNotUsedInConstructor()
     {
-        $data = array(
-            'column'         => 'value1',
-            'column_foo'     => 'value2',
+        $data = [
+            'column' => 'value1',
+            'column_foo' => 'value2',
             'column_bar_baz' => 'value3'
-        );
-        $row = new My_ZendDbTable_Row_TestMockRow(array('data' => $data));
+        ];
+        $row = new My_ZendDbTable_Row_TestMockRow(['data' => $data]);
 
         $array = $row->toArray();
         $this->assertEquals($data, $array);
@@ -53,12 +56,12 @@ class Zend_Db_Table_Row_StaticTest extends PHPUnit_Framework_TestCase
 
     public function testTableRowTransformColumnMagicGet()
     {
-        $data = array(
-            'column'         => 'value1',
-            'column_foo'     => 'value2',
+        $data = [
+            'column' => 'value1',
+            'column_foo' => 'value2',
             'column_bar_baz' => 'value3'
-        );
-        $row = new My_ZendDbTable_Row_TestMockRow(array('data' => $data));
+        ];
+        $row = new My_ZendDbTable_Row_TestMockRow(['data' => $data]);
 
         $this->assertEquals('value1', $row->column);
         $this->assertEquals('value2', $row->columnFoo);
@@ -67,33 +70,34 @@ class Zend_Db_Table_Row_StaticTest extends PHPUnit_Framework_TestCase
 
     public function testTableRowTransformColumnMagicSet()
     {
-        $data = array(
-            'column'         => 'value1',
-            'column_foo'     => 'value2',
+        $data = [
+            'column' => 'value1',
+            'column_foo' => 'value2',
             'column_bar_baz' => 'value3'
-        );
-        $row = new My_ZendDbTable_Row_TestMockRow(array('data' => $data));
+        ];
+        $row = new My_ZendDbTable_Row_TestMockRow(['data' => $data]);
 
         $this->assertEquals('value1', $row->column);
         $this->assertEquals('value2', $row->columnFoo);
         $this->assertEquals('value3', $row->columnBarBaz);
 
-        $row->column       = 'another value 1';
-        $row->columnFoo    = 'another value 2';
+        $row->column = 'another value 1';
+        $row->columnFoo = 'another value 2';
         $row->columnBarBaz = 'another value 3';
 
         $array = $row->toArray();
         $this->assertEquals(
-            array(
-                'column'         => 'another value 1',
-                'column_foo'     => 'another value 2',
+            [
+                'column' => 'another value 1',
+                'column_foo' => 'another value 2',
                 'column_bar_baz' => 'another value 3'
-            ), $array);
+            ],
+            $array
+        );
     }
 
     public function getDriver()
     {
         return 'Static';
     }
-
 }

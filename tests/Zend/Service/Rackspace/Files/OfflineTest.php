@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,8 +37,7 @@ require_once 'Zend/Http/Client/Adapter/Test.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Service_Rackspace_Files
  */
-class Zend_Service_Rackspace_Files_OfflineTest
-    extends PHPUnit_Framework_TestCase
+class Zend_Service_Rackspace_Files_OfflineTest extends TestCase
 {
     /**
      * Reference to RackspaceFiles
@@ -77,15 +79,15 @@ class Zend_Service_Rackspace_Files_OfflineTest
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->rackspace = new Zend_Service_Rackspace_Files('foo', 'bar');
 
         $this->container = new Zend_Service_Rackspace_Files_Container(
             $this->rackspace,
-            array(
+            [
                  'name' => TESTS_ZEND_SERVICE_RACKSPACE_CONTAINER_NAME
-            )
+            ]
         );
 
         $this->httpClientAdapterTest = new Zend_Http_Client_Adapter_Test();
@@ -99,17 +101,18 @@ class Zend_Service_Rackspace_Files_OfflineTest
             self::loadResponse('../../_files/testAuthenticate')
         );
         $this->assertTrue(
-            $this->rackspace->authenticate(), 'Authentication failed'
+            $this->rackspace->authenticate(),
+            'Authentication failed'
         );
 
-        $this->metadata = array(
-            'foo'  => 'bar',
+        $this->metadata = [
+            'foo' => 'bar',
             'foo2' => 'bar2'
-        );
+        ];
 
-        $this->metadata2 = array(
+        $this->metadata2 = [
             'hello' => 'world'
-        );
+        ];
 
         // load the HTTP response (from a file)
         $this->httpClientAdapterTest->setResponse(
@@ -182,7 +185,7 @@ class Zend_Service_Rackspace_Files_OfflineTest
     public function testStoreObject()
     {
         $content = 'This is a test!';
-        $result  = $this->rackspace->storeObject(
+        $result = $this->rackspace->storeObject(
             'zf-unit-test',
             'zf-object-test',
             $content,
@@ -212,7 +215,7 @@ class Zend_Service_Rackspace_Files_OfflineTest
             'zf-object-test' . '-copy'
         );
         $this->assertTrue($result);
-        $this->assertNotContains('application/x-www-form-urlencoded', $this->rackspace->getHttpClient()->getLastRequest());
+        $this->assertStringNotContainsString('application/x-www-form-urlencoded', $this->rackspace->getHttpClient()->getLastRequest());
     }
 
     public function testGetObjects()
@@ -231,10 +234,10 @@ class Zend_Service_Rackspace_Files_OfflineTest
     {
         $objects = $this->rackspace->getObjects(
             'zf-unit-test',
-            array(
+            [
                 'delimiter' => '/',
-                'prefix'    => 'dir/',
-            )
+                'prefix' => 'dir/',
+            ]
         );
         $this->assertTrue($objects !== false);
 

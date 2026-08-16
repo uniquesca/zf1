@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,30 +35,26 @@ require_once 'Zend/Mobile/Push/Message/Gcm.php';
  * @group      Zend_Mobile_Push
  * @group      Zend_Mobile_Push_Gcm
  */
-class Zend_Mobile_Push_Message_GcmTest extends PHPUnit_Framework_TestCase
+class Zend_Mobile_Push_Message_GcmTest extends TestCase
 {
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testAddDataThrowsExceptionOnNonStringKey()
     {
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
         $msg = new Zend_Mobile_Push_Message_Gcm();
-        $msg->addData(array(), 'value');
+        $msg->addData([], 'value');
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testAddDataThrowsExceptionOnNonScalarValue()
     {
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
         $msg = new Zend_Mobile_Push_Message_Gcm();
-        $msg->addData('key', new stdClass);
+        $msg->addData('key', new stdClass());
     }
 
     public function testSetData()
     {
-        $data = array('key' => 'value');
-        $data2 = array('key2' => 'value2');
+        $data = ['key' => 'value'];
+        $data2 = ['key2' => 'value2'];
         $msg = new Zend_Mobile_Push_Message_Gcm();
 
         $msg->setData($data);
@@ -69,17 +68,17 @@ class Zend_Mobile_Push_Message_GcmTest extends PHPUnit_Framework_TestCase
     {
         $msg = new Zend_Mobile_Push_Message_Gcm();
         $msg->setToken('foo');
-        $this->assertEquals(array('foo'), $msg->getToken());
+        $this->assertEquals(['foo'], $msg->getToken());
 
-        $msg->setToken(array('foo', 'bar'));
-        $this->assertEquals(array('foo', 'bar'), $msg->getToken());
+        $msg->setToken(['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $msg->getToken());
 
         $msg->setToken('bar');
         $msg->addToken('foo');
-        $this->assertEquals(array('bar', 'foo'), $msg->getToken());
+        $this->assertEquals(['bar', 'foo'], $msg->getToken());
 
         $msg->clearToken();
-        $this->assertEquals(array(), $msg->getToken());
+        $this->assertEquals([], $msg->getToken());
     }
 
     public function testDelayWhileIdle()
@@ -91,11 +90,9 @@ class Zend_Mobile_Push_Message_GcmTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($msg->getDelayWhileIdle());
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testDelayWhileIdleThrowsExceptionOnInvalidValue()
     {
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
         $msg = new Zend_Mobile_Push_Message_Gcm();
         $msg->setDelayWhileIdle('true');
     }
@@ -115,11 +112,9 @@ class Zend_Mobile_Push_Message_GcmTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('{"time_to_live":0}', $msg->toJson());
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Message_Exception
-     */
     public function testTtlThrowsExceptionOnInvalidValue()
     {
+        $this->expectException(Zend_Mobile_Push_Message_Exception::class);
         $msg = new Zend_Mobile_Push_Message_Gcm();
         $msg->setTtl('foo');
     }

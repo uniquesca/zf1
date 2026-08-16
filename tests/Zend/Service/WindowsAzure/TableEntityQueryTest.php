@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -28,7 +33,7 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
  * Test helpers
  */
 require_once dirname(__FILE__) . '/../../../TestHelper.php';
-require_once dirname(__FILE__) . '/../../../TestConfiguration.php.dist';
+require_once dirname(__FILE__) . '/../../../TestConfiguration.dist.php';
 
 /** Zend_Service_WindowsAzure_Storage_TableEntityQuery */
 require_once 'Zend/Service/WindowsAzure/Storage/TableEntityQuery.php';
@@ -41,12 +46,12 @@ require_once 'Zend/Service/WindowsAzure/Storage/TableEntityQuery.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_Service_WindowsAzure_TableEntityQueryTest extends PHPUnit_Framework_TestCase
+class Zend_Service_WindowsAzure_TableEntityQueryTest extends TestCase
 {
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Service_WindowsAzure_TableEntityQueryTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Service_WindowsAzure_TableEntityQueryTest");
+        $result = (new resources_Runner())->run($suite);
     }
     
     /**
@@ -162,7 +167,7 @@ class Zend_Service_WindowsAzure_TableEntityQueryTest extends PHPUnit_Framework_T
         $target = new Zend_Service_WindowsAzure_Storage_TableEntityQuery();
         $target->select()
                ->from('MyTable')
-               ->where('Name eq ? or Name eq ?', array('Maarten', 'Vijay'));
+               ->where('Name eq ? or Name eq ?', ['Maarten', 'Vijay']);
                
         $this->assertEquals('MyTable()?$filter=Name eq \'Maarten\' or Name eq \'Vijay\'', $target->__toString());
     }
@@ -183,6 +188,6 @@ class Zend_Service_WindowsAzure_TableEntityQueryTest extends PHPUnit_Framework_T
 }
 
 // Call Zend_Service_WindowsAzure_TableEntityQueryTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Service_WindowsAzure_TableEntityQueryTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Service_WindowsAzure_TableEntityQueryTest::main") {
     Zend_Service_WindowsAzure_TableEntityQueryTest::main();
 }

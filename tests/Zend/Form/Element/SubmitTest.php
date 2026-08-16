@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -41,8 +46,13 @@ require_once 'Zend/Translate/Adapter/Array.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Form
  */
-class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
+class Zend_Form_Element_SubmitTest extends TestCase
 {
+    /**
+     * @var Zend_Form_Element_Submit
+     */
+    protected $element;
+
     /**
      * Runs the test methods of this class.
      *
@@ -50,9 +60,8 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Form_Element_SubmitTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Form_Element_SubmitTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -61,7 +70,7 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         Zend_Registry::_unsetInstance();
         Zend_Form::setDefaultTranslator(null);
@@ -74,7 +83,7 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -133,7 +142,7 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
         $decorator = $this->element->getDecorator('ViewHelper');
         $decorator->setElement($this->element);
         $html = $decorator->render('');
-        $this->assertRegexp('/<(input|button)[^>]*?value="Submit Button"/', $html);
+        $this->assertMatchesRegularExpression('/<(input|button)[^>]*?value="Submit Button"/', $html);
     }
 
     public function testConstructorSetsLabelToNameIfNoLabelProvided()
@@ -152,7 +161,7 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
     public function testLabelIsTranslatedWhenTranslationAvailable()
     {
         require_once 'Zend/Translate.php';
-        $translations = array('Label' => 'This is the Submit Label');
+        $translations = ['Label' => 'This is the Submit Label'];
         $translate = new Zend_Translate('array', $translations);
         $submit = new Zend_Form_Element_Submit('foo', 'Label');
         $submit->setTranslator($translate);
@@ -162,7 +171,7 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
     public function testLabelWhichIsSetToNameIsTranslatedWhenTranslationAvailable()
     {
         require_once 'Zend/Translate.php';
-        $translations = array('foo' => 'This is the Submit Label');
+        $translations = ['foo' => 'This is the Submit Label'];
         $translate = new Zend_Translate('array', $translations);
         $submit = new Zend_Form_Element_Submit('foo');
         $submit->setTranslator($translate);
@@ -175,8 +184,8 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
     public function testLabelIsNotTranslatedTwice()
     {
         require_once 'Zend/Translate.php';
-        $translations = array('firstLabel' => 'secondLabel',
-                              'secondLabel' => 'thirdLabel');
+        $translations = ['firstLabel' => 'secondLabel',
+                              'secondLabel' => 'thirdLabel'];
         $translate = new Zend_Translate('array', $translations);
         $submit = new Zend_Form_Element_Submit('foo', 'firstLabel');
         $submit->setTranslator($translate);
@@ -208,7 +217,7 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
      */
     public function testIsCheckedReturnsExpectedValueWhenUsingTranslator()
     {
-        $translations = array('label' => 'translation');
+        $translations = ['label' => 'translation'];
         $translate = new Zend_Translate('array', $translations);
 
         $submit = new Zend_Form_Element_Submit('foo', 'label');
@@ -229,25 +238,25 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
     public function testTitleAttributeGetsTranslated()
     {
         $this->element->setAttrib('title', 'bar');
-        $translator = new Zend_Translate_Adapter_Array(array("bar" => "baz"), 'de');
+        $translator = new Zend_Translate_Adapter_Array(["bar" => "baz"], 'de');
         $this->element->setTranslator($translator);
         $html = $this->element->render(new Zend_View());
-        $this->assertContains('title', $html);
-        $this->assertContains('baz', $html);
-        $this->assertNotContains('bar', $html);
+        $this->assertStringContainsString('title', $html);
+        $this->assertStringContainsString('baz', $html);
+        $this->assertStringNotContainsString('bar', $html);
     }
 
     public function testTitleAttributeDoesNotGetTranslatedIfTranslatorIsDisabled()
     {
         $this->element->setAttrib('title', 'bar');
-        $translator = new Zend_Translate_Adapter_Array(array("bar" => "baz"), 'de');
+        $translator = new Zend_Translate_Adapter_Array(["bar" => "baz"], 'de');
         $this->element->setTranslator($translator);
         // now disable translator and see if that works
         $this->element->setDisableTranslator(true);
         $html = $this->element->render(new Zend_View());
-        $this->assertContains('title', $html);
-        $this->assertContains('bar', $html);
-        $this->assertNotContains('baz', $html);
+        $this->assertStringContainsString('title', $html);
+        $this->assertStringContainsString('bar', $html);
+        $this->assertStringNotContainsString('baz', $html);
     }
 
     public function testSetDefaultIgnoredToTrueWhenNotDefined()
@@ -281,6 +290,6 @@ class Zend_Form_Element_SubmitTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_Form_Element_SubmitTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Form_Element_SubmitTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Form_Element_SubmitTest::main") {
     Zend_Form_Element_SubmitTest::main();
 }

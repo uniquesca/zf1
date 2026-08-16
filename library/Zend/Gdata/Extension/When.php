@@ -44,7 +44,7 @@ class Zend_Gdata_Extension_When extends Zend_Gdata_Extension
 {
 
     protected $_rootElement = 'when';
-    protected $_reminders = array();
+    protected $_reminders = [];
     protected $_startTime = null;
     protected $_valueString = null;
     protected $_endTime = null;
@@ -84,7 +84,7 @@ class Zend_Gdata_Extension_When extends Zend_Gdata_Extension
     {
         $absoluteNodeName = $child->namespaceURI . ':' . $child->localName;
         switch ($absoluteNodeName) {
-            case $this->lookupNamespace('gd') . ':' . 'reminder';
+            case $this->lookupNamespace('gd') . ':' . 'reminder':
                 $reminder = new Zend_Gdata_Extension_Reminder();
                 $reminder->transferFromDOM($child);
                 $this->_reminders[] = $reminder;

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -35,7 +38,12 @@ require_once 'Zend/Cache/Backend/Test.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Cache
  */
-class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
+class Zend_Cache_FileFrontendTest extends TestCase
+{
+    /**
+     * @var \Zend_Cache_Backend_Test|mixed
+     */
+    protected $_backend;
 
     private $_instance1;
     private $_instance2;
@@ -46,7 +54,7 @@ class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
     private $_masterFile2;
 
 
-    public function setUp()
+    protected function set_up()
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $this->_masterFile = $this->_getTmpDirWindows() . DIRECTORY_SEPARATOR . 'zend_cache_master';
@@ -59,13 +67,13 @@ class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
         }
         if (!$this->_instance1) {
             touch($this->_masterFile, 123455);
-            $this->_instance1 = new Zend_Cache_Frontend_File(array('master_file' => $this->_masterFile));
+            $this->_instance1 = new Zend_Cache_Frontend_File(['master_file' => $this->_masterFile]);
             $this->_backend = new Zend_Cache_Backend_Test();
             $this->_instance1->setBackend($this->_backend);
         }
         if (!$this->_instance2) {
             touch($this->_masterFile);
-            $this->_instance2 = new Zend_Cache_Frontend_File(array('master_file' => $this->_masterFile));
+            $this->_instance2 = new Zend_Cache_Frontend_File(['master_file' => $this->_masterFile]);
             $this->_backend = new Zend_Cache_Backend_Test();
             $this->_instance2->setBackend($this->_backend);
         }
@@ -73,13 +81,13 @@ class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
             touch($this->_masterFile1, 123455);
             touch($this->_masterFile2, 123455);
             $this->_instance3 = new Zend_Cache_Frontend_File(
-                array(
-                    'master_files' => array(
+                [
+                    'master_files' => [
                         // ZF-10682: test Undefined offset: 0
                         'file1' => $this->_masterFile1,
                         'file2' => $this->_masterFile2
-                    )
-                )
+                    ]
+                ]
             );
             $this->_backend = new Zend_Cache_Backend_Test();
             $this->_instance3->setBackend($this->_backend);
@@ -87,13 +95,13 @@ class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
         if (!$this->_instance4) {
             touch($this->_masterFile1);
             touch($this->_masterFile2);
-            $this->_instance4 = new Zend_Cache_Frontend_File(array('master_files' => array($this->_masterFile1, $this->_masterFile2)));
+            $this->_instance4 = new Zend_Cache_Frontend_File(['master_files' => [$this->_masterFile1, $this->_masterFile2]]);
             $this->_backend = new Zend_Cache_Backend_Test();
             $this->_instance4->setBackend($this->_backend);
         }
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         unset($this->_instance1);
         unlink($this->_masterFile);
@@ -141,27 +149,36 @@ class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
         return '/tmp';
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConstructorCorrectCall()
     {
-        $test = new Zend_Cache_Frontend_File(array('master_file' => $this->_masterFile, 'lifetime' => 3600, 'caching' => true));
+        $test = new Zend_Cache_Frontend_File(['master_file' => $this->_masterFile, 'lifetime' => 3600, 'caching' => true]);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConstructorBadCall1()
     {
         # no masterfile
         try {
-            $test = new Zend_Cache_Frontend_File(array('lifetime' => 3600, 'caching' => true));
+            $test = new Zend_Cache_Frontend_File(['lifetime' => 3600, 'caching' => true]);
         } catch (Zend_Cache_Exception $e) {
             return;
         }
         $this->fail('Zend_Cache_Exception was expected but not thrown');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConstructorBadCall2()
     {
         # incorrect option
         try {
-            $test = new Zend_Cache_Frontend_File(array('master_file' => $this->_masterFile, 0 => 3600));
+            $test = new Zend_Cache_Frontend_File(['master_file' => $this->_masterFile, 0 => 3600]);
         } catch (Zend_Cache_Exception $e) {
             return;
         }
@@ -208,10 +225,13 @@ class Zend_Cache_FileFrontendTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($this->_instance2->load('cache_id'));
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConstructorWithABadMasterFile()
     {
         try {
-            $instance = new Zend_Cache_Frontend_File(array('master_file' => '/foo/bar/ljhfdjh/qhskldhqjk'));
+            $instance = new Zend_Cache_Frontend_File(['master_file' => '/foo/bar/ljhfdjh/qhskldhqjk']);
         } catch (Zend_Cache_Exception $e) {
             return;
         }

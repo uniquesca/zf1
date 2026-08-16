@@ -50,7 +50,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      *
      * @var array
      */
-    protected $_routes = array();
+    protected $_routes = [];
 
     /**
      * Currently matched route
@@ -64,7 +64,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      *
      * @var array
      */
-    protected $_globalParams = array();
+    protected $_globalParams = [];
 
     /**
      * Separator to use with chain names
@@ -84,7 +84,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
     /**
      * Add default routes which are used to mimic basic router behaviour
      *
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function addDefaultRoutes()
     {
@@ -93,9 +93,9 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
             $request    = $this->getFrontController()->getRequest();
 
             require_once 'Zend/Controller/Router/Route/Module.php';
-            $compat = new Zend_Controller_Router_Route_Module(array(), $dispatcher, $request);
+            $compat = new Zend_Controller_Router_Route_Module([], $dispatcher, $request);
 
-            $this->_routes = array('default' => $compat) + $this->_routes;
+            $this->_routes = ['default' => $compat] + $this->_routes;
         }
 
         return $this;
@@ -108,7 +108,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      *
      * @param  string                                 $name  Name of the route
      * @param  Zend_Controller_Router_Route_Interface $route Instance of the route
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function addRoute($name, Zend_Controller_Router_Route_Interface $route)
     {
@@ -125,7 +125,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      * Add routes to the route chain
      *
      * @param  array $routes Array of routes with names as keys and routes as values
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function addRoutes($routes)
     {
@@ -158,7 +158,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      * @param  Zend_Config $config  Configuration object
      * @param  string      $section Name of the config section containing route's definitions
      * @throws Zend_Controller_Router_Exception
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function addConfig(Zend_Config $config, $section = null)
     {
@@ -217,10 +217,10 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
         }
 
         $route = call_user_func(
-            array(
+            [
                 $class,
                 'getInstance'
-            ), $info
+            ], $info
         );
 
         if (isset($info->abstract) && $info->abstract && method_exists($route, 'isAbstract')) {
@@ -274,7 +274,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      *
      * @param  string $name Name of the route
      * @throws Zend_Controller_Router_Exception
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function removeRoute($name)
     {
@@ -291,7 +291,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
     /**
      * Remove all standard default routes
      *
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function removeDefaultRoutes()
     {
@@ -488,7 +488,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
         $url   = $route->assemble($params, $reset, $encode);
 
         if (!preg_match('|^[a-z]+://|', $url)) {
-            $url = rtrim($this->getFrontController()->getBaseUrl(), self::URI_DELIMITER) . self::URI_DELIMITER . $url;
+            $url = rtrim((string) $this->getFrontController()->getBaseUrl(), self::URI_DELIMITER) . self::URI_DELIMITER . $url;
         }
 
         return $url;
@@ -499,7 +499,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      *
      * @param  string $name
      * @param  mixed  $value
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function setGlobalParam($name, $value)
     {
@@ -512,7 +512,7 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
      * Set the separator to use with chain names
      *
      * @param string $separator The separator to use
-     * @return Zend_Controller_Router_Rewrite
+     * @return $this
      */
     public function setChainNameSeparator($separator)
     {

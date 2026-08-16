@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -47,8 +52,13 @@ require_once 'Zend/Server/Method/Prototype.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Server
  */
-class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
+class Zend_Server_DefinitionTest extends TestCase
 {
+    /**
+     * @var Zend_Server_Definition
+     */
+    protected $definition;
+
     /**
      * Runs the test methods of this class.
      *
@@ -56,8 +66,8 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Server_DefinitionTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Server_DefinitionTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -66,7 +76,7 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->definition = new Zend_Server_Definition();
     }
@@ -77,7 +87,7 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -90,7 +100,7 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
 
     public function testDefinitionShouldAllowAddingSingleMethods()
     {
-        $method = new Zend_Server_Method_Definition(array('name' => 'foo'));
+        $method = new Zend_Server_Method_Definition(['name' => 'foo']);
         $this->definition->addMethod($method);
         $methods = $this->definition->getMethods();
         $this->assertEquals(1, count($methods));
@@ -100,9 +110,9 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
 
     public function testDefinitionShouldAllowAddingMultipleMethods()
     {
-        $method1 = new Zend_Server_Method_Definition(array('name' => 'foo'));
-        $method2 = new Zend_Server_Method_Definition(array('name' => 'bar'));
-        $this->definition->addMethods(array($method1, $method2));
+        $method1 = new Zend_Server_Method_Definition(['name' => 'foo']);
+        $method2 = new Zend_Server_Method_Definition(['name' => 'bar']);
+        $this->definition->addMethods([$method1, $method2]);
         $methods = $this->definition->getMethods();
         $this->assertEquals(2, count($methods));
         $this->assertSame($method1, $methods['foo']);
@@ -114,9 +124,9 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
     public function testSetMethodsShouldOverwriteExistingMethods()
     {
         $this->testDefinitionShouldAllowAddingMultipleMethods();
-        $method1 = new Zend_Server_Method_Definition(array('name' => 'foo'));
-        $method2 = new Zend_Server_Method_Definition(array('name' => 'bar'));
-        $methods = array($method1, $method2);
+        $method1 = new Zend_Server_Method_Definition(['name' => 'foo']);
+        $method2 = new Zend_Server_Method_Definition(['name' => 'bar']);
+        $methods = [$method1, $method2];
         $this->assertNotEquals($methods, $this->definition->getMethods());
         $this->definition->setMethods($methods);
         $test = $this->definition->getMethods();
@@ -152,21 +162,21 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
 
     public function testDefinitionShouldSerializeToArray()
     {
-        $method = array(
+        $method = [
             'name' => 'foo.bar',
-            'callback' => array(
-                'type'     => 'function',
+            'callback' => [
+                'type' => 'function',
                 'function' => 'bar',
-            ),
-            'prototypes' => array(
-                array(
+            ],
+            'prototypes' => [
+                [
                     'returnType' => 'string',
-                    'parameters' => array('string'),
-                ),
-            ),
+                    'parameters' => ['string'],
+                ],
+            ],
             'methodHelp' => 'Foo Bar!',
-            'invokeArguments' => array('foo'),
-        );
+            'invokeArguments' => ['foo'],
+        ];
         $definition = new Zend_Server_Definition();
         $definition->addMethod($method);
         $test = $definition->toArray();
@@ -180,22 +190,22 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
 
     public function testPassingOptionsToConstructorShouldSetObjectState()
     {
-        $method = array(
+        $method = [
             'name' => 'foo.bar',
-            'callback' => array(
-                'type'     => 'function',
+            'callback' => [
+                'type' => 'function',
                 'function' => 'bar',
-            ),
-            'prototypes' => array(
-                array(
+            ],
+            'prototypes' => [
+                [
                     'returnType' => 'string',
-                    'parameters' => array('string'),
-                ),
-            ),
+                    'parameters' => ['string'],
+                ],
+            ],
             'methodHelp' => 'Foo Bar!',
-            'invokeArguments' => array('foo'),
-        );
-        $options = array($method);
+            'invokeArguments' => ['foo'],
+        ];
+        $options = [$method];
         $definition = new Zend_Server_Definition($options);
         $test = $definition->toArray();
         $this->assertEquals(1, count($test));
@@ -208,6 +218,6 @@ class Zend_Server_DefinitionTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_Server_DefinitionTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Server_DefinitionTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Server_DefinitionTest::main") {
     Zend_Server_DefinitionTest::main();
 }

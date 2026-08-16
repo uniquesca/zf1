@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -25,26 +28,26 @@
  */
 require_once 'Zend/Mail/Header/HeaderValue.php';
 
-class Zend_Mail_Header_HeaderValueTest extends PHPUnit_Framework_TestCase
+class Zend_Mail_Header_HeaderValueTest extends TestCase
 {
     /**
      * Data for filter value
      */
     public function getFilterValues()
     {
-        return array(
-            array("This is a\n test", "This is a test"),
-            array("This is a\r test", "This is a test"),
-            array("This is a\n\r test", "This is a test"),
-            array("This is a\r\n  test", "This is a\r\n  test"),
-            array("This is a \r\ntest", "This is a test"),
-            array("This is a \r\n\n test", "This is a  test"),
-            array("This is a\n\n test", "This is a test"),
-            array("This is a\r\r test", "This is a test"),
-            array("This is a \r\r\n test", "This is a \r\n test"),
-            array("This is a \r\n\r\ntest", "This is a test"),
-            array("This is a \r\n\n\r\n test", "This is a \r\n test")
-        );
+        return [
+            ["This is a\n test", "This is a test"],
+            ["This is a\r test", "This is a test"],
+            ["This is a\n\r test", "This is a test"],
+            ["This is a\r\n  test", "This is a\r\n  test"],
+            ["This is a \r\ntest", "This is a test"],
+            ["This is a \r\n\n test", "This is a  test"],
+            ["This is a\n\n test", "This is a test"],
+            ["This is a\r\r test", "This is a test"],
+            ["This is a \r\r\n test", "This is a \r\n test"],
+            ["This is a \r\n\r\ntest", "This is a test"],
+            ["This is a \r\n\n\r\n test", "This is a \r\n test"]
+        ];
     }
 
     /**
@@ -58,19 +61,22 @@ class Zend_Mail_Header_HeaderValueTest extends PHPUnit_Framework_TestCase
 
     public function validateValues()
     {
-        return array(
-            array("This is a\n test", 'assertFalse'),
-            array("This is a\r test", 'assertFalse'),
-            array("This is a\n\r test", 'assertFalse'),
-            array("This is a\r\n  test", 'assertTrue'),
-            array("This is a \r\ntest", 'assertFalse'),
-            array("This is a \r\n\n test", 'assertFalse'),
-            array("This is a\n\n test", 'assertFalse'),
-            array("This is a\r\r test", 'assertFalse'),
-            array("This is a \r\r\n test", 'assertFalse'),
-            array("This is a \r\n\r\ntest", 'assertFalse'),
-            array("This is a \r\n\n\r\n test", 'assertFalse')
-        );
+        return [
+            ["This is a\n test", 'assertFalse'],
+            ["This is a\r test", 'assertFalse'],
+            ["This is a\n\r test", 'assertFalse'],
+            ["This is a\r\n  test", 'assertTrue'],
+            ["This is a \r\ntest", 'assertTrue'],
+            ["This is a \r\n\n test", 'assertFalse'],
+            ["This is a\n\n test", 'assertFalse'],
+            ["This is a\r\r test", 'assertFalse'],
+            ["This is a \r\r\n test", 'assertFalse'],
+            ["This is a \r\n\r\ntest", 'assertTrue'],
+            ["This is a \r\n\n\r\n test", 'assertFalse'],
+            ["This is à tèst àèìòù", 'assertTrue'],
+            ["это тест по русскому языку", 'assertTrue'],
+            ["هذااختار في اللغة العربية", 'assertTrue']
+        ];
     }
 
     /**
@@ -84,18 +90,16 @@ class Zend_Mail_Header_HeaderValueTest extends PHPUnit_Framework_TestCase
 
     public function assertValues()
     {
-        return array(
-            array("This is a\n test"),
-            array("This is a\r test"),
-            array("This is a\n\r test"),
-            array("This is a \r\ntest"),
-            array("This is a \r\n\n test"),
-            array("This is a\n\n test"),
-            array("This is a\r\r test"),
-            array("This is a \r\r\n test"),
-            array("This is a \r\n\r\ntest"),
-            array("This is a \r\n\n\r\n test")
-        );
+        return [
+            ["This is a\n test"],
+            ["This is a\r test"],
+            ["This is a\n\r test"],
+            ["This is a \r\n\n test"],
+            ["This is a\n\n test"],
+            ["This is a\r\r test"],
+            ["This is a \r\r\n test"],
+            ["This is a \r\n\n\r\n test"]
+        ];
     }
 
     /**
@@ -104,7 +108,8 @@ class Zend_Mail_Header_HeaderValueTest extends PHPUnit_Framework_TestCase
      */
     public function testAssertValidRaisesExceptionForInvalidValues($value)
     {
-        $this->setExpectedException('Zend_Mail_Exception', 'Invalid');
+        $this->expectException('Zend_Mail_Exception');
+        $this->expectExceptionMessage('Invalid');
         Zend_Mail_Header_HeaderValue::assertValid($value);
     }
 }

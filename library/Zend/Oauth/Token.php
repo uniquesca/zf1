@@ -33,9 +33,9 @@ abstract class Zend_Oauth_Token
     /**@+
      * Token constants
      */
-    const TOKEN_PARAM_KEY                = 'oauth_token';
-    const TOKEN_SECRET_PARAM_KEY         = 'oauth_token_secret';
-    const TOKEN_PARAM_CALLBACK_CONFIRMED = 'oauth_callback_confirmed';
+    public const TOKEN_PARAM_KEY                = 'oauth_token';
+    public const TOKEN_SECRET_PARAM_KEY         = 'oauth_token_secret';
+    public const TOKEN_PARAM_CALLBACK_CONFIRMED = 'oauth_callback_confirmed';
     /**@-*/
 
     /**
@@ -43,7 +43,7 @@ abstract class Zend_Oauth_Token
      *
      * @var array
      */
-    protected $_params = array();
+    protected $_params = [];
 
     /**
      * OAuth response object
@@ -65,8 +65,8 @@ abstract class Zend_Oauth_Token
      * @return void
      */
     public function __construct(
-        Zend_Http_Response $response = null,
-        Zend_Oauth_Http_Utility $utility = null
+        ?Zend_Http_Response $response = null,
+        ?Zend_Oauth_Http_Utility $utility = null
     ) {
         if ($response !== null) {
             $this->_response = $response;
@@ -250,7 +250,7 @@ abstract class Zend_Oauth_Token
      */
     protected function _parseParameters(Zend_Http_Response $response)
     {
-        $params = array();
+        $params = [];
         $body   = $response->getBody();
         if (empty($body)) {
             return;
@@ -270,7 +270,7 @@ abstract class Zend_Oauth_Token
      */
     public function __sleep()
     {
-        return array('_params');
+        return ['_params'];
     }
 
     /**

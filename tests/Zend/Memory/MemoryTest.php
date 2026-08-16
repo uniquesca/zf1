@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -35,15 +40,20 @@ require_once 'Zend/Memory.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Memory
  */
-class Zend_Memory_MemoryTest extends PHPUnit_Framework_TestCase
+class Zend_Memory_MemoryTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected $cacheDir;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         $tmpDir = sys_get_temp_dir() . '/zend_memory';
         $this->_removeCacheDir($tmpDir);
@@ -83,7 +93,7 @@ class Zend_Memory_MemoryTest extends PHPUnit_Framework_TestCase
         unset($memoryManager);
 
         /** 'File' backend */
-        $backendOptions = array('cache_dir' => $this->cacheDir); // Directory where to put the cache files
+        $backendOptions = ['cache_dir' => $this->cacheDir]; // Directory where to put the cache files
         $memoryManager = Zend_Memory::factory('File', $backendOptions);
         $this->assertTrue($memoryManager instanceof Zend_Memory_Manager);
         unset($memoryManager);
@@ -97,7 +107,7 @@ class Zend_Memory_MemoryTest extends PHPUnit_Framework_TestCase
     {
         try {
             $memoryManager = Zend_Memory::factory($backend);
-        } catch(Zend_Cache_Exception $exception) {
+        } catch (Zend_Cache_Exception $exception) {
             $this->markTestSkipped($exception->getMessage());
         }
         $this->assertTrue($memoryManager instanceof Zend_Memory_Manager);
@@ -108,21 +118,21 @@ class Zend_Memory_MemoryTest extends PHPUnit_Framework_TestCase
      */
     public function providerCacheBackend()
     {
-        return array(
-            array('Apc'),
-            array('File'),
-            array('Libmemcached'),
-            array('Memcached'),
-            array('Sqlite'),
-            array('TwoLevels'),
-            array('Xcache'),
-            array('ZendPlatform'),
-            array('ZendServer_Disk'),
-            array('ZendServer_ShMem')
-        );
+        return [
+            'Zend_Cache_Backend_Apc' => ['Apc'],
+            'Zend_Cache_Backend_File' => ['File'],
+            'Zend_Cache_Backend_Libmemcached' => ['Libmemcached'],
+            'Zend_Cache_Backend_Memcached' => ['Memcached'],
+            'Zend_Cache_Backend_Sqlite' => ['Sqlite'],
+            'Zend_Cache_Backend_TwoLevels' => ['TwoLevels'],
+            'Zend_Cache_Backend_TwoLevels' => ['Xcache'],
+            'Zend_Cache_Backend_ZendPlatform' => ['ZendPlatform'],
+            'Zend_Cache_Backend_ZendServer_Disk' => ['ZendServer_Disk'],
+            'Zend_Cache_Backend_ZendServer_ShMem    ' => ['ZendServer_ShMem']
+        ];
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Memory_MemoryTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Memory_MemoryTest::main') {
     Zend_Memory_MemoryTest::main();
 }

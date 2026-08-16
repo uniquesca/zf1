@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,7 +35,7 @@ require_once 'Zend/Validate/Sitemap/Changefreq.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_Sitemap_ChangefreqTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_Sitemap_ChangefreqTest extends TestCase
 {
     /**
      * Validator
@@ -44,7 +47,7 @@ class Zend_Validate_Sitemap_ChangefreqTest extends PHPUnit_Framework_TestCase
     /**
      * Prepares the environment before running a test
      */
-    protected function setUp()
+    protected function set_up()
     {
         $this->_validator = new Zend_Validate_Sitemap_Changefreq();
     }
@@ -52,7 +55,7 @@ class Zend_Validate_Sitemap_ChangefreqTest extends PHPUnit_Framework_TestCase
     /**
      * Cleans up the environment after running a test
      */
-    protected function tearDown()
+    protected function tear_down()
     {
         $this->_validator = null;
     }
@@ -63,10 +66,10 @@ class Zend_Validate_Sitemap_ChangefreqTest extends PHPUnit_Framework_TestCase
      */
     public function testValidChangefreqs()
     {
-        $values = array(
+        $values = [
             'always',  'hourly', 'daily', 'weekly',
             'monthly', 'yearly', 'never'
-        );
+        ];
 
         foreach ($values as $value) {
             $this->assertSame(true, $this->_validator->isValid($value));
@@ -79,16 +82,16 @@ class Zend_Validate_Sitemap_ChangefreqTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidStrings()
     {
-        $values = array(
+        $values = [
             'alwayz',  '_hourly', 'Daily', 'wEekly',
             'mönthly ', ' yearly ', 'never ', 'rofl',
             'yesterday',
-        );
+        ];
 
         foreach ($values as $value) {
             $this->assertSame(false, $this->_validator->isValid($value));
             $messages = $this->_validator->getMessages();
-            $this->assertContains('is not a valid', current($messages));
+            $this->assertStringContainsString('is not a valid', current($messages));
         }
     }
 
@@ -98,14 +101,14 @@ class Zend_Validate_Sitemap_ChangefreqTest extends PHPUnit_Framework_TestCase
      */
     public function testNotString()
     {
-        $values = array(
+        $values = [
             1, 1.4, null, new stdClass(), true, false
-        );
+        ];
 
         foreach ($values as $value) {
             $this->assertSame(false, $this->_validator->isValid($value));
             $messages = $this->_validator->getMessages();
-            $this->assertContains('String expected', current($messages));
+            $this->assertStringContainsString('String expected', current($messages));
         }
     }
 }

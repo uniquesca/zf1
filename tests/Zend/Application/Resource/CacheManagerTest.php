@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -57,22 +62,42 @@ require_once 'Zend/Cache/Core.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Application
  */
-class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestCase
+class Zend_Application_Resource_CacheManagerTest extends TestCase
 {
+    /**
+     * @var array
+     */
+    protected $loaders;
+
+    /**
+     * @var Zend_Loader_Autoloader
+     */
+    protected $autoloader;
+
+    /**
+     * @var Zend_Application
+     */
+    protected $application;
+
+    /**
+     * @var Zend_Application_Bootstrap_Bootstrap
+     */
+    protected $bootstrap;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         // Store original autoloaders
         $this->loaders = spl_autoload_functions();
         if (!is_array($this->loaders)) {
             // spl_autoload_functions does not return empty array when no
             // autoloaders registered...
-            $this->loaders = array();
+            $this->loaders = [];
         }
 
         Zend_Loader_Autoloader::resetInstance();
@@ -84,7 +109,7 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
         $this->bootstrap = new ZfAppBootstrap($this->application);
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         // Restore original autoloaders
         $loaders = spl_autoload_functions();
@@ -104,48 +129,46 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
 
     public function testInitializationCreatesCacheManagerInstance()
     {
-
-        $resource = new Zend_Application_Resource_Cachemanager(array());
+        $resource = new Zend_Application_Resource_Cachemanager([]);
         $resource->init();
         $this->assertTrue($resource->getCachemanager() instanceof Zend_Cache_Manager);
     }
 
     public function testShouldReturnCacheManagerWhenComplete()
     {
-        $resource = new Zend_Application_Resource_Cachemanager(array());
+        $resource = new Zend_Application_Resource_Cachemanager([]);
         $manager = $resource->init();
         $this->assertTrue($manager instanceof Zend_Cache_Manager);
     }
 
     public function testShouldMergeConfigsIfOptionsPassedForDefaultCacheTemplate()
     {
-        $options = array(
-            'page' => array(
-                'backend' => array(
-                    'options' => array(
+        $options = [
+            'page' => [
+                'backend' => [
+                    'options' => [
                         'cache_dir' => '/foo'
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
         $resource = new Zend_Application_Resource_Cachemanager($options);
         $manager = $resource->init();
         $cacheTemplate = $manager->getCacheTemplate('page');
         $this->assertEquals('/foo', $cacheTemplate['backend']['options']['cache_dir']);
-
     }
 
     public function testShouldCreateNewCacheTemplateIfConfigNotMatchesADefaultTemplate()
     {
-        $options = array(
-            'foo' => array(
-                'backend' => array(
-                    'options' => array(
+        $options = [
+            'foo' => [
+                'backend' => [
+                    'options' => [
                         'cache_dir' => '/foo'
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
         $resource = new Zend_Application_Resource_Cachemanager($options);
         $manager = $resource->init();
         $cacheTemplate = $manager->getCacheTemplate('foo');
@@ -154,13 +177,13 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
 
     public function testShouldNotMeddleWithFrontendOrBackendCapitalisation()
     {
-        $options = array(
-            'foo' => array(
-                'backend' => array(
+        $options = [
+            'foo' => [
+                'backend' => [
                     'name' => 'BlackHole'
-                )
-            )
-        );
+                ]
+            ]
+        ];
         $resource = new Zend_Application_Resource_Cachemanager($options);
         $manager = $resource->init();
         $cacheTemplate = $manager->getCacheTemplate('foo');
@@ -169,19 +192,19 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
 
     public function testEmptyBackendOptionsShouldNotResultInError()
     {
-        $options = array(
-            'foo' => array(
-                'frontend' => array(
+        $options = [
+            'foo' => [
+                'frontend' => [
                     'name' => 'Core',
-                    'options' => array(
+                    'options' => [
                         'lifetime' => 7200,
-                    ),
-                ),
-                'backend' => array(
+                    ],
+                ],
+                'backend' => [
                     'name' => 'black.hole',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $resource = new Zend_Application_Resource_Cachemanager($options);
         $manager = $resource->init();
         $cache = $manager->getCache('foo');
@@ -197,19 +220,19 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
             $this->markTestSkipped('ZendServer is required for this test');
         }
 
-        $options = array(
-            'foo' => array(
-                'frontend' => array(
+        $options = [
+            'foo' => [
+                'frontend' => [
                     'name' => 'Core',
-                    'options' => array(
+                    'options' => [
                         'lifetime' => 7200,
-                    ),
-                ),
-                'backend' => array(
+                    ],
+                ],
+                'backend' => [
                     'name' => 'ZendServer_Disk',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $resource = new Zend_Application_Resource_Cachemanager($options);
         $manager = $resource->init();
         $cache = $manager->getCache('foo')->getBackend();
@@ -221,19 +244,19 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
      */
     public function testCustomFrontendBackendNaming()
     {
-        $options = array(
-            'zf9737' => array(
-                'frontend' => array(
-                    'name'                 => 'custom-naming',
-                    'customFrontendNaming' => false),
-                'backend' => array('name'                    => 'Zend_Cache_Backend_Custom_Naming',
-                                   'customBackendNaming'     => true),
-                'frontendBackendAutoload' => true)
-        );
+        $options = [
+            'zf9737' => [
+                'frontend' => [
+                    'name' => 'custom-naming',
+                    'customFrontendNaming' => false],
+                'backend' => ['name' => 'Zend_Cache_Backend_Custom_Naming',
+                                   'customBackendNaming' => true],
+                'frontendBackendAutoload' => true]
+        ];
 
         $resource = new Zend_Application_Resource_Cachemanager($options);
-        $manager  = $resource->init();
-        $cache    = $manager->getCache('zf9737');
+        $manager = $resource->init();
+        $cache = $manager->getCache('zf9737');
         $this->assertTrue($cache->getBackend() instanceof Zend_Cache_Backend_Custom_Naming);
         $this->assertTrue($cache instanceof Zend_Cache_Frontend_CustomNaming);
     }
@@ -243,18 +266,18 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
      */
     public function testLoggerFactory()
     {
-        $options = array(
-            'page' => array(
-                'frontend' => array(
-                    'options' => array(
+        $options = [
+            'page' => [
+                'frontend' => [
+                    'options' => [
                         'logging' => true,
-                        'logger'  => array(
+                        'logger' => [
                             new Zend_Log_Writer_Mock()
-                        )
-                    )
-                )
-            )
-        );
+                        ]
+                    ]
+                ]
+            ]
+        ];
 
         $resource = new Zend_Application_Resource_Cachemanager($options);
         $resource->setBootstrap($this->bootstrap);
@@ -267,7 +290,7 @@ class Zend_Application_Resource_CacheManagerTest extends PHPUnit_Framework_TestC
 
         $this->assertTrue(is_array($event));
         $this->assertTrue(array_key_exists('message', $event));
-        $this->assertContains('Zend_Cache_Backend_Static', $event['message']);
+        $this->assertStringContainsString('Zend_Cache_Backend_Static', $event['message']);
     }
 }
 
@@ -280,6 +303,6 @@ class Zend_Cache_Frontend_CustomNaming extends Zend_Cache_Core
 {
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Application_Resource_CacheManagerTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Application_Resource_CacheManagerTest::main') {
     Zend_Application_Resource_CacheManagerTest::main();
 }

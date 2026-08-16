@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,30 +37,45 @@ require_once 'Zend/Service/StrikeIron.php';
  * @group      Zend_Service
  * @group      Zend_Service_StrikeIron
  */
-class Zend_Service_StrikeIron_StrikeIronTest extends PHPUnit_Framework_TestCase
+class Zend_Service_StrikeIron_StrikeIronTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \stdclass|mixed
+     */
+    protected $soapClient;
+
+    /**
+     * @var array<string, \stdclass>|mixed
+     */
+    protected $options;
+
+    /**
+     * @var \Zend_Service_StrikeIron|mixed
+     */
+    protected $strikeIron;
+
+    protected function set_up()
     {
         // stub out SOAPClient instance
         $this->soapClient = new stdclass();
-        $this->options    = array('client' => $this->soapClient);
+        $this->options = ['client' => $this->soapClient];
         $this->strikeIron = new Zend_Service_StrikeIron($this->options);
     }
 
     public function testFactoryThrowsOnBadName()
     {
         try {
-            $this->strikeIron->getService(array('class' => 'BadServiceNameHere'));
+            $this->strikeIron->getService(['class' => 'BadServiceNameHere']);
             $this->fail();
         } catch (Zend_Service_StrikeIron_Exception $e) {
-            $this->assertRegExp('/could not be loaded/i', $e->getMessage());
-            $this->assertRegExp('/not found/i', $e->getMessage());
+            $this->assertMatchesRegularExpression('/could not be loaded/i', $e->getMessage());
+            $this->assertMatchesRegularExpression('/not found/i', $e->getMessage());
         }
     }
 
     public function testFactoryReturnsServiceByStrikeIronClass()
     {
-        $base = $this->strikeIron->getService(array('class' => 'Base'));
+        $base = $this->strikeIron->getService(['class' => 'Base']);
         $this->assertTrue($base instanceof Zend_Service_StrikeIron_Base);
         $this->assertSame(null, $base->getWsdl());
         $this->assertSame($this->soapClient, $base->getSoapClient());
@@ -66,28 +84,28 @@ class Zend_Service_StrikeIron_StrikeIronTest extends PHPUnit_Framework_TestCase
     public function testFactoryReturnsServiceAnyUnderscoredClass()
     {
         $class = 'Zend_Service_StrikeIron_StrikeIronTest_StubbedBase';
-        $stub = $this->strikeIron->getService(array('class' => $class));
+        $stub = $this->strikeIron->getService(['class' => $class]);
         $this->assertTrue($stub instanceof $class);
     }
 
     public function testFactoryReturnsServiceByWsdl()
     {
         $wsdl = 'http://strikeiron.com/foo';
-        $base = $this->strikeIron->getService(array('wsdl' => $wsdl));
+        $base = $this->strikeIron->getService(['wsdl' => $wsdl]);
         $this->assertEquals($wsdl, $base->getWsdl());
     }
 
     public function testFactoryPassesOptionsFromConstructor()
     {
         $class = 'Zend_Service_StrikeIron_StrikeIronTest_StubbedBase';
-        $stub = $this->strikeIron->getService(array('class' => $class));
+        $stub = $this->strikeIron->getService(['class' => $class]);
         $this->assertEquals($this->options, $stub->options);
     }
 
     public function testFactoryMergesItsOptionsWithConstructorOptions()
     {
-        $options = array('class' => 'Zend_Service_StrikeIron_StrikeIronTest_StubbedBase',
-                         'foo'   => 'bar');
+        $options = ['class' => 'Zend_Service_StrikeIron_StrikeIronTest_StubbedBase',
+                         'foo' => 'bar'];
 
         $mergedOptions = array_merge($options, $this->options);
         unset($mergedOptions['class']);
@@ -95,7 +113,6 @@ class Zend_Service_StrikeIron_StrikeIronTest extends PHPUnit_Framework_TestCase
         $stub = $this->strikeIron->getService($options);
         $this->assertEquals($mergedOptions, $stub->options);
     }
-
 }
 
 /**
@@ -109,6 +126,7 @@ class Zend_Service_StrikeIron_StrikeIronTest extends PHPUnit_Framework_TestCase
  */
 class Zend_Service_StrikeIron_StrikeIronTest_StubbedBase
 {
+    protected $options;
     public function __construct($options)
     {
         $this->options = $options;

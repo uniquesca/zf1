@@ -32,9 +32,9 @@ require_once 'Zend/Validate/Abstract.php';
  */
 class Zend_Validate_Alpha extends Zend_Validate_Abstract
 {
-    const INVALID      = 'alphaInvalid';
-    const NOT_ALPHA    = 'notAlpha';
-    const STRING_EMPTY = 'alphaStringEmpty';
+    public const INVALID      = 'alphaInvalid';
+    public const NOT_ALPHA    = 'notAlpha';
+    public const STRING_EMPTY = 'alphaStringEmpty';
 
     /**
      * Whether to allow white space characters; off by default
@@ -56,11 +56,11 @@ class Zend_Validate_Alpha extends Zend_Validate_Abstract
      *
      * @var array
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::INVALID      => "Invalid type given. String expected",
         self::NOT_ALPHA    => "'%value%' contains non alphabetic characters",
         self::STRING_EMPTY => "'%value%' is an empty string"
-    );
+    ];
 
     /**
      * Sets default option values for this instance
@@ -81,7 +81,7 @@ class Zend_Validate_Alpha extends Zend_Validate_Abstract
             }
         }
 
-        $this->allowWhiteSpace = (boolean) $allowWhiteSpace;
+        $this->allowWhiteSpace = (bool) $allowWhiteSpace;
     }
 
     /**
@@ -98,11 +98,11 @@ class Zend_Validate_Alpha extends Zend_Validate_Abstract
      * Sets the allowWhiteSpace option
      *
      * @param boolean $allowWhiteSpace
-     * @return Zend_Filter_Alpha Provides a fluent interface
+     * @return $this
      */
     public function setAllowWhiteSpace($allowWhiteSpace)
     {
-        $this->allowWhiteSpace = (boolean) $allowWhiteSpace;
+        $this->allowWhiteSpace = (bool) $allowWhiteSpace;
         return $this;
     }
 

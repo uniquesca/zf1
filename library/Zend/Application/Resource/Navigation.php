@@ -40,7 +40,7 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
 class Zend_Application_Resource_Navigation
     extends Zend_Application_Resource_ResourceAbstract
 {
-    const DEFAULT_REGISTRY_KEY = 'Zend_Navigation';
+    public const DEFAULT_REGISTRY_KEY = 'Zend_Navigation';
 
     /**
      * @var Zend_Navigation
@@ -63,7 +63,7 @@ class Zend_Application_Resource_Navigation
                 );
             }
 
-            $pages = isset($options['pages']) ? $options['pages'] : array();
+            $pages = isset($options['pages']) ? $options['pages'] : [];
             $this->_container = new Zend_Navigation($pages);
         }
 

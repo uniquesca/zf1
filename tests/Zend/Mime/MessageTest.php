@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,9 +36,8 @@ require_once 'Zend/Mime/Message.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Mime
  */
-class Zend_Mime_MessageTest extends PHPUnit_Framework_TestCase
+class Zend_Mime_MessageTest extends TestCase
 {
-
     public function testMultiPart()
     {
         $msg = new Zend_Mime_Message();  // No Parts
@@ -49,7 +51,7 @@ class Zend_Mime_MessageTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($p));
         $this->assertTrue(count($p) == 0);
 
-        $p2 = array();
+        $p2 = [];
         $p2[] = new Zend_Mime_Part('This is a test');
         $p2[] = new Zend_Mime_Part('This is another test');
         $msg->setParts($p2);

@@ -58,13 +58,13 @@ class Zend_Queue_Adapter_DbTest extends Zend_Queue_Adapter_AdapterTest
     /**
      * Test setup
      */
-    public function setUp()
+    protected function set_up()
     {
         if (!TESTS_ZEND_QUEUE_DB) {
             $this->markTestSkipped('TESTS_ZEND_QUEUE_DB is not enabled in TestConfiguration.php');
         }
         date_default_timezone_set('GMT');
-        parent::setUp();
+        parent::set_up();
     }
 
     /**
@@ -96,16 +96,16 @@ class Zend_Queue_Adapter_DbTest extends Zend_Queue_Adapter_AdapterTest
 
     public function getTestConfig()
     {
-        $driverOptions = array();
+        $driverOptions = [];
         if (defined('TESTS_ZEND_QUEUE_DB')) {
             require_once 'Zend/Json.php';
             $driverOptions = Zend_Json::decode(TESTS_ZEND_QUEUE_DB);
         }
 
-        return array(
-            'options'       => array(Zend_Db_Select::FOR_UPDATE => true),
+        return [
+            'options' => [Zend_Db_Select::FOR_UPDATE => true],
             'driverOptions' => $driverOptions,
-        );
+        ];
     }
 
     // test the constants
@@ -124,14 +124,14 @@ class Zend_Queue_Adapter_DbTest extends Zend_Queue_Adapter_AdapterTest
              * @see Zend_Db_Select
              */
             require_once 'Zend/Db/Select.php';
-            $config['options'][Zend_Db_Select::FOR_UPDATE] = array();
+            $config['options'][Zend_Db_Select::FOR_UPDATE] = [];
             $queue = $this->createQueue(__FUNCTION__, $config);
             $this->fail('FOR_UPDATE accepted an array');
         } catch (Exception $e) {
             $this->assertTrue(true, 'FOR_UPDATE cannot be an array');
         }
 
-        foreach (array('host', 'username', 'password', 'dbname') as $i => $arg) {
+        foreach (['host', 'username', 'password', 'dbname'] as $i => $arg) {
             try {
                 $config = $this->getTestConfig();
                 unset($config['driverOptions'][$arg]);
@@ -161,4 +161,3 @@ class Zend_Queue_Adapter_DbTest extends Zend_Queue_Adapter_AdapterTest
         $this->assertEquals(0, count($messages));
     }
 }
-

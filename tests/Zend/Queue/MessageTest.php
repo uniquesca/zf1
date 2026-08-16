@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -47,33 +50,53 @@ require_once 'Zend/Queue/Adapter/Null.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Queue
  */
-class Zend_Queue_MessageTest extends PHPUnit_Framework_TestCase
+class Zend_Queue_MessageTest extends TestCase
 {
-    protected function setUp()
+    /**
+     * @var Zend_Queue_Message
+     */
+    protected $message;
+
+    /**
+     * @var array
+     */
+    protected $data;
+
+    /**
+     * @var array
+     */
+    protected $options;
+
+    /**
+     * @var Zend_Queue
+     */
+    protected $queue;
+
+    protected function set_up()
     {
         // Test Zend_Config
-        $this->options = array(
-            'name'      => 'queue1',
-            'params'    => array(),
-        );
+        $this->options = [
+            'name' => 'queue1',
+            'params' => [],
+        ];
 
         $this->queue = new Zend_Queue('array', $this->options);
 
-        $this->data = array(
-            'id'     => 123,
+        $this->data = [
+            'id' => 123,
             'handle' => 567,
-            'body'   => 'Hello world' // This is my 2524'th time writing that.
-        );
+            'body' => 'Hello world' // This is my 2524'th time writing that.
+        ];
 
-        $this->options = array(
-            'queue'     => $this->queue,
-            'data'      => $this->data,
-        );
+        $this->options = [
+            'queue' => $this->queue,
+            'data' => $this->data,
+        ];
 
         $this->message = new Zend_Queue_Message($this->options);
     }
 
-    protected function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -168,7 +191,7 @@ class Zend_Queue_MessageTest extends PHPUnit_Framework_TestCase
         // parameter verification
 
         try {
-            $null = new Zend_Queue('Null', array());
+            $null = new Zend_Queue('Null', []);
             $this->message->setQueue($null);
             $this->fail('invalid class passed to setQueue()');
         } catch (Exception $e) {
@@ -195,5 +218,4 @@ class Zend_Queue_MessageTest extends PHPUnit_Framework_TestCase
         $woken = unserialize($message);
         $this->assertEquals($this->message->body, $woken->body);
     }
-
 }

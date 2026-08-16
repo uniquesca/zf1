@@ -63,29 +63,29 @@ abstract class Zend_XmlRpc_Value
     /**
      * Specify that the XML-RPC native type will be auto detected from a PHP variable type
      */
-    const AUTO_DETECT_TYPE = 'auto_detect';
+    public const AUTO_DETECT_TYPE = 'auto_detect';
 
     /**
      * Specify that the XML-RPC value will be parsed out from a given XML code
      */
-    const XML_STRING = 'xml';
+    public const XML_STRING = 'xml';
 
     /**
      * All the XML-RPC native types
      */
-    const XMLRPC_TYPE_I4        = 'i4';
-    const XMLRPC_TYPE_INTEGER   = 'int';
-    const XMLRPC_TYPE_I8        = 'i8';
-    const XMLRPC_TYPE_APACHEI8  = 'ex:i8';
-    const XMLRPC_TYPE_DOUBLE    = 'double';
-    const XMLRPC_TYPE_BOOLEAN   = 'boolean';
-    const XMLRPC_TYPE_STRING    = 'string';
-    const XMLRPC_TYPE_DATETIME  = 'dateTime.iso8601';
-    const XMLRPC_TYPE_BASE64    = 'base64';
-    const XMLRPC_TYPE_ARRAY     = 'array';
-    const XMLRPC_TYPE_STRUCT    = 'struct';
-    const XMLRPC_TYPE_NIL       = 'nil';
-    const XMLRPC_TYPE_APACHENIL = 'ex:nil';
+    public const XMLRPC_TYPE_I4        = 'i4';
+    public const XMLRPC_TYPE_INTEGER   = 'int';
+    public const XMLRPC_TYPE_I8        = 'i8';
+    public const XMLRPC_TYPE_APACHEI8  = 'ex:i8';
+    public const XMLRPC_TYPE_DOUBLE    = 'double';
+    public const XMLRPC_TYPE_BOOLEAN   = 'boolean';
+    public const XMLRPC_TYPE_STRING    = 'string';
+    public const XMLRPC_TYPE_DATETIME  = 'dateTime.iso8601';
+    public const XMLRPC_TYPE_BASE64    = 'base64';
+    public const XMLRPC_TYPE_ARRAY     = 'array';
+    public const XMLRPC_TYPE_STRUCT    = 'struct';
+    public const XMLRPC_TYPE_NIL       = 'nil';
+    public const XMLRPC_TYPE_APACHENIL = 'ex:nil';
 
     /**
      * Get the native XML-RPC type (the type is one of the Zend_XmlRpc_Value::XMLRPC_TYPE_* constants)
@@ -158,7 +158,7 @@ abstract class Zend_XmlRpc_Value
     {
         if (!$this->_xml) {
             $this->generateXml();
-            $this->_xml = (string) $this->getGenerator();
+            $this->_xml = (string) static::getGenerator();
         }
         return $this->_xml;
     }
@@ -426,7 +426,7 @@ abstract class Zend_XmlRpc_Value
                     require_once 'Zend/XmlRpc/Value/Exception.php';
                     throw new Zend_XmlRpc_Value_Exception('Invalid XML for XML-RPC native '. self::XMLRPC_TYPE_ARRAY .' type: ARRAY tag must contain DATA tag');
                 }
-                $values = array();
+                $values = [];
                 // Parse all the elements of the array from the XML string
                 // (simple xml element) to Zend_XmlRpc_Value objects
                 foreach ($data->value as $element) {
@@ -436,13 +436,13 @@ abstract class Zend_XmlRpc_Value
                 $xmlrpcValue = new Zend_XmlRpc_Value_Array($values);
                 break;
             case self::XMLRPC_TYPE_STRUCT:
-                $values = array();
+                $values = [];
                 // Parse all the memebers of the struct from the XML string
                 // (simple xml element) to Zend_XmlRpc_Value objects
                 foreach ($value->member as $member) {
                     // @todo? If a member doesn't have a <value> tag, we don't add it to the struct
                     // Maybe we want to throw an exception here ?
-                    if (!isset($member->value) or !isset($member->name)) {
+                    if (!isset($member->value) || !isset($member->name)) {
                         continue;
                         //throw new Zend_XmlRpc_Value_Exception('Member of the '. self::XMLRPC_TYPE_STRUCT .' XML-RPC native type must contain a VALUE tag');
                     }
@@ -486,16 +486,22 @@ abstract class Zend_XmlRpc_Value
      */
     protected static function _extractTypeAndValue(SimpleXMLElement $xml, &$type, &$value)
     {
-        list($type, $value) = each($xml);
+        // Fix key() and current() deprecation for objects in PHP 8.1
+        $xmlVars = get_object_vars($xml);
+        list($type, $value) = [key($xmlVars), current($xmlVars)];
 
-        if (!$type and $value === null) {
-            $namespaces = array('ex' => 'http://ws.apache.org/xmlrpc/namespaces/extensions');
+        if (!$type && $value === null) {
+            $namespaces = ['ex' => 'http://ws.apache.org/xmlrpc/namespaces/extensions'];
             foreach ($namespaces as $namespaceName => $namespaceUri) {
                 $namespaceXml = $xml->children($namespaceUri);
-                list($type, $value) = each($namespaceXml);
-                if ($type !== null) {
-                    $type = $namespaceName . ':' . $type;
-                    break;
+                if ($namespaceXml) {
+                    // Fix key() and current() deprecation for objects in PHP 8.1
+                    $namespaceXmlVars = get_object_vars($namespaceXml);
+                    list($type, $value) = [key($namespaceXmlVars), current($namespaceXmlVars)];
+                    if ($type !== null) {
+                        $type = $namespaceName . ':' . $type;
+                        break;
+                    }
                 }
             }
         }
@@ -509,7 +515,7 @@ abstract class Zend_XmlRpc_Value
         if (!$type) {
             $type = self::XMLRPC_TYPE_STRING;
             if (preg_match('#^<value>.*</value>$#', $xml->asXML())) {
-                $value = str_replace(array('<value>', '</value>'), '', $xml->asXML());
+                $value = str_replace(['<value>', '</value>'], '', $xml->asXML());
             }
         }
     }
@@ -520,6 +526,6 @@ abstract class Zend_XmlRpc_Value
      */
     protected function _setXML($xml)
     {
-        $this->_xml = $this->getGenerator()->stripDeclaration($xml);
+        $this->_xml = static::getGenerator()->stripDeclaration($xml);
     }
 }

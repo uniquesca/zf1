@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,7 +36,7 @@ require_once 'Zend/Validate/StringLength.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_StringLengthTest extends TestCase
 {
     /**
      * Default instance created for all test methods
@@ -47,7 +50,7 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_validator = new Zend_Validate_StringLength();
     }
@@ -71,17 +74,17 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
          *      - expected validation result
          *      - array of test input values
          */
-        $valuesExpected = array(
-            array(0, null, true, array('', 'a', 'ab')),
-            array(-1, null, true, array('')),
-            array(2, 2, true, array('ab', '  ')),
-            array(2, 2, false, array('a', 'abc')),
-            array(1, null, false, array('')),
-            array(2, 3, true, array('ab', 'abc')),
-            array(2, 3, false, array('a', 'abcd')),
-            array(3, 3, true, array('äöü')),
-            array(6, 6, true, array('Müller'))
-            );
+        $valuesExpected = [
+            [0, null, true, ['', 'a', 'ab']],
+            [-1, null, true, ['']],
+            [2, 2, true, ['ab', '  ']],
+            [2, 2, false, ['a', 'abc']],
+            [1, null, false, ['']],
+            [2, 3, true, ['ab', 'abc']],
+            [2, 3, false, ['a', 'abcd']],
+            [3, 3, true, ['äöü']],
+            [6, 6, true, ['Müller']]
+            ];
         foreach ($valuesExpected as $element) {
             $validator = new Zend_Validate_StringLength($element[0], $element[1]);
             foreach ($element[3] as $input) {
@@ -97,7 +100,7 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMessages()
     {
-        $this->assertEquals(array(), $this->_validator->getMessages());
+        $this->assertEquals([], $this->_validator->getMessages());
     }
 
     /**
@@ -136,7 +139,7 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(
                 "The minimum must be less than or equal to the maximum length, but $min > $max",
                 $e->getMessage()
-                );
+            );
         }
     }
 
@@ -156,7 +159,7 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(
                 "The maximum must be greater than or equal to the minimum length, but $max < $min",
                 $e->getMessage()
-                );
+            );
         }
     }
 
@@ -179,11 +182,11 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Zend_Validate_Exception
      * @group GH-634
      */
     public function testWrongEncoding()
     {
+        $this->expectException(Zend_Validate_Exception::class);
         $this->_validator->setEncoding('');
     }
 
@@ -192,6 +195,6 @@ class Zend_Validate_StringLengthTest extends PHPUnit_Framework_TestCase
      */
     public function testNonStringValidation()
     {
-        $this->assertFalse($this->_validator->isValid(array(1 => 1)));
+        $this->assertFalse($this->_validator->isValid([1 => 1]));
     }
 }

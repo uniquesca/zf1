@@ -72,7 +72,7 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     public function testSelectQueryWithBinds()
     {
         $select = $this->_select()->where('product_id = :product_id')
-                                  ->bind(array(':product_id' => 1));
+                                  ->bind([':product_id' => 1]);
 
         $sql = preg_replace('/\\s+/', ' ', $select->__toString());
         $this->assertEquals('SELECT "zfproducts".* FROM "zfproducts" WHERE (product_id = :product_id)', $sql);
@@ -615,9 +615,11 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     /**
      * Not applicable in static test
      * @group ZF-5263
+     * @doesNotPerformAssertions
      */
     public function testSelectLimitFetchCol()
-    {}
+    {
+    }
 
     public function testSelectLimitNone()
     {
@@ -700,11 +702,11 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     public function testSqlInjectionWithOrder()
     {
         $select = $this->_db->select();
-        $select->from(array('p' => 'products'))->order('MD5(1);select');
+        $select->from(['p' => 'products'])->order('MD5(1);select');
         $this->assertEquals('SELECT "p".* FROM "products" AS "p" ORDER BY "MD5(1);select" ASC', $select->assemble());
 
         $select = $this->_db->select();
-        $select->from(array('p' => 'products'))->order('name;select;MD5(1)');
+        $select->from(['p' => 'products'])->order('name;select;MD5(1)');
         $this->assertEquals('SELECT "p".* FROM "products" AS "p" ORDER BY "name;select;MD5(1)" ASC', $select->assemble());
     }
 
@@ -714,12 +716,15 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     public function testOrderOfSingleFieldWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
+        $select->from(['p' => 'product'])
             ->order('productId DESC');
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY "productId" DESC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
 
     /**
@@ -728,12 +733,15 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     public function testOrderOfMultiFieldWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
-            ->order(array ('productId DESC', 'userId ASC'));
+        $select->from(['p' => 'product'])
+            ->order(['productId DESC', 'userId ASC']);
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY "productId" DESC, "userId" ASC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
 
     /**
@@ -742,12 +750,15 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     public function testOrderOfMultiFieldButOnlyOneWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
-            ->order(array ('productId', 'userId DESC'));
+        $select->from(['p' => 'product'])
+            ->order(['productId', 'userId DESC']);
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY "productId" ASC, "userId" DESC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
 
     /**
@@ -757,12 +768,14 @@ class Zend_Db_Table_Select_StaticTest extends Zend_Db_Select_TestCommon
     public function testOrderOfConditionalFieldWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
+        $select->from(['p' => 'product'])
             ->order('IF("productId" > 5,1,0) ASC');
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY IF("productId" > 5,1,0) ASC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
-
 }

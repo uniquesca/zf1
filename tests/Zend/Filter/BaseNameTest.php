@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,7 +37,7 @@ require_once 'Zend/Filter/BaseName.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Filter
  */
-class Zend_Filter_BaseNameTest extends PHPUnit_Framework_TestCase
+class Zend_Filter_BaseNameTest extends TestCase
 {
     /**
      * Zend_Filter_BaseName object
@@ -48,7 +51,7 @@ class Zend_Filter_BaseNameTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_filter = new Zend_Filter_BaseName();
     }
@@ -60,10 +63,10 @@ class Zend_Filter_BaseNameTest extends PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $valuesExpected = array(
-            '/path/to/filename'     => 'filename',
+        $valuesExpected = [
+            '/path/to/filename' => 'filename',
             '/path/to/filename.ext' => 'filename.ext'
-            );
+            ];
         foreach ($valuesExpected as $input => $output) {
             $this->assertEquals($output, $this->_filter->filter($input));
         }

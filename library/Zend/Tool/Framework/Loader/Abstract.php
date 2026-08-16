@@ -47,12 +47,12 @@ abstract class Zend_Tool_Framework_Loader_Abstract
     /**
      * @var array
      */
-    private $_retrievedFiles = array();
+    private $_retrievedFiles = [];
 
     /**
      * @var array
      */
-    private $_loadedClasses  = array();
+    private $_loadedClasses  = [];
 
     /**
      * _getFiles
@@ -81,12 +81,16 @@ abstract class Zend_Tool_Framework_Loader_Abstract
     public function load()
     {
         $this->_retrievedFiles = $this->getRetrievedFiles();
-        $this->_loadedClasses  = array();
+        $this->_loadedClasses  = [];
 
         $manifestRepository = $this->_registry->getManifestRepository();
         $providerRepository = $this->_registry->getProviderRepository();
 
-        $loadedClasses = array();
+        $loadedClasses = [];
+
+        $newLevel = (defined('E_STRICT') && version_compare(PHP_VERSION, '8.4.0', '<'))
+            ? (E_ALL | ~E_STRICT)
+            : E_ALL;
 
         // loop through files and find the classes declared by loading the file
         foreach ($this->_retrievedFiles as $file) {
@@ -95,7 +99,7 @@ abstract class Zend_Tool_Framework_Loader_Abstract
             }
 
             $classesLoadedBefore = get_declared_classes();
-            $oldLevel = error_reporting(E_ALL | ~E_STRICT); // remove strict so that other packages wont throw warnings
+            $oldLevel = error_reporting($newLevel); // remove strict so that other packages wont throw warnings
             // should we lint the files here? i think so
             include_once $file;
             error_reporting($oldLevel); // restore old error level

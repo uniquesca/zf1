@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -65,9 +68,8 @@ require_once dirname(__FILE__) . '/_files/Db/MockHasResult.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_Db_NoRecordExistsTest extends TestCase
 {
-
     /**
      * @var Zend_Db_Adapter_Abstract
      */
@@ -83,11 +85,10 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_adapterHasResult = new Db_MockHasResult();
         $this->_adapterNoResult = new Db_MockNoResult();
-
     }
 
     /**
@@ -122,7 +123,7 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
     public function testExcludeWithArray()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterHasResult);
-        $validator = new Zend_Validate_Db_NoRecordExists('users', 'field1', array('field' => 'id', 'value' => 1));
+        $validator = new Zend_Validate_Db_NoRecordExists('users', 'field1', ['field' => 'id', 'value' => 1]);
         $this->assertFalse($validator->isValid('value3'));
     }
 
@@ -135,7 +136,7 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
     public function testExcludeWithArrayNoRecord()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterNoResult);
-        $validator = new Zend_Validate_Db_NoRecordExists('users', 'field1', array('field' => 'id', 'value' => 1));
+        $validator = new Zend_Validate_Db_NoRecordExists('users', 'field1', ['field' => 'id', 'value' => 1]);
         $this->assertTrue($validator->isValid('nosuchvalue'));
     }
 
@@ -170,6 +171,7 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
      * and no default is set.
      *
      * @return void
+     * @doesNotPerformAssertions
      */
     public function testThrowsExceptionWithNoAdapter()
     {
@@ -190,9 +192,9 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
     public function testWithSchema()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterHasResult);
-        $validator = new Zend_Validate_Db_NoRecordExists(array('table' => 'users',
+        $validator = new Zend_Validate_Db_NoRecordExists(['table' => 'users',
                                                                'schema' => 'my',
-                                                               'field' => 'field1'));
+                                                               'field' => 'field1']);
         $this->assertFalse($validator->isValid('value1'));
     }
 
@@ -204,9 +206,9 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
     public function testWithSchemaNoResult()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterNoResult);
-        $validator = new Zend_Validate_Db_NoRecordExists(array('table' => 'users',
+        $validator = new Zend_Validate_Db_NoRecordExists(['table' => 'users',
                                                                'schema' => 'my',
-                                                               'field' => 'field1'));
+                                                               'field' => 'field1']);
         $this->assertTrue($validator->isValid('value1'));
     }
 
@@ -245,18 +247,18 @@ class Zend_Validate_Db_NoRecordExistsTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * 
+     *
      * @group ZF-10705
      */
     public function testCreatesQueryBasedOnNamedOrPositionalAvailablity()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter(null);
-        $this->_adapterHasResult->setSupportsParametersValues(array('named' => false, 'positional' => true));
+        $this->_adapterHasResult->setSupportsParametersValues(['named' => false, 'positional' => true]);
         $validator = new Zend_Validate_Db_RecordExists('users', 'field1', null, $this->_adapterHasResult);
         $wherePart = $validator->getSelect()->getPart('where');
         $this->assertEquals($wherePart[0], '("field1" = ?)');
         
-        $this->_adapterHasResult->setSupportsParametersValues(array('named' => true, 'positional' => true));
+        $this->_adapterHasResult->setSupportsParametersValues(['named' => true, 'positional' => true]);
         $validator = new Zend_Validate_Db_RecordExists('users', 'field1', null, $this->_adapterHasResult);
         $wherePart = $validator->getSelect()->getPart('where');
         $this->assertEquals($wherePart[0], '("field1" = :value)');

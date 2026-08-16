@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,7 +37,7 @@ require_once 'Zend/Validate/Hex.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_HexTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_HexTest extends TestCase
 {
     /**
      * Zend_Validate_Hex object
@@ -48,7 +51,7 @@ class Zend_Validate_HexTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_validator = new Zend_Validate_Hex();
     }
@@ -60,17 +63,17 @@ class Zend_Validate_HexTest extends PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $valuesExpected = array(
-            array(1, true),
-            array(0x1, true),
-            array(0x123, true),
-            array('1', true),
-            array('abc123', true),
-            array('ABC123', true),
-            array('1234567890abcdef', true),
-            array('g', false),
-            array('1.2', false)
-            );
+        $valuesExpected = [
+            [1, true],
+            [0x1, true],
+            [0x123, true],
+            ['1', true],
+            ['abc123', true],
+            ['ABC123', true],
+            ['1234567890abcdef', true],
+            ['g', false],
+            ['1.2', false]
+            ];
         foreach ($valuesExpected as $element) {
             $this->assertEquals($element[1], $this->_validator->isValid($element[0]), $element[0]);
         }
@@ -83,7 +86,7 @@ class Zend_Validate_HexTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMessages()
     {
-        $this->assertEquals(array(), $this->_validator->getMessages());
+        $this->assertEquals([], $this->_validator->getMessages());
     }
 
     /**
@@ -91,6 +94,6 @@ class Zend_Validate_HexTest extends PHPUnit_Framework_TestCase
      */
     public function testNonStringValidation()
     {
-        $this->assertFalse($this->_validator->isValid(array(1 => 1)));
+        $this->assertFalse($this->_validator->isValid([1 => 1]));
     }
 }

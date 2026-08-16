@@ -42,10 +42,10 @@ class Zend_View_Helper_FormCheckbox extends Zend_View_Helper_FormElement
      * Default checked/unchecked options
      * @var array
      */
-    protected static $_defaultCheckedOptions = array(
+    protected static $_defaultCheckedOptions = [
         'checkedValue'   => '1',
         'uncheckedValue' => '0'
-    );
+    ];
 
     /**
      * Generates a 'checkbox' element.
@@ -59,7 +59,7 @@ class Zend_View_Helper_FormCheckbox extends Zend_View_Helper_FormElement
      * @param array $attribs Attributes for the element tag.
      * @return string The element XHTML.
      */
-    public function formCheckbox($name, $value = null, $attribs = null, array $checkedOptions = null)
+    public function formCheckbox($name, $value = null, $attribs = null, ?array $checkedOptions = null)
     {
         $info = $this->_getInfo($name, $value, $attribs);
         extract($info); // name, id, value, attribs, options, listsep, disable
@@ -113,7 +113,7 @@ class Zend_View_Helper_FormCheckbox extends Zend_View_Helper_FormElement
      * @param  array|null $checkedOptions
      * @return array
      */
-    public static function determineCheckboxInfo($value, $checked, array $checkedOptions = null)
+    public static function determineCheckboxInfo($value, $checked, ?array $checkedOptions = null)
     {
         // Checked/unchecked values
         $checkedValue   = null;
@@ -154,11 +154,11 @@ class Zend_View_Helper_FormCheckbox extends Zend_View_Helper_FormElement
             $checkedValue = $value;
         }
 
-        return array(
+        return [
             'checked'        => $checked,
             'checkedString'  => $checkedString,
             'checkedValue'   => $checkedValue,
             'uncheckedValue' => $uncheckedValue,
-        );
+        ];
     }
 }

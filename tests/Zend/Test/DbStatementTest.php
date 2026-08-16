@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -31,7 +34,7 @@ require_once "Zend/Test/DbStatement.php";
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Test
  */
-class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
+class Zend_Test_DbStatementTest extends TestCase
 {
     public function testRowCountDefault()
     {
@@ -48,7 +51,7 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testCreateSelectStatementWithRows()
     {
-        $rows = array("foo", "bar");
+        $rows = ["foo", "bar"];
 
         $stmt = Zend_Test_DbStatement::createSelectStatement($rows);
 
@@ -82,7 +85,7 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testSetFetchRow()
     {
-        $row = array("foo");
+        $row = ["foo"];
 
         $stmt = new Zend_Test_DbStatement();
         $stmt->append($row);
@@ -98,7 +101,7 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testFetchResult_FromEmptyResultStack()
     {
-        $row = array("foo");
+        $row = ["foo"];
 
         $stmt = new Zend_Test_DbStatement();
         $stmt->append($row);
@@ -117,7 +120,7 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testFetchColumn()
     {
-        $row = array("foo" => "bar", "bar" => "baz");
+        $row = ["foo" => "bar", "bar" => "baz"];
 
         $stmt = new Zend_Test_DbStatement();
         $stmt->append($row);
@@ -127,9 +130,9 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testFetchColumn_OutOfBounds()
     {
-        $this->setExpectedException("Zend_Db_Statement_Exception");
+        $this->expectException("Zend_Db_Statement_Exception");
 
-        $row = array("foo" => "bar", "bar" => "baz");
+        $row = ["foo" => "bar", "bar" => "baz"];
 
         $stmt = new Zend_Test_DbStatement();
         $stmt->append($row);
@@ -139,7 +142,7 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testFetchObject()
     {
-        $row = array("foo" => "bar", "bar" => "baz");
+        $row = ["foo" => "bar", "bar" => "baz"];
 
         $stmt = new Zend_Test_DbStatement();
         $stmt->append($row);
@@ -152,9 +155,9 @@ class Zend_Test_DbStatementTest extends PHPUnit_Framework_TestCase
 
     public function testFetchObject_ClassNotExists_ThrowsException()
     {
-        $this->setExpectedException("Zend_Db_Statement_Exception");
+        $this->expectException("Zend_Db_Statement_Exception");
 
-        $row = array("foo" => "bar", "bar" => "baz");
+        $row = ["foo" => "bar", "bar" => "baz"];
 
         $stmt = new Zend_Test_DbStatement();
         $stmt->append($row);

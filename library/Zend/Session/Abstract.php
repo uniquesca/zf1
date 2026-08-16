@@ -52,21 +52,21 @@ abstract class Zend_Session_Abstract
      *
      * @var array
      */
-    protected static $_expiringData = array();
+    protected static $_expiringData = [];
 
 
     /**
      * Error message thrown when an action requires modification,
      * but current Zend_Session has been marked as read-only.
      */
-    const _THROW_NOT_WRITABLE_MSG = 'Zend_Session is currently marked as read-only.';
+    public const _THROW_NOT_WRITABLE_MSG = 'Zend_Session is currently marked as read-only.';
 
 
     /**
      * Error message thrown when an action requires reading session data,
      * but current Zend_Session is not marked as readable.
      */
-    const _THROW_NOT_READABLE_MSG = 'Zend_Session is not marked as readable.';
+    public const _THROW_NOT_READABLE_MSG = 'Zend_Session is not marked as readable.';
 
 
     /**
@@ -172,14 +172,14 @@ abstract class Zend_Session_Abstract
      *
      * @param string $namespace
      * @param string $name
-     * @return mixed
+     * @return array
      */
     protected static function _namespaceGetAll($namespace)
     {
         $currentData  = (isset($_SESSION[$namespace]) && is_array($_SESSION[$namespace])) ?
-            $_SESSION[$namespace] : array();
+            $_SESSION[$namespace] : [];
         $expiringData = (isset(self::$_expiringData[$namespace]) && is_array(self::$_expiringData[$namespace])) ?
-            self::$_expiringData[$namespace] : array();
+            self::$_expiringData[$namespace] : [];
         return array_merge($currentData, $expiringData);
     }
 }

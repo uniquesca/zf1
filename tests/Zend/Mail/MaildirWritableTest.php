@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,14 +36,14 @@ require_once 'Zend/Mail/Storage/Writable/Maildir.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Mail
  */
-class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
+class Zend_Mail_MaildirWritableTest extends TestCase
 {
     protected $_params;
     protected $_originalDir;
     protected $_tmpdir;
-    protected $_subdirs = array('.', '.subfolder', '.subfolder.test');
+    protected $_subdirs = ['.', '.subfolder', '.subfolder.test'];
 
-    public function setUp()
+    protected function set_up()
     {
         $this->_originalDir = dirname(__FILE__) . '/_files/test.maildir/';
 
@@ -72,14 +75,14 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
             }
         }
 
-        $this->_params = array();
+        $this->_params = [];
         $this->_params['dirname'] = $this->_tmpdir;
 
         foreach ($this->_subdirs as $dir) {
             if ($dir != '.') {
                 mkdir($this->_tmpdir . $dir);
             }
-            foreach (array('cur', 'new') as $subdir) {
+            foreach (['cur', 'new'] as $subdir) {
                 if (!file_exists($this->_originalDir . $dir . '/' . $subdir)) {
                     continue;
                 }
@@ -98,13 +101,13 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         foreach (array_reverse($this->_subdirs) as $dir) {
             if (!file_exists($this->_tmpdir . $dir)) {
                 continue;
             }
-            foreach (array('cur', 'new', 'tmp') as $subdir) {
+            foreach (['cur', 'new', 'tmp'] as $subdir) {
                 if (!file_exists($this->_tmpdir . $dir . '/' . $subdir)) {
                     continue;
                 }
@@ -126,6 +129,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         @unlink($this->_tmpdir . 'maildirsize');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreateFolder()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -151,6 +157,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->_subdirs[] = '.foo.bar';
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreateFolderEmtpyPart()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -163,6 +172,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no exception while creating folder with empty part name');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreateFolderSlash()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -175,6 +187,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no exception while creating folder with slash');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreateFolderDirectorySeparator()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -187,6 +202,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no exception while creating folder with DIRECTORY_SEPARATOR');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreateFolderExistingDir()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -201,6 +219,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('should not be able to create existing folder');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCreateExistingFolder()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -214,6 +235,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('should not be able to create existing folder');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemoveFolderName()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -227,6 +251,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('folder still exists');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemoveFolderInstance()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -240,6 +267,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('folder still exists');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemoveFolderWithChildren()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -253,6 +283,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('should not be able to remove a folder with children');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemoveSelectedFolder()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -266,6 +299,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no error while removing selected folder');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemoveInvalidFolder()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -278,6 +314,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no error while removing invalid folder');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRenameFolder()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -296,6 +335,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no error while renaming INBOX');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRenameSelectedFolder()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -309,6 +351,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->fail('no error while renaming selected folder');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRenameToChild()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -366,36 +411,39 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
 
-        $mail->setFlags(1, array(Zend_Mail_Storage::FLAG_SEEN));
+        $mail->setFlags(1, [Zend_Mail_Storage::FLAG_SEEN]);
         $message = $mail->getMessage(1);
         $this->assertTrue($message->hasFlag(Zend_Mail_Storage::FLAG_SEEN));
         $this->assertFalse($message->hasFlag(Zend_Mail_Storage::FLAG_FLAGGED));
 
-        $mail->setFlags(1, array(Zend_Mail_Storage::FLAG_SEEN, Zend_Mail_Storage::FLAG_FLAGGED));
+        $mail->setFlags(1, [Zend_Mail_Storage::FLAG_SEEN, Zend_Mail_Storage::FLAG_FLAGGED]);
         $message = $mail->getMessage(1);
         $this->assertTrue($message->hasFlag(Zend_Mail_Storage::FLAG_SEEN));
         $this->assertTrue($message->hasFlag(Zend_Mail_Storage::FLAG_FLAGGED));
 
-        $mail->setFlags(1, array(Zend_Mail_Storage::FLAG_FLAGGED));
+        $mail->setFlags(1, [Zend_Mail_Storage::FLAG_FLAGGED]);
         $message = $mail->getMessage(1);
         $this->assertFalse($message->hasFlag(Zend_Mail_Storage::FLAG_SEEN));
         $this->assertTrue($message->hasFlag(Zend_Mail_Storage::FLAG_FLAGGED));
 
         try {
-            $mail->setFlags(1, array(Zend_Mail_Storage::FLAG_RECENT));
+            $mail->setFlags(1, [Zend_Mail_Storage::FLAG_RECENT]);
         } catch (Exception $e) {
             return; // ok
         }
         $this->fail('should not be able to set recent flag');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testSetFlagsRemovedFile()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
         unlink($this->_params['dirname'] . 'cur/1000000000.P1.example.org:2,S');
 
         try {
-            $mail->setFlags(1, array(Zend_Mail_Storage::FLAG_FLAGGED));
+            $mail->setFlags(1, [Zend_Mail_Storage::FLAG_FLAGGED]);
         } catch (Exception $e) {
             return; // ok
         }
@@ -415,6 +463,9 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($mail->countMessages(), --$count);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testRemoveRemovedFile()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
@@ -438,16 +489,16 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
     public function testCheckQuotaDetailed()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
-        $quotaResult = array(
-            'size'  => 2596,
+        $quotaResult = [
+            'size' => 2596,
             'count' => 6,
-            'quota' => array(
+            'quota' => [
                     'count' => 10,
-                    'L'     => 1,
-                    'size'  => 3000
-                ),
+                    'L' => 1,
+                    'size' => 3000
+                ],
             'over_quota' => false
-        );
+        ];
         $this->assertEquals($mail->checkQuota(true), $quotaResult);
     }
 
@@ -462,29 +513,29 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $mail->setQuota(false);
         $this->assertFalse($mail->getQuota());
 
-        $mail->setQuota(array('size' => 100, 'count' => 2, 'X' => 0));
-        $this->assertEquals($mail->getQuota(), array('size' => 100, 'count' => 2, 'X' => 0));
-        $this->assertEquals($mail->getQuota(true), array('size' => 3000, 'L' => 1, 'count' => 10));
+        $mail->setQuota(['size' => 100, 'count' => 2, 'X' => 0]);
+        $this->assertEquals($mail->getQuota(), ['size' => 100, 'count' => 2, 'X' => 0]);
+        $this->assertEquals($mail->getQuota(true), ['size' => 3000, 'L' => 1, 'count' => 10]);
 
-        $quotaResult = array(
-            'size'  => 2596,
+        $quotaResult = [
+            'size' => 2596,
             'count' => 6,
-            'quota' => array(
-                    'size'  => 100,
+            'quota' => [
+                    'size' => 100,
                     'count' => 2,
-                    'X'     => 0
-                ),
+                    'X' => 0
+                ],
             'over_quota' => true
-        );
+        ];
         $this->assertEquals($mail->checkQuota(true, true), $quotaResult);
 
-        $this->assertEquals($mail->getQuota(true), array('size' => 100, 'count' => 2, 'X' => 0));
+        $this->assertEquals($mail->getQuota(true), ['size' => 100, 'count' => 2, 'X' => 0]);
     }
 
     public function testMissingMaildirsize()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
-        $this->assertEquals($mail->getQuota(true), array('size' => 3000, 'L' => 1, 'count' => 10));
+        $this->assertEquals($mail->getQuota(true), ['size' => 3000, 'L' => 1, 'count' => 10]);
 
         unlink($this->_tmpdir . 'maildirsize');
 
@@ -492,7 +543,7 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
 
         try {
             $mail->getQuota(true);
-        } catch(Zend_Mail_Exception $e) {
+        } catch (Zend_Mail_Exception $e) {
             // ok
             return;
         }
@@ -503,18 +554,18 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
         unlink($this->_tmpdir . 'maildirsize');
-        $mail->setQuota(array('size' => 100, 'count' => 2, 'X' => 0));
+        $mail->setQuota(['size' => 100, 'count' => 2, 'X' => 0]);
 
-        $quotaResult = array(
-            'size'  => 2596,
+        $quotaResult = [
+            'size' => 2596,
             'count' => 6,
-            'quota' => array(
-                    'size'  => 100,
+            'quota' => [
+                    'size' => 100,
                     'count' => 2,
-                    'X'     => 0
-                ),
+                    'X' => 0
+                ],
             'over_quota' => true
-        );
+        ];
         $this->assertEquals($mail->checkQuota(true), $quotaResult);
 
         $this->assertEquals($mail->getQuota(true), $quotaResult['quota']);
@@ -523,26 +574,26 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
     public function testAppendMessage()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
-        $mail->setQuota(array('size' => 3000, 'count' => 6, 'X' => 0));
+        $mail->setQuota(['size' => 3000, 'count' => 6, 'X' => 0]);
         $this->assertFalse($mail->checkQuota(false, true));
         $mail->appendMessage("Subject: test\r\n\r\n");
-        $quotaResult = array(
-            'size'  => 2613,
+        $quotaResult = [
+            'size' => 2613,
             'count' => 7,
-            'quota' => array(
-                    'size'  => 3000,
+            'quota' => [
+                    'size' => 3000,
                     'count' => 6,
-                    'X'     => 0
-                ),
+                    'X' => 0
+                ],
             'over_quota' => true
-        );
+        ];
         $this->assertEquals($mail->checkQuota(true), $quotaResult);
 
         $mail->setQuota(false);
         $this->assertTrue($mail->checkQuota());
         try {
             $mail->appendMessage("Subject: test\r\n\r\n");
-        } catch(Zend_Mail_Exception $e) {
+        } catch (Zend_Mail_Exception $e) {
             $this->fail('appending should not fail if quota check is not active');
         }
 
@@ -550,7 +601,7 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($mail->checkQuota());
         try {
             $mail->appendMessage("Subject: test\r\n\r\n");
-        } catch(Zend_Mail_Exception $e) {
+        } catch (Zend_Mail_Exception $e) {
             // ok
             return;
         }
@@ -560,7 +611,7 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
     public function testRemoveMessage()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
-        $mail->setQuota(array('size' => 3000, 'count' => 5, 'X' => 0));
+        $mail->setQuota(['size' => 3000, 'count' => 5, 'X' => 0]);
         $this->assertTrue($mail->checkQuota(false, true));
 
         $mail->removeMessage(1);
@@ -570,19 +621,19 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
     public function testCopyMessage()
     {
         $mail = new Zend_Mail_Storage_Writable_Maildir($this->_params);
-        $mail->setQuota(array('size' => 3000, 'count' => 6, 'X' => 0));
+        $mail->setQuota(['size' => 3000, 'count' => 6, 'X' => 0]);
         $this->assertFalse($mail->checkQuota(false, true));
         $mail->copyMessage(1, 'subfolder');
-        $quotaResult = array(
-            'size'  => 2993,
+        $quotaResult = [
+            'size' => 2993,
             'count' => 7,
-            'quota' => array(
-                    'size'  => 3000,
+            'quota' => [
+                    'size' => 3000,
                     'count' => 6,
-                    'X'     => 0
-                ),
+                    'X' => 0
+                ],
             'over_quota' => true
-        );
+        ];
         $this->assertEquals($mail->checkQuota(true), $quotaResult);
     }
 
@@ -624,7 +675,7 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
 
     public function testInit()
     {
-        $this->tearDown();
+        $this->tear_down();
 
         // should fail now
         $e = null;
@@ -644,7 +695,7 @@ class Zend_Mail_MaildirWritableTest extends PHPUnit_Framework_TestCase
 
     public function testCreate()
     {
-        $this->tearDown();
+        $this->tear_down();
 
         // should fail now
         $e = null;

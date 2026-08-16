@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -38,7 +43,7 @@ require_once 'Zend/Validate/File/WordCount.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_File_WordCountTest extends TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -47,8 +52,8 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Validate_File_WordCountTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Validate_File_WordCountTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -58,12 +63,12 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $valuesExpected = array(
-            array(15, true),
-            array(4, false),
-            array(array('min' => 0, 'max' => 10), true),
-            array(array('min' => 10, 'max' => 15), false),
-            );
+        $valuesExpected = [
+            [15, true],
+            [4, false],
+            [['min' => 0, 'max' => 10], true],
+            [['min' => 10, 'max' => 15], false],
+            ];
 
         foreach ($valuesExpected as $element) {
             $validator = new Zend_Validate_File_WordCount($element[0]);
@@ -82,24 +87,24 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMin()
     {
-        $validator = new Zend_Validate_File_WordCount(array('min' => 1, 'max' => 5));
+        $validator = new Zend_Validate_File_WordCount(['min' => 1, 'max' => 5]);
         $this->assertEquals(1, $validator->getMin());
 
         try {
-            $validator = new Zend_Validate_File_WordCount(array('min' => 5, 'max' => 1));
+            $validator = new Zend_Validate_File_WordCount(['min' => 5, 'max' => 1]);
             $this->fail("Missing exception");
         } catch (Zend_Validate_Exception $e) {
-            $this->assertContains("greater than or equal", $e->getMessage());
+            $this->assertStringContainsString("greater than or equal", $e->getMessage());
         }
 
-        $validator = new Zend_Validate_File_WordCount(array('min' => 1, 'max' => 5));
+        $validator = new Zend_Validate_File_WordCount(['min' => 1, 'max' => 5]);
         $this->assertEquals(1, $validator->getMin());
 
         try {
-            $validator = new Zend_Validate_File_WordCount(array('min' => 5, 'max' => 1));
+            $validator = new Zend_Validate_File_WordCount(['min' => 5, 'max' => 1]);
             $this->fail("Missing exception");
         } catch (Zend_Validate_Exception $e) {
-            $this->assertContains("greater than or equal", $e->getMessage());
+            $this->assertStringContainsString("greater than or equal", $e->getMessage());
         }
     }
 
@@ -110,7 +115,7 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
      */
     public function testSetMin()
     {
-        $validator = new Zend_Validate_File_WordCount(array('min' => 1000, 'max' => 10000));
+        $validator = new Zend_Validate_File_WordCount(['min' => 1000, 'max' => 10000]);
         $validator->setMin(100);
         $this->assertEquals(100, $validator->getMin());
 
@@ -118,7 +123,7 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
             $validator->setMin(20000);
             $this->fail("Missing exception");
         } catch (Zend_Validate_Exception $e) {
-            $this->assertContains("less than or equal", $e->getMessage());
+            $this->assertStringContainsString("less than or equal", $e->getMessage());
         }
     }
 
@@ -129,14 +134,14 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMax()
     {
-        $validator = new Zend_Validate_File_WordCount(array('min' => 1, 'max' => 100));
+        $validator = new Zend_Validate_File_WordCount(['min' => 1, 'max' => 100]);
         $this->assertEquals(100, $validator->getMax());
 
         try {
-            $validator = new Zend_Validate_File_WordCount(array('min' => 5, 'max' => 1));
+            $validator = new Zend_Validate_File_WordCount(['min' => 5, 'max' => 1]);
             $this->fail("Missing exception");
         } catch (Zend_Validate_Exception $e) {
-            $this->assertContains("greater than or equal", $e->getMessage());
+            $this->assertStringContainsString("greater than or equal", $e->getMessage());
         }
     }
 
@@ -147,7 +152,7 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
      */
     public function testSetMax()
     {
-        $validator = new Zend_Validate_File_WordCount(array('min' => 1000, 'max' => 10000));
+        $validator = new Zend_Validate_File_WordCount(['min' => 1000, 'max' => 10000]);
         $validator->setMax(1000000);
         $this->assertEquals(1000000, $validator->getMax());
 
@@ -157,6 +162,6 @@ class Zend_Validate_File_WordCountTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_Validate_File_WordCountTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Validate_File_WordCountTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Validate_File_WordCountTest::main") {
     Zend_Validate_File_WordCountTest::main();
 }

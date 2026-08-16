@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -40,12 +43,22 @@ require_once 'Zend/Service/StrikeIron/SalesUseTaxBasic.php';
  * @group      Zend_Service
  * @group      Zend_Service_StrikeIron
  */
-class Zend_Service_StrikeIron_SalesUseTaxBasicTest extends PHPUnit_Framework_TestCase
+class Zend_Service_StrikeIron_SalesUseTaxBasicTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \stdclass|mixed
+     */
+    protected $soapClient;
+
+    /**
+     * @var \Zend_Service_StrikeIron_SalesUseTaxBasic|mixed
+     */
+    protected $service;
+
+    protected function set_up()
     {
         $this->soapClient = new stdclass();
-        $this->service = new Zend_Service_StrikeIron_SalesUseTaxBasic(array('client' => $this->soapClient));
+        $this->service = new Zend_Service_StrikeIron_SalesUseTaxBasic(['client' => $this->soapClient]);
     }
 
     public function testInheritsFromBase()
@@ -61,8 +74,8 @@ class Zend_Service_StrikeIron_SalesUseTaxBasicTest extends PHPUnit_Framework_Tes
 
     public function testInstantiationFromFactory()
     {
-        $strikeIron = new Zend_Service_StrikeIron(array('client' => $this->soapClient));
-        $client = $strikeIron->getService(array('class' => 'SalesUseTaxBasic'));
+        $strikeIron = new Zend_Service_StrikeIron(['client' => $this->soapClient]);
+        $client = $strikeIron->getService(['class' => 'SalesUseTaxBasic']);
 
         $this->assertTrue($client instanceof Zend_Service_StrikeIron_SalesUseTaxBasic);
     }

@@ -38,7 +38,7 @@ class Zend_Log_Formatter_Simple extends Zend_Log_Formatter_Abstract
      */
     protected $_format;
 
-    const DEFAULT_FORMAT = '%timestamp% %priorityName% (%priority%): %message%';
+    public const DEFAULT_FORMAT = '%timestamp% %priorityName% (%priority%): %message%';
 
     /**
      * Class constructor
@@ -100,7 +100,7 @@ class Zend_Log_Formatter_Simple extends Zend_Log_Formatter_Abstract
                 $value = gettype($value);
             }
 
-            $output = str_replace("%$name%", $value, $output);
+            $output = str_replace("%$name%", (string)$value, $output);
         }
 
         return $output;

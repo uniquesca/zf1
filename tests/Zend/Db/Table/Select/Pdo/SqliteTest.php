@@ -38,7 +38,6 @@ require_once 'Zend/Db/Table/Select/TestCommon.php';
  */
 class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommon
 {
-
     public function testSelectFromQualified()
     {
         $this->markTestSkipped($this->getDriver() . ' does not support qualified table names');
@@ -71,11 +70,17 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
         $bugs_products = $this->_db->quoteIdentifier('zfbugs_products');
         $bug_id = $this->_db->quoteIdentifier('bug_id');
         $key = "$bugs_products.$bug_id";
-        $this->assertEquals(3, count($result),
-            'Expected count of first result set to be 2');
+        $this->assertEquals(
+            3,
+            count($result),
+            'Expected count of first result set to be 2'
+        );
         $this->assertEquals(1, $result[0][$key]);
-        $this->assertEquals(3, $result[0]['thecount'],
-            'Expected count(*) of first result set to be 2');
+        $this->assertEquals(
+            3,
+            $result[0]['thecount'],
+            'Expected count(*) of first result set to be 2'
+        );
         $this->assertEquals(2, $result[1][$key]);
         $this->assertEquals(1, $result[1]['thecount']);
     }
@@ -92,11 +97,17 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
         $bugs_products = $this->_db->quoteIdentifier('zfbugs_products');
         $bug_id = $this->_db->quoteIdentifier('bug_id');
         $key = "$bugs_products.$bug_id";
-        $this->assertEquals(3, count($result),
-            'Expected count of first result set to be 2');
+        $this->assertEquals(
+            3,
+            count($result),
+            'Expected count of first result set to be 2'
+        );
         $this->assertEquals(1, $result[0][$key]);
-        $this->assertEquals(3, $result[0]['thecount'],
-            'Expected count(*) of first result set to be 2');
+        $this->assertEquals(
+            3,
+            $result[0]['thecount'],
+            'Expected count(*) of first result set to be 2'
+        );
         $this->assertEquals(2, $result[1][$key]);
         $this->assertEquals(1, $result[1]['thecount']);
     }
@@ -181,11 +192,11 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
     public function testSqlInjectionWithOrder()
     {
         $select = $this->_db->select();
-        $select->from(array('p' => 'products'))->order('MD5(1);select');
+        $select->from(['p' => 'products'])->order('MD5(1);select');
         $this->assertEquals('SELECT "p".* FROM "products" AS "p" ORDER BY "MD5(1);select" ASC', $select->assemble());
 
         $select = $this->_db->select();
-        $select->from(array('p' => 'products'))->order('name;select;MD5(1)');
+        $select->from(['p' => 'products'])->order('name;select;MD5(1)');
         $this->assertEquals('SELECT "p".* FROM "products" AS "p" ORDER BY "name;select;MD5(1)" ASC', $select->assemble());
     }
 
@@ -195,12 +206,15 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
     public function testOrderOfSingleFieldWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
+        $select->from(['p' => 'product'])
             ->order('productId DESC');
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY "productId" DESC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
 
     /**
@@ -209,12 +223,15 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
     public function testOrderOfMultiFieldWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
-            ->order(array ('productId DESC', 'userId ASC'));
+        $select->from(['p' => 'product'])
+            ->order(['productId DESC', 'userId ASC']);
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY "productId" DESC, "userId" ASC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
 
     /**
@@ -223,12 +240,15 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
     public function testOrderOfMultiFieldButOnlyOneWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
-            ->order(array ('productId', 'userId DESC'));
+        $select->from(['p' => 'product'])
+            ->order(['productId', 'userId DESC']);
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY "productId" ASC, "userId" DESC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
 
     /**
@@ -238,12 +258,14 @@ class Zend_Db_Table_Select_Pdo_SqliteTest extends Zend_Db_Table_Select_TestCommo
     public function testOrderOfConditionalFieldWithDirection()
     {
         $select = $this->_db->select();
-        $select->from(array ('p' => 'product'))
+        $select->from(['p' => 'product'])
             ->order('IF("productId" > 5,1,0) ASC');
 
         $expected = 'SELECT "p".* FROM "product" AS "p" ORDER BY IF("productId" > 5,1,0) ASC';
-        $this->assertEquals($expected, $select->assemble(),
-            'Order direction of field failed');
+        $this->assertEquals(
+            $expected,
+            $select->assemble(),
+            'Order direction of field failed'
+        );
     }
-
 }

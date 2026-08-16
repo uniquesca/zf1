@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,7 +37,7 @@ require_once 'Zend/Http/Client/Adapter/Test.php';
  * @group      Zend_Http
  * @group      Zend_Http_Client
  */
-class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
+class Zend_Http_Client_TestAdapterTest extends TestCase
 {
     /**
      * Test adapter
@@ -47,7 +50,7 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
      * Set up the test adapter before running the test
      *
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->adapter = new Zend_Http_Client_Adapter_Test();
     }
@@ -56,36 +59,47 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
      * Tear down the test adapter after running the test
      *
      */
-    public function tearDown()
+    protected function tear_down()
     {
         $this->adapter = null;
     }
 
     /**
      * Make sure an exception is thrown on invalid cofiguration
-     *
-     * @expectedException Zend_Http_Client_Adapter_Exception
      */
     public function testSetConfigThrowsOnInvalidConfig()
     {
+        $this->expectException(Zend_Http_Client_Adapter_Exception::class);
         $this->adapter->setConfig('foo');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testSetConfigReturnsQuietly()
     {
-        $this->adapter->setConfig(array('foo' => 'bar'));
+        $this->adapter->setConfig(['foo' => 'bar']);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConnectReturnsQuietly()
     {
         $this->adapter->connect('http://foo');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testCloseReturnsQuietly()
     {
         $this->adapter->close();
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFailRequestOnDemand()
     {
         $this->adapter->setNextRequestWillFail(true);
@@ -116,8 +130,8 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
 
     public function testReadingResponseCycles()
     {
-        $expected = array("HTTP/1.1 200 OK\r\n\r\n",
-                          "HTTP/1.1 302 Moved Temporarily\r\n\r\n");
+        $expected = ["HTTP/1.1 200 OK\r\n\r\n",
+                          "HTTP/1.1 302 Moved Temporarily\r\n\r\n"];
 
         $this->adapter->setResponse($expected[0]);
         $this->adapter->addResponse($expected[1]);
@@ -158,8 +172,8 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
 
     public function testReadingResponseCyclesWhenSetByArray()
     {
-        $expected = array("HTTP/1.1 200 OK\r\n\r\n",
-                          "HTTP/1.1 302 Moved Temporarily\r\n\r\n");
+        $expected = ["HTTP/1.1 200 OK\r\n\r\n",
+                          "HTTP/1.1 302 Moved Temporarily\r\n\r\n"];
 
         $this->adapter->setResponse($expected);
 
@@ -170,9 +184,9 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
 
     public function testSettingNextResponseByIndex()
     {
-        $expected = array("HTTP/1.1 200 OK\r\n\r\n",
+        $expected = ["HTTP/1.1 200 OK\r\n\r\n",
                           "HTTP/1.1 302 Moved Temporarily\r\n\r\n",
-                          "HTTP/1.1 404 Not Found\r\n\r\n");
+                          "HTTP/1.1 404 Not Found\r\n\r\n"];
 
         $this->adapter->setResponse($expected);
         $this->assertEquals($expected[0], $this->adapter->read());
@@ -185,7 +199,7 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
 
     public function testSettingNextResponseToAnInvalidIndex()
     {
-        $indexes = array(-1, 1);
+        $indexes = [-1, 1];
         foreach ($indexes as $i) {
             try {
                 $this->adapter->setResponseIndex($i);
@@ -193,7 +207,7 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
             } catch (Exception $e) {
                 $class = 'Zend_Http_Client_Adapter_Exception';
                 $this->assertTrue($e instanceof $class);
-                $this->assertRegexp('/out of range/i', $e->getMessage());
+                $this->assertMatchesRegularExpression('/out of range/i', $e->getMessage());
             }
         }
     }
@@ -215,12 +229,12 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    static public function validHttpResponseProvider()
+    public static function validHttpResponseProvider()
     {
-        return array(
-           array("HTTP/1.1 200 OK\r\n\r\n"),
-           array("HTTP/1.1 302 Moved Temporarily\r\nLocation: http://example.com/baz\r\n\r\n"),
-           array("HTTP/1.1 404 Not Found\r\n" .
+        return [
+           ["HTTP/1.1 200 OK\r\n\r\n"],
+           ["HTTP/1.1 302 Moved Temporarily\r\nLocation: http://example.com/baz\r\n\r\n"],
+           ["HTTP/1.1 404 Not Found\r\n" .
                  "Date: Sun, 14 Jun 2009 10:40:06 GMT\r\n" .
                  "Server: Apache/2.2.3 (CentOS)\r\n" .
                  "Content-length: 281\r\n" .
@@ -234,7 +248,7 @@ class Zend_Http_Client_TestAdapterTest extends PHPUnit_Framework_TestCase
                  "<p>The requested URL /foo/bar was not found on this server.</p>\n" .
                  "<hr>\n" .
                  "<address>Apache/2.2.3 (CentOS) Server at example.com Port 80</address>\n" .
-                 "</body></html>")
-        );
+                 "</body></html>"]
+        ];
     }
 }

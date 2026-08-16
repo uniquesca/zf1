@@ -37,33 +37,33 @@ class Zend_Validate_File_IsCompressed extends Zend_Validate_File_MimeType
     /**
      * @const string Error constants
      */
-    const FALSE_TYPE   = 'fileIsCompressedFalseType';
-    const NOT_DETECTED = 'fileIsCompressedNotDetected';
-    const NOT_READABLE = 'fileIsCompressedNotReadable';
+    public const FALSE_TYPE   = 'fileIsCompressedFalseType';
+    public const NOT_DETECTED = 'fileIsCompressedNotDetected';
+    public const NOT_READABLE = 'fileIsCompressedNotReadable';
 
     /**
      * @var array Error message templates
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::FALSE_TYPE   => "File '%value%' is not compressed, '%type%' detected",
         self::NOT_DETECTED => "The mimetype of file '%value%' could not be detected",
         self::NOT_READABLE => "File '%value%' is not readable or does not exist",
-    );
+    ];
 
     /**
      * Sets validator options
      *
      * @param string|array|Zend_Config $mimetype
      */
-    public function __construct($mimetype = array())
+    public function __construct($mimetype = [])
     {
         if ($mimetype instanceof Zend_Config) {
             $mimetype = $mimetype->toArray();
         }
 
-        $temp    = array();
+        $temp    = [];
         // http://de.wikipedia.org/wiki/Liste_von_Dateiendungen
-            $default = array(
+            $default = [
             'application/arj',
             'application/gnutar',
             'application/lha',
@@ -96,7 +96,7 @@ class Zend_Validate_File_IsCompressed extends Zend_Validate_File_MimeType
             'application/x-zip',
             'application/zoo',
             'multipart/x-gzip',
-        );
+        ];
 
         if (is_array($mimetype)) {
             $temp = $mimetype;

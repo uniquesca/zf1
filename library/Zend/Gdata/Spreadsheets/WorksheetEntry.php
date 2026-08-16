@@ -96,12 +96,12 @@ class Zend_Gdata_Spreadsheets_WorksheetEntry extends Zend_Gdata_Entry
     {
         $absoluteNodeName = $child->namespaceURI . ':' . $child->localName;
         switch ($absoluteNodeName) {
-            case $this->lookupNamespace('gs') . ':' . 'rowCount';
+            case $this->lookupNamespace('gs') . ':' . 'rowCount':
                 $rowCount = new Zend_Gdata_Spreadsheets_Extension_RowCount();
                 $rowCount->transferFromDOM($child);
                 $this->_rowCount = $rowCount;
                 break;
-            case $this->lookupNamespace('gs') . ':' . 'colCount';
+            case $this->lookupNamespace('gs') . ':' . 'colCount':
                 $colCount = new Zend_Gdata_Spreadsheets_Extension_ColCount();
                 $colCount->transferFromDOM($child);
                 $this->_colCount = $colCount;
@@ -116,7 +116,7 @@ class Zend_Gdata_Spreadsheets_WorksheetEntry extends Zend_Gdata_Entry
     /**
      * Gets the row count for this entry.
      *
-     * @return string The row count for the entry.
+     * @return string|null The row count for the entry.
      */
     public function getRowCount()
     {
@@ -126,7 +126,7 @@ class Zend_Gdata_Spreadsheets_WorksheetEntry extends Zend_Gdata_Entry
     /**
      * Gets the column count for this entry.
      *
-     * @return string The column count for the entry.
+     * @return string|null The column count for the entry.
      */
     public function getColumnCount()
     {

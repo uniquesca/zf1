@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -64,9 +67,8 @@ require_once dirname(__FILE__) . '/_files/Db/MockHasResult.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_Db_RecordExistsTest extends TestCase
 {
-
     /**
      * @var Zend_Db_Adapter_Abstract
      */
@@ -82,11 +84,10 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_adapterHasResult = new Db_MockHasResult();
         $this->_adapterNoResult = new Db_MockNoResult();
-
     }
 
     /**
@@ -97,7 +98,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testBasicFindsRecord()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterHasResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users', 'field' => 'field1'));
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users', 'field' => 'field1']);
         $this->assertTrue($validator->isValid('value1'));
     }
 
@@ -109,7 +110,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testBasicFindsNoRecord()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterNoResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users', 'field' => 'field1'));
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users', 'field' => 'field1']);
         $this->assertFalse($validator->isValid('nosuchvalue'));
     }
 
@@ -121,7 +122,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testExcludeWithArray()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterHasResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users', 'field' => 'field1', 'exclude' => array('field' => 'id', 'value' => 1)));
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users', 'field' => 'field1', 'exclude' => ['field' => 'id', 'value' => 1]]);
         $this->assertTrue($validator->isValid('value3'));
     }
 
@@ -134,7 +135,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testExcludeWithArrayNoRecord()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterNoResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users', 'field' => 'field1', 'exclude' => array('field' => 'id', 'value' => 1)));
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users', 'field' => 'field1', 'exclude' => ['field' => 'id', 'value' => 1]]);
         $this->assertFalse($validator->isValid('nosuchvalue'));
     }
 
@@ -147,7 +148,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testExcludeWithString()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterHasResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users', 'field' => 'field1', 'exclude' => 'id != 1'));
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users', 'field' => 'field1', 'exclude' => 'id != 1']);
         $this->assertTrue($validator->isValid('value3'));
     }
 
@@ -169,6 +170,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
      * and no default is set.
      *
      * @return void
+     * @doesNotPerformAssertions
      */
     public function testThrowsExceptionWithNoAdapter()
     {
@@ -189,9 +191,9 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testWithSchema()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterHasResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users',
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users',
                                                              'schema' => 'my',
-                                                             'field' => 'field1'));
+                                                             'field' => 'field1']);
         $this->assertTrue($validator->isValid('value1'));
     }
 
@@ -203,9 +205,9 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     public function testWithSchemaNoResult()
     {
         Zend_Db_Table_Abstract::setDefaultAdapter($this->_adapterNoResult);
-        $validator = new Zend_Validate_Db_RecordExists(array('table' => 'users',
+        $validator = new Zend_Validate_Db_RecordExists(['table' => 'users',
                                                              'schema' => 'my',
-                                                             'field' => 'field1'));
+                                                             'field' => 'field1']);
         $this->assertFalse($validator->isValid('value1'));
     }
 
@@ -244,7 +246,7 @@ class Zend_Validate_Db_RecordExistsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ZF-8863
+     * @return void
      */
     public function testExcludeConstructor()
     {

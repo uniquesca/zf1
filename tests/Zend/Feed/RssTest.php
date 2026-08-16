@@ -37,12 +37,13 @@ require_once 'Zend/Feed/Rss.php';
  */
 class Zend_Feed_RssTest extends Zend_Feed_AbstractFeedTest
 {
-    public $remoteFeedNames = array('zend_feed_rss_xxe.remote.xml');
+    public $remoteFeedNames = ['zend_feed_rss_xxe.remote.xml'];
 
     public function testPreventsXxeAttacksOnParsing()
     {
-        $uri   = $this->baseUri . '/' . $this->prepareFeed('zend_feed_rss_xxe.xml');
-        $this->setExpectedException('Zend_Feed_Exception', 'parse');
-        $feed  = new Zend_Feed_Rss($uri);
+        $uri = $this->baseUri . '/' . $this->prepareFeed('zend_feed_rss_xxe.xml');
+        $this->expectException('Zend_Feed_Exception');
+        $this->expectExceptionMessage('parse');
+        $feed = new Zend_Feed_Rss($uri);
     }
 }

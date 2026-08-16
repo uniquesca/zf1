@@ -32,18 +32,18 @@ require_once 'Zend/Validate/Abstract.php';
  */
 class Zend_Validate_Hex extends Zend_Validate_Abstract
 {
-    const INVALID = 'hexInvalid';
-    const NOT_HEX = 'notHex';
+    public const INVALID = 'hexInvalid';
+    public const NOT_HEX = 'notHex';
 
     /**
      * Validation failure message template definitions
      *
      * @var array
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::INVALID => "Invalid type given. String expected",
         self::NOT_HEX => "'%value%' has not only hexadecimal digit characters",
-    );
+    ];
 
     /**
      * Defined by Zend_Validate_Interface

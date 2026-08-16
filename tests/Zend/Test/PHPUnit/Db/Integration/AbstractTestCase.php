@@ -1,4 +1,8 @@
 <?php
+
+use PHPUnit\Extensions\Database\DataSet\FlatXmlDataSet;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -38,7 +42,7 @@ require_once "Zend/Test/PHPUnit/Db/DataSet/DbRowset.php";
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Test
  */
-abstract class Zend_Test_PHPUnit_Db_Integration_AbstractTestCase extends PHPUnit_Framework_TestCase
+abstract class Zend_Test_PHPUnit_Db_Integration_AbstractTestCase extends TestCase
 {
     /**
      * @var Zend_Db_Adapter_Abstract
@@ -52,27 +56,29 @@ abstract class Zend_Test_PHPUnit_Db_Integration_AbstractTestCase extends PHPUnit
         $dataSet->addTable($this->createBarTable());
 
         $this->assertEquals(
-            "foo", $dataSet->getTableMetaData('foo')->getTableName()
+            "foo",
+            $dataSet->getTableMetaData('foo')->getTableName()
         );
         $this->assertEquals(
-            "bar", $dataSet->getTableMetaData("bar")->getTableName()
+            "bar",
+            $dataSet->getTableMetaData("bar")->getTableName()
         );
 
-        $this->assertEquals(array("foo", "bar"), $dataSet->getTableNames());
+        $this->assertEquals(["foo", "bar"], $dataSet->getTableNames());
     }
 
     public function testZendDbTableEqualsXmlDataSet()
     {
         $fooTable = $this->createFooTable();
-        $fooTable->insert(array("id" => null, "foo" => "foo", "bar" => "bar", "baz" => "baz"));
-        $fooTable->insert(array("id" => null, "foo" => "bar", "bar" => "bar", "baz" => "bar"));
-        $fooTable->insert(array("id" => null, "foo" => "baz", "bar" => "baz", "baz" => "baz"));
+        $fooTable->insert(["id" => null, "foo" => "foo", "bar" => "bar", "baz" => "baz"]);
+        $fooTable->insert(["id" => null, "foo" => "bar", "bar" => "bar", "baz" => "bar"]);
+        $fooTable->insert(["id" => null, "foo" => "baz", "bar" => "baz", "baz" => "baz"]);
 
         $dataSet = new Zend_Test_PHPUnit_Db_DataSet_DbTableDataSet();
         $dataSet->addTable($fooTable);
 
-        $xmlDataSet = new PHPUnit_Extensions_Database_DataSet_FlatXmlDataSet(
-            dirname(__FILE__)."/_files/sqliteIntegrationFixture.xml"
+        $xmlDataSet = new FlatXmlDataSet(
+            dirname(__FILE__) . "/_files/sqliteIntegrationFixture.xml"
         );
 
         if (method_exists($xmlDataSet, 'assertEquals')) {
@@ -92,8 +98,8 @@ abstract class Zend_Test_PHPUnit_Db_Integration_AbstractTestCase extends PHPUnit
 
     public function testSimpleTesterSetupAndRowsetEquals()
     {
-        $dataSet = new PHPUnit_Extensions_Database_DataSet_FlatXmlDataSet(
-            dirname(__FILE__)."/_files/sqliteIntegrationFixture.xml"
+        $dataSet = new FlatXmlDataSet(
+            dirname(__FILE__) . "/_files/sqliteIntegrationFixture.xml"
         );
         $fooDataTable = $dataSet->getTable("foo");
 
@@ -118,7 +124,7 @@ abstract class Zend_Test_PHPUnit_Db_Integration_AbstractTestCase extends PHPUnit
      */
     public function createFooTable()
     {
-        $table = new Zend_Test_PHPUnit_Db_TableFoo(array('db' => $this->dbAdapter));
+        $table = new Zend_Test_PHPUnit_Db_TableFoo(['db' => $this->dbAdapter]);
         return $table;
     }
 
@@ -127,7 +133,7 @@ abstract class Zend_Test_PHPUnit_Db_Integration_AbstractTestCase extends PHPUnit
      */
     public function createBarTable()
     {
-        $table = new Zend_Test_PHPUnit_Db_TableBar(array('db' => $this->dbAdapter));
+        $table = new Zend_Test_PHPUnit_Db_TableBar(['db' => $this->dbAdapter]);
         return $table;
     }
 }
