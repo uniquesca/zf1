@@ -54,8 +54,36 @@ current — it is what makes the next upstream merge tractable.
 |---|---|---|
 | Cache | `library/Zend/Cache/Backend/Memcached.php` | `load()` honours `$doNotTestCacheValidity` and returns the raw entry instead of unwrapping `$tmp[0]`. |
 | i18n | `resources/languages/fr/Zend_Captcha.php` | French CAPTCHA messages. Upstream ships `fr/Zend_Validate.php` but no `fr` CAPTCHA translation. |
+| TLD list | `library/Zend/Validate/Hostname.php` | Two appended blocks in `$_validTlds`: U-label forms for IDN TLDs upstream lists only in Punycode, and delegated TLDs upstream omits entirely. See below. |
 
 Plus `composer.json` (package identity) and this file.
+
+### The TLD additions
+
+`Zend_Validate_Hostname` compares the last label of the input **verbatim**
+against `$_validTlds` (`$this->_tld = $matches[1]`, then `in_array()` on the raw
+and lowercased forms). There is no Punycode conversion, so an `xn--` entry does
+**not** match native-script input and vice versa — a TLD needs both forms listed
+to be accepted both ways.
+
+Upstream lists most IDN TLDs only in Punycode, so `example.бг` and
+`example.商店` fail there while `example.xn--90ae` passes. Two blocks are
+appended to the end of `$_validTlds` to close that:
+
+1. U-label (native script) forms for the 69 delegated IDN TLDs that upstream
+   carries only as `xn--`.
+2. Eight delegated TLDs missing from upstream's list in any form: `amazon`,
+   `kids`, `merck`, `spa`, `web`, and the A-labels `xn--4dbrk0ce` (ישראל),
+   `xn--cckwcxetd` (アマゾン), `xn--jlq480n2rg` (亚马逊).
+
+Checked against IANA `tlds-alpha-by-domain` version 2026081500: every one of
+the 1438 delegated TLDs now validates in Punycode form, and all 151 that have a
+native-script form validate that way too.
+
+Both blocks are appended after upstream's last entry and carry a comment, so
+they sit outside the region upstream edits and should not conflict on merge.
+Re-check them against IANA when merging a new upstream release — upstream may
+have adopted some, in which case the duplicates can be dropped.
 
 That is the whole delta. If it ever reaches zero, this fork can be retired in
 favour of requiring `shardj/zf1-future` directly.
