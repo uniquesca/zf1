@@ -14,7 +14,7 @@ jobs:
           php-version: 7.4
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get composer cache directory
         id: composer-cache
