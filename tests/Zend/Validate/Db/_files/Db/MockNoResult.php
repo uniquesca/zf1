@@ -36,7 +36,6 @@ require_once 'Zend/Db/Adapter/Abstract.php';
  */
 class Db_MockNoResult extends Zend_Db_Adapter_Abstract
 {
-
     /**
      * Returns a fixed result
      *
@@ -45,7 +44,7 @@ class Db_MockNoResult extends Zend_Db_Adapter_Abstract
      * @param mixed                 $fetchMode Override current fetch mode.
      * @return null
      */
-    public function fetchRow($sql, $bind = array(), $fetchMode = null)
+    public function fetchRow($sql, $bind = [], $fetchMode = null)
     {
         return null;
     }
@@ -119,5 +118,4 @@ class Db_MockNoResult extends Zend_Db_Adapter_Abstract
     {
         return null;
     }
-
 }

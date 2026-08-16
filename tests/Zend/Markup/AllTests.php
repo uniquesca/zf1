@@ -1,4 +1,8 @@
 <?php
+
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -40,18 +44,18 @@ class Zend_Markup_AllTests
 {
     public static function main()
     {
-        $parameters = array();
+        $parameters = [];
 
         if (TESTS_GENERATE_REPORT && extension_loaded('xdebug')) {
             $parameters['reportDirectory'] = TESTS_GENERATE_REPORT_TARGET;
         }
 
-        PHPUnit_TextUI_TestRunner::run(self::suite(), $parameters);
+        (new resources_Runner())->run(self::suite(), $parameters);
     }
 
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('Zend Framework - Zend_Markup');
+        $suite = new TestSuite('Zend Framework - Zend_Markup');
 
         $suite->addTestSuite('Zend_Markup_BbcodeAndHtmlTest');
         $suite->addTestSuite('Zend_Markup_ParserIntegrityTest');
@@ -61,6 +65,6 @@ class Zend_Markup_AllTests
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Markup_AllTests::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Markup_AllTests::main') {
     Zend_Markup_AllTests::main();
 }

@@ -94,7 +94,7 @@ class Zend_Memory_Manager
      *
      * @var array
      */
-    private $_unloadCandidates = array();
+    private $_unloadCandidates = [];
 
     /**
      * List of object sizes.
@@ -105,7 +105,7 @@ class Zend_Memory_Manager
      *
      * @var array
      */
-    private $_sizes = array();
+    private $_sizes = [];
 
     /**
      * Last modified object
@@ -145,7 +145,7 @@ class Zend_Memory_Manager
          * (Ex. backend interface should be extended to provide this functionality)
          */
         $this->_managerId = uniqid('ZendMemManager', true);
-        $this->_tags = array($this->_managerId);
+        $this->_tags = [$this->_managerId];
         $this->_managerId .= '_';
     }
 
@@ -169,7 +169,7 @@ class Zend_Memory_Manager
 
         $memoryLimitStr = trim(ini_get('memory_limit'));
         if ($memoryLimitStr != ''  &&  $memoryLimitStr != -1) {
-            $this->_memoryLimit = (integer)$memoryLimitStr;
+            $this->_memoryLimit = (int)$memoryLimitStr;
             switch (strtolower($memoryLimitStr[strlen($memoryLimitStr)-1])) {
                 case 'g':
                     $this->_memoryLimit *= 1024;
@@ -303,9 +303,9 @@ class Zend_Memory_Manager
      *
      * Used by Memory container destroy() method
      *
-     * @internal
      * @param integer $id
-     * @return Zend_Memory_Container
+     * @return void
+     * @internal
      */
     public function unlink(Zend_Memory_Container_Movable $container, $id)
     {

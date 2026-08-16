@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -41,8 +46,18 @@ require_once 'Zend/View.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Form
  */
-class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
+class Zend_Form_Decorator_ErrorsTest extends TestCase
 {
+    /**
+     * @var Zend_Form_Decorator_Errors
+     */
+    protected $decorator;
+
+    /**
+     * @var Zend_Form_Element
+     */
+    protected $element;
+
     /**
      * Runs the test methods of this class.
      *
@@ -50,9 +65,8 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Form_Decorator_ErrorsTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Form_Decorator_ErrorsTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -61,7 +75,7 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->decorator = new Zend_Form_Decorator_Errors();
     }
@@ -72,7 +86,7 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -107,9 +121,9 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
         $this->setupElement();
         $content = 'test content';
         $test = $this->decorator->render($content);
-        $this->assertContains($content, $test);
+        $this->assertStringContainsString($content, $test);
         foreach ($this->element->getMessages() as $message) {
-            $this->assertContains($message, $test);
+            $this->assertStringContainsString($message, $test);
         }
     }
 
@@ -118,16 +132,16 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
         $this->setupElement();
         $content = 'test content';
         $test = $this->decorator->render($content);
-        $this->assertRegexp('#' . $content . '.*?<ul#s', $test, $test);
+        $this->assertMatchesRegularExpression('#' . $content . '.*?<ul#s', $test, $test);
     }
 
     public function testRenderPrependsMessagesToContentWhenRequested()
     {
-        $this->decorator->setOptions(array('placement' => 'PREPEND'));
+        $this->decorator->setOptions(['placement' => 'PREPEND']);
         $this->setupElement();
         $content = 'test content';
         $test = $this->decorator->render($content);
-        $this->assertRegexp('#</ul>.*?' . $content . '#s', $test);
+        $this->assertMatchesRegularExpression('#</ul>.*?' . $content . '#s', $test);
     }
 
     public function testRenderSeparatesContentAndErrorsWithPhpEolByDefault()
@@ -135,16 +149,16 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
         $this->setupElement();
         $content = 'test content';
         $test = $this->decorator->render($content);
-        $this->assertContains($content . PHP_EOL . '<ul', $test);
+        $this->assertStringContainsString($content . PHP_EOL . '<ul', $test);
     }
 
     public function testRenderSeparatesContentAndErrorsWithCustomSeparatorWhenRequested()
     {
-        $this->decorator->setOptions(array('separator' => '<br />'));
+        $this->decorator->setOptions(['separator' => '<br />']);
         $this->setupElement();
         $content = 'test content';
         $test = $this->decorator->render($content);
-        $this->assertContains($content . $this->decorator->getSeparator() . '<ul', $test, $test);
+        $this->assertStringContainsString($content . $this->decorator->getSeparator() . '<ul', $test, $test);
     }
 
     /**
@@ -154,25 +168,25 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
     {
         // Set up form
         $form = new Zend_Form(
-            array(
-                 'elements'         => array(
+            [
+                 'elements' => [
                      'foo' => new Zend_Form_Element('foo'),
                      'bar' => new Zend_Form_Element('bar'),
-                 ),
-                 'view'             => $this->getView(),
+                 ],
+                 'view' => $this->getView(),
                  'elementsBelongTo' => 'foobar',
-            )
+            ]
         );
 
         $this->decorator->setElement($form);
 
         // Tests
         $this->assertEquals(
-            array('foobar' => array()),
+            ['foobar' => []],
             $form->getMessages()
         );
         $this->assertEquals(
-            array(),
+            [],
             $form->getMessages(null, true)
         );
         $this->assertEquals(
@@ -188,25 +202,25 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
     {
         // Set up sub form
         $subForm = new Zend_Form_SubForm(
-            array(
-                 'elements' => array(
+            [
+                 'elements' => [
                      'foo' => new Zend_Form_Element('foo'),
                      'bar' => new Zend_Form_Element('bar'),
-                 ),
-                 'view'     => $this->getView(),
-                 'name'     => 'foobar',
-            )
+                 ],
+                 'view' => $this->getView(),
+                 'name' => 'foobar',
+            ]
         );
 
         $this->decorator->setElement($subForm);
 
         // Tests
         $this->assertEquals(
-            array('foobar' => array()),
+            ['foobar' => []],
             $subForm->getMessages()
         );
         $this->assertEquals(
-            array(),
+            [],
             $subForm->getMessages(null, true)
         );
         $this->assertEquals(
@@ -217,6 +231,6 @@ class Zend_Form_Decorator_ErrorsTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_Form_Decorator_ErrorsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Form_Decorator_ErrorsTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Form_Decorator_ErrorsTest::main") {
     Zend_Form_Decorator_ErrorsTest::main();
 }

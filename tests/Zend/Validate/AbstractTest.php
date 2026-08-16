@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -41,8 +46,18 @@ require_once 'Zend/Registry.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_AbstractTest extends TestCase
 {
+    /**
+     * @var Zend_Validate_AbstractTest_Concrete
+     */
+    protected $validator;
+
+    /**
+     * @var bool
+     */
+    protected $_errorOccurred;
+
     /**
      * Runs this test suite
      *
@@ -50,8 +65,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite('Zend_Validate_AbstractTest');
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite('Zend_Validate_AbstractTest');
+        $result = (new resources_Runner())->run($suite);
     }
 
     public function clearRegistry()
@@ -67,14 +82,14 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->clearRegistry();
         Zend_Validate_Abstract::setDefaultTranslator(null);
         $this->validator = new Zend_Validate_AbstractTest_Concrete();
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         $this->clearRegistry();
         Zend_Validate_Abstract::setDefaultTranslator(null);
@@ -89,8 +104,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     public function testCanSetTranslator()
     {
         $this->testTranslatorNullByDefault();
-        set_error_handler(array($this, 'errorHandlerIgnore'));
-        $translator = new Zend_Translate('array', array(), 'en');
+        set_error_handler([$this, 'errorHandlerIgnore']);
+        $translator = new Zend_Translate('array', [], 'en');
         restore_error_handler();
         $this->validator->setTranslator($translator);
         $this->assertSame($translator->getAdapter(), $this->validator->getTranslator());
@@ -99,7 +114,7 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     public function testCanSetTranslatorToNull()
     {
         $this->testCanSetTranslator();
-        set_error_handler(array($this, 'errorHandlerIgnore'));
+        set_error_handler([$this, 'errorHandlerIgnore']);
         $this->validator->setTranslator(null);
         restore_error_handler();
         $this->assertNull($this->validator->getTranslator());
@@ -113,8 +128,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     public function testCanSetGlobalDefaultTranslator()
     {
         $this->testGlobalDefaultTranslatorNullByDefault();
-        set_error_handler(array($this, 'errorHandlerIgnore'));
-        $translator = new Zend_Translate('array', array(), 'en');
+        set_error_handler([$this, 'errorHandlerIgnore']);
+        $translator = new Zend_Translate('array', [], 'en');
         restore_error_handler();
         Zend_Validate_Abstract::setDefaultTranslator($translator);
         $this->assertSame($translator->getAdapter(), Zend_Validate_Abstract::getDefaultTranslator());
@@ -128,8 +143,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
 
     public function testGlobalTranslatorFromRegistryUsedWhenNoLocalTranslatorSet()
     {
-        set_error_handler(array($this, 'errorHandlerIgnore'));
-        $translate = new Zend_Translate('array', array());
+        set_error_handler([$this, 'errorHandlerIgnore']);
+        $translate = new Zend_Translate('array', []);
         restore_error_handler();
         Zend_Registry::set('Zend_Translate', $translate);
         $this->assertSame($translate->getAdapter(), $this->validator->getTranslator());
@@ -138,8 +153,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     public function testLocalTranslatorPreferredOverGlobalTranslator()
     {
         $this->testCanSetGlobalDefaultTranslator();
-        set_error_handler(array($this, 'errorHandlerIgnore'));
-        $translator = new Zend_Translate('array', array(), 'en');
+        set_error_handler([$this, 'errorHandlerIgnore']);
+        $translator = new Zend_Translate('array', [], 'en');
         restore_error_handler();
         $this->validator->setTranslator($translator);
         $this->assertNotSame(Zend_Validate_Abstract::getDefaultTranslator(), $this->validator->getTranslator());
@@ -149,30 +164,30 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     {
         $translator = new Zend_Translate(
             'array',
-            array('fooMessage' => 'This is the translated message for %value%'),
+            ['fooMessage' => 'This is the translated message for %value%'],
             'en'
         );
         $this->validator->setTranslator($translator);
         $this->assertFalse($this->validator->isValid('bar'));
         $messages = $this->validator->getMessages();
         $this->assertTrue(array_key_exists('fooMessage', $messages));
-        $this->assertContains('bar', $messages['fooMessage']);
-        $this->assertContains('This is the translated message for ', $messages['fooMessage']);
+        $this->assertStringContainsString('bar', $messages['fooMessage']);
+        $this->assertStringContainsString('This is the translated message for ', $messages['fooMessage']);
     }
 
     public function testCanTranslateMessagesInsteadOfKeys()
     {
         $translator = new Zend_Translate(
             'array',
-            array('%value% was passed' => 'This is the translated message for %value%'),
+            ['%value% was passed' => 'This is the translated message for %value%'],
             'en'
         );
         $this->validator->setTranslator($translator);
         $this->assertFalse($this->validator->isValid('bar'));
         $messages = $this->validator->getMessages();
         $this->assertTrue(array_key_exists('fooMessage', $messages));
-        $this->assertContains('bar', $messages['fooMessage']);
-        $this->assertContains('This is the translated message for ', $messages['fooMessage']);
+        $this->assertStringContainsString('bar', $messages['fooMessage']);
+        $this->assertStringContainsString('This is the translated message for ', $messages['fooMessage']);
     }
 
     public function testObscureValueFlagFalseByDefault()
@@ -196,8 +211,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         $messages = $this->validator->getMessages();
         $this->assertTrue(isset($messages['fooMessage']));
         $message = $messages['fooMessage'];
-        $this->assertNotContains('foobar', $message);
-        $this->assertContains('******', $message);
+        $this->assertStringNotContainsString('foobar', $message);
+        $this->assertStringContainsString('******', $message);
     }
 
     /**
@@ -212,8 +227,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
 
     public function testTranslatorEnabledPerDefault()
     {
-        set_error_handler(array($this, 'errorHandlerIgnore'));
-        $translator = new Zend_Translate('array', array(), 'en');
+        set_error_handler([$this, 'errorHandlerIgnore']);
+        $translator = new Zend_Translate('array', [], 'en');
         restore_error_handler();
         $this->validator->setTranslator($translator);
         $this->assertFalse($this->validator->translatorIsDisabled());
@@ -221,10 +236,10 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
 
     public function testCanDisableTranslator()
     {
-        set_error_handler(array($this, 'errorHandlerIgnore'));
+        set_error_handler([$this, 'errorHandlerIgnore']);
         $translator = new Zend_Translate(
             'array',
-            array('fooMessage' => 'This is the translated message for %value%'),
+            ['fooMessage' => 'This is the translated message for %value%'],
             'en'
         );
         restore_error_handler();
@@ -233,8 +248,8 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid('bar'));
         $messages = $this->validator->getMessages();
         $this->assertTrue(array_key_exists('fooMessage', $messages));
-        $this->assertContains('bar', $messages['fooMessage']);
-        $this->assertContains('This is the translated message for ', $messages['fooMessage']);
+        $this->assertStringContainsString('bar', $messages['fooMessage']);
+        $this->assertStringContainsString('This is the translated message for ', $messages['fooMessage']);
 
         $this->validator->setDisableTranslator(true);
         $this->assertTrue($this->validator->translatorIsDisabled());
@@ -242,19 +257,23 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid('bar'));
         $messages = $this->validator->getMessages();
         $this->assertTrue(array_key_exists('fooMessage', $messages));
-        $this->assertContains('bar', $messages['fooMessage']);
-        $this->assertContains('bar was passed', $messages['fooMessage']);
+        $this->assertStringContainsString('bar', $messages['fooMessage']);
+        $this->assertStringContainsString('bar was passed', $messages['fooMessage']);
     }
 
     public function testGetMessageTemplates()
     {
         $messages = $this->validator->getMessageTemplates();
         $this->assertEquals(
-            array('fooMessage' => '%value% was passed'), $messages);
+            ['fooMessage' => '%value% was passed'],
+            $messages
+        );
 
         $this->assertEquals(
-            array(
-                Zend_Validate_AbstractTest_Concrete::FOO_MESSAGE => '%value% was passed'), $messages);
+            [
+                Zend_Validate_AbstractTest_Concrete::FOO_MESSAGE => '%value% was passed'],
+            $messages
+        );
     }
 
     public function testMaximumErrorMessageLength()
@@ -266,7 +285,7 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
 
         $translator = new Zend_Translate(
             'array',
-            array('fooMessage' => 'This is the translated message for %value%'),
+            ['fooMessage' => 'This is the translated message for %value%'],
             'en'
         );
         $this->validator->setTranslator($translator);
@@ -286,7 +305,7 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
      * @param  array   $errcontext
      * @return void
      */
-    public function errorHandlerIgnore($errno, $errstr, $errfile, $errline, array $errcontext)
+    public function errorHandlerIgnore($errno, $errstr, $errfile, $errline, array $errcontext = [])
     {
         $this->_errorOccurred = true;
     }
@@ -294,11 +313,11 @@ class Zend_Validate_AbstractTest extends PHPUnit_Framework_TestCase
 
 class Zend_Validate_AbstractTest_Concrete extends Zend_Validate_Abstract
 {
-    const FOO_MESSAGE = 'fooMessage';
+    public const FOO_MESSAGE = 'fooMessage';
 
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         'fooMessage' => '%value% was passed',
-    );
+    ];
 
     public function isValid($value)
     {
@@ -308,6 +327,6 @@ class Zend_Validate_AbstractTest_Concrete extends Zend_Validate_Abstract
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Validate_AbstractTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Validate_AbstractTest::main') {
     Zend_Validate_AbstractTest::main();
 }

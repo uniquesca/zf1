@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -39,7 +44,7 @@ require_once 'Zend/View/Helper/Placeholder/Registry.php';
  * @group      Zend_View
  * @group      Zend_View_Helper
  */
-class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCase
+class Zend_View_Helper_Placeholder_RegistryTest extends TestCase
 {
     /**
      * @var Zend_View_Helper_Placeholder_Registry
@@ -53,9 +58,8 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_View_Helper_Placeholder_RegistryTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_View_Helper_Placeholder_RegistryTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -64,7 +68,7 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $registry = Zend_Registry::getInstance();
         if (isset($registry[Zend_View_Helper_Placeholder_Registry::REGISTRY_KEY])) {
@@ -79,7 +83,7 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
         unset($this->registry);
     }
@@ -120,7 +124,7 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
      */
     public function testSetContainerCreatesRegistryEntry()
     {
-        $foo = new Zend_View_Helper_Placeholder_Container(array('foo', 'bar'));
+        $foo = new Zend_View_Helper_Placeholder_Container(['foo', 'bar']);
         $this->assertFalse($this->registry->containerExists('foo'));
         $this->registry->setContainer('foo', $foo);
         $this->assertTrue($this->registry->containerExists('foo'));
@@ -131,7 +135,7 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
      */
     public function testSetContainerCreatesRegistersContainerInstance()
     {
-        $foo = new Zend_View_Helper_Placeholder_Container(array('foo', 'bar'));
+        $foo = new Zend_View_Helper_Placeholder_Container(['foo', 'bar']);
         $this->assertFalse($this->registry->containerExists('foo'));
         $this->registry->setContainer('foo', $foo);
         $container = $this->registry->getContainer('foo');
@@ -150,6 +154,7 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
 
     /**
      * @return void
+     * @doesNotPerformAssertions
      */
     public function testSetContainerClassThrowsExceptionWithInvalidContainerClass()
     {
@@ -214,17 +219,17 @@ class Zend_View_Helper_Placeholder_RegistryTest extends PHPUnit_Framework_TestCa
     public function testSetValueCreateContainer()
     {
         $this->registry->setContainerClass('Zend_View_Helper_Placeholder_RegistryTest_Container');
-        $data = array(
+        $data = [
             'ZF-10793'
-        );
+        ];
         $container = $this->registry->createContainer('foo', $data);
-        $this->assertEquals(array('ZF-10793'), $container->data);
+        $this->assertEquals(['ZF-10793'], $container->data);
     }
 }
 
 class Zend_View_Helper_Placeholder_RegistryTest_Container extends Zend_View_Helper_Placeholder_Container_Abstract
 {
-    public $data = array();
+    public $data = [];
 
     public function __construct($data)
     {
@@ -237,6 +242,6 @@ class Zend_View_Helper_Placeholder_RegistryTest_BogusContainer
 }
 
 // Call Zend_View_Helper_Placeholder_RegistryTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_View_Helper_Placeholder_RegistryTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_View_Helper_Placeholder_RegistryTest::main") {
     Zend_View_Helper_Placeholder_RegistryTest::main();
 }

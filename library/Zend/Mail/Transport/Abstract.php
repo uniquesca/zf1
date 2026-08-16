@@ -65,7 +65,7 @@ abstract class Zend_Mail_Transport_Abstract
      * @var array
      * @access protected
      */
-    protected $_headers = array();
+    protected $_headers = [];
 
     /**
      * Message is a multipart message
@@ -86,7 +86,7 @@ abstract class Zend_Mail_Transport_Abstract
      * @var array
      * @access protected
      */
-    protected $_parts = array();
+    protected $_parts = [];
 
     /**
      * Recipients string
@@ -139,15 +139,15 @@ abstract class Zend_Mail_Transport_Abstract
                 }
             }
 
-            $this->_headers['Content-Type'] = array(
+            $this->_headers['Content-Type'] = [
                 $type . ';'
                 . $this->EOL
                 . " " . 'boundary="' . $boundary . '"'
-            );
+            ];
             $this->boundary = $boundary;
         }
 
-        $this->_headers['MIME-Version'] = array('1.0');
+        $this->_headers['MIME-Version'] = ['1.0'];
 
         return $this->_headers;
     }
@@ -196,7 +196,7 @@ abstract class Zend_Mail_Transport_Abstract
                 $value = implode(',' . $this->EOL . ' ', $content);
                 $this->header .= $header . ': ' . $value . $this->EOL;
             } else {
-                array_walk($content, array(get_class($this), '_formatHeader'), $header);
+                array_walk($content, [get_class($this), '_formatHeader'], $header);
                 $this->header .= implode($this->EOL, $content) . $this->EOL;
             }
         }
@@ -244,16 +244,16 @@ abstract class Zend_Mail_Transport_Abstract
             $html->disposition = false;
 
             $body = $boundaryLine
-                . $text->getHeaders($this->EOL)
-                . $this->EOL
-                . $text->getContent($this->EOL)
-                . $this->EOL
-                . $boundaryLine
-                . $html->getHeaders($this->EOL)
-                . $this->EOL
-                . $html->getContent($this->EOL)
-                . $this->EOL
-                . $boundaryEnd;
+                  . $text->getHeaders($this->EOL)
+                  . $this->EOL
+                  . $text->getContent($this->EOL)
+                  . $this->EOL
+                  . $boundaryLine
+                  . $html->getHeaders($this->EOL)
+                  . $this->EOL
+                  . $html->getContent($this->EOL)
+                  . $this->EOL
+                  . $boundaryEnd;
 
             $mp           = new Zend_Mime_Part($body);
             $mp->type     = Zend_Mime::MULTIPART_ALTERNATIVE;
@@ -290,7 +290,7 @@ abstract class Zend_Mail_Transport_Abstract
         foreach ($headers as $header) {
             // Headers in Zend_Mime_Part are kept as arrays with two elements, a
             // key and a value
-            $this->_headers[$header[0]] = array($header[1]);
+            $this->_headers[$header[0]] = [$header[1]];
         }
     }
 
@@ -298,12 +298,11 @@ abstract class Zend_Mail_Transport_Abstract
      * Send a mail using this transport
      *
      * @param  Zend_Mail $mail
-     * @param  boolean Whether email should be sent out
      * @access public
-     * @return array Information about the email prepared
+     * @return void
      * @throws Zend_Mail_Transport_Exception if mail is empty
      */
-    public function send(Zend_Mail $mail, $send = true)
+    public function send(Zend_Mail $mail)
     {
         $this->_isMultipart = false;
         $this->_mail        = $mail;
@@ -335,9 +334,7 @@ abstract class Zend_Mail_Transport_Abstract
 
         // Determine recipients, and prepare headers
         $this->recipients = implode(',', $mail->getRecipients());
-
-        $headers = $this->_getHeaders($boundary);
-        $this->_prepareHeaders($headers);
+        $this->_prepareHeaders($this->_getHeaders($boundary));
 
         // Create message body
         // This is done so that the same Zend_Mail object can be used in
@@ -348,16 +345,6 @@ abstract class Zend_Mail_Transport_Abstract
         $this->body = $message->generateMessage($this->EOL);
 
         // Send to transport!
-        if ($send) {
-            $this->_sendMail();
-        }
-
-        return array(
-            'recipients' => $mail->getRecipients(),
-            'subject' => $mail->getSubject(),
-            'header' => $this->header,
-            'body' => $this->body,
-            'headers' => $headers
-        );
+        $this->_sendMail();
     }
 }

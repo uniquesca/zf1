@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,21 +37,40 @@ require_once 'Zend/Http/Client/Adapter/Test.php';
  * @group      Zend_Mobile_Push
  * @group      Zend_Mobile_Push_Gcm
  */
-class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
+class Zend_Mobile_Push_gcmTest extends TestCase
 {
+    /**
+     * @var \Zend_Http_Client_Adapter_Test|mixed
+     */
+    protected $adapter;
+
+    /**
+     * @var \Zend_Http_Client|mixed
+     */
+    protected $client;
+
+    /**
+     * @var \Zend_Mobile_Push_Gcm|mixed
+     */
+    protected $gcm;
+
+    /**
+     * @var \Zend_Mobile_Push_Message_Gcm|mixed
+     */
+    protected $message;
 
     protected function _createJSONResponse($id, $success, $failure, $ids, $results)
     {
-         return json_encode(array(
+        return json_encode([
             'multicast_id' => $id,
             'success' => $success,
             'failure' => $failure,
             'canonical_ids' => $ids,
             'results' => $results
-        ));
+        ]);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         $this->adapter = new Zend_Http_Client_Adapter_Test();
         $this->client = new Zend_Http_Client();
@@ -61,12 +83,10 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
         $this->message->addData('testKey', 'testValue');
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Exception
-     */
     public function testSetApiKeyThrowsExceptionOnNonString()
     {
-        $this->gcm->setApiKey(array());
+        $this->expectException(Zend_Mobile_Push_Exception::class);
+        $this->gcm->setApiKey([]);
     }
 
     public function testSetApiKey()
@@ -90,55 +110,45 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($client, $this->gcm->getHttpClient());
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Exception
-     */
     public function testSendThrowsExceptionWithNonValidMessage()
     {
+        $this->expectException(Zend_Mobile_Push_Exception::class);
         $msg = new Zend_Mobile_Push_Message_Gcm();
         $this->gcm->send($msg);
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Exception
-     */
     public function testSendThrowsExceptionWithTtlNoId()
     {
+        $this->expectException(Zend_Mobile_Push_Exception::class);
         $msg = $this->message;
         $msg->setTtl(300);
         $this->gcm->send($msg);
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Exception_ServerUnavailable
-     */
     public function testSendThrowsExceptionWhenServerUnavailable()
     {
+        $this->expectException(Zend_Mobile_Push_Exception_ServerUnavailable::class);
         $this->adapter->setResponse('HTTP/1.1 500 Internal Server Error' . "\r\n\r\n");
         $this->gcm->send($this->message);
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Exception_InvalidAuthToken
-     */
     public function testSendThrowsExceptionWhenInvalidAuthToken()
     {
+        $this->expectException(Zend_Mobile_Push_Exception_InvalidAuthToken::class);
         $this->adapter->setResponse('HTTP/1.1 401 Unauthorized' . "\r\n\r\n");
         $this->gcm->send($this->message);
     }
 
-    /**
-     * @expectedException Zend_Mobile_Push_Exception_InvalidPayload
-     */
     public function testSendThrowsExceptionWhenInvalidPayload()
     {
+        $this->expectException(Zend_Mobile_Push_Exception_InvalidPayload::class);
         $this->adapter->setResponse('HTTP/1.1 400 Bad Request' . "\r\n\r\n");
         $this->gcm->send($this->message);
     }
 
     public function testSendResultInvalidRegistrationId()
     {
-        $body = $this->_createJSONResponse(101, 0, 1, 0, array(array('error' => 'InvalidRegistration')));
+        $body = $this->_createJSONResponse(101, 0, 1, 0, [['error' => 'InvalidRegistration']]);
         $this->adapter->setResponse(
             'HTTP/1.1 200 OK' . "\r\n" .
             'Context-Type: text/html' . "\r\n\r\n" .
@@ -155,7 +165,7 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
 
     public function testSendResultMismatchSenderId()
     {
-        $body = $this->_createJSONResponse(101, 0, 1, 0, array(array('error' => 'MismatchSenderId')));
+        $body = $this->_createJSONResponse(101, 0, 1, 0, [['error' => 'MismatchSenderId']]);
         $this->adapter->setResponse(
             'HTTP/1.1 200 OK' . "\r\n" .
             'Context-Type: text/html' . "\r\n\r\n" .
@@ -172,7 +182,7 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
 
     public function testSendResultNotRegistered()
     {
-        $body = $this->_createJSONResponse(101, 0, 1, 0, array(array('error' => 'NotRegistered')));
+        $body = $this->_createJSONResponse(101, 0, 1, 0, [['error' => 'NotRegistered']]);
         $this->adapter->setResponse(
             'HTTP/1.1 200 OK' . "\r\n" .
             'Context-Type: text/html' . "\r\n\r\n" .
@@ -189,7 +199,7 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
 
     public function testSendResultMessageTooBig()
     {
-        $body = $this->_createJSONResponse(101, 0, 1, 0, array(array('error' => 'MessageTooBig')));
+        $body = $this->_createJSONResponse(101, 0, 1, 0, [['error' => 'MessageTooBig']]);
         $this->adapter->setResponse(
             'HTTP/1.1 200 OK' . "\r\n" .
             'Context-Type: text/html' . "\r\n\r\n" .
@@ -206,7 +216,7 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
 
     public function testSendResultSuccessful()
     {
-        $body = $this->_createJSONResponse(101, 1, 0, 0, array(array('message_id' => '1:2342')));
+        $body = $this->_createJSONResponse(101, 1, 0, 0, [['message_id' => '1:2342']]);
         $this->adapter->setResponse(
             'HTTP/1.1 200 OK' . "\r\n" .
             'Context-Type: text/html' . "\r\n\r\n" .
@@ -223,7 +233,7 @@ class Zend_Mobile_Push_gcmTest extends PHPUnit_Framework_TestCase
 
     public function testSendResultSuccessfulWithRegistrationId()
     {
-        $body = $this->_createJSONResponse(101, 1, 0, 1, array(array('message_id' => '1:2342', 'registration_id' => 'testfoo')));
+        $body = $this->_createJSONResponse(101, 1, 0, 1, [['message_id' => '1:2342', 'registration_id' => 'testfoo']]);
         $this->adapter->setResponse(
             'HTTP/1.1 200 OK' . "\r\n" .
             'Context-Type: text/html' . "\r\n\r\n" .

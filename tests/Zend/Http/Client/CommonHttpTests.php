@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -20,9 +23,8 @@
  * @version    $Id$
  */
 // Read local configuration
-if (! defined('TESTS_ZEND_HTTP_CLIENT_BASEURI') &&
+if (!defined('TESTS_ZEND_HTTP_CLIENT_BASEURI') &&
     is_readable('TestConfiguration.php')) {
-
     require_once 'TestConfiguration.php';
 }
 
@@ -52,11 +54,11 @@ require_once 'Zend/Uri/Http.php';
  * @group      Zend_Http
  * @group      Zend_Http_Client
  */
-abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCase
+abstract class Zend_Http_Client_CommonHttpTests extends TestCase
 {
     /**
      * The bast URI for this test, containing all files in the _files directory
-     * Should be set in TestConfiguration.php or TestConfiguration.php.dist
+     * Should be set in TestConfiguration.php or TestConfiguration.dist.php
      *
      * @var string
      */
@@ -81,21 +83,22 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      *
      * @var array
      */
-    protected $config = array(
-        'adapter'     => 'Zend_Http_Client_Adapter_Socket'
-    );
+    protected $config = [
+        'adapter' => 'Zend_Http_Client_Adapter_Socket'
+    ];
 
     /**
      * Set up the test case
      *
      */
-    protected function setUp()
+    protected function set_up()
     {
         if (defined('TESTS_ZEND_HTTP_CLIENT_BASEURI') &&
             Zend_Uri_Http::check(TESTS_ZEND_HTTP_CLIENT_BASEURI)) {
-
             $this->baseuri = TESTS_ZEND_HTTP_CLIENT_BASEURI;
-            if (substr($this->baseuri, -1) != '/') $this->baseuri .= '/';
+            if (substr($this->baseuri, -1) != '/') {
+                $this->baseuri .= '/';
+            }
 
             $name = $this->getName();
             if (($pos = strpos($name, ' ')) !== false) {
@@ -104,10 +107,9 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
             $uri = $this->baseuri . $name . '.php';
 
-            $this->_adapter = new $this->config['adapter'];
+            $this->_adapter = new $this->config['adapter']();
             $this->client = new Zend_Http_Client($uri, $this->config);
             $this->client->setAdapter($this->_adapter);
-
         } else {
             // Skip tests
             $this->markTestSkipped("Zend_Http_Client dynamic tests are not enabled in TestConfiguration.php");
@@ -118,7 +120,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      * Clean up the test environment
      *
      */
-    protected function tearDown()
+    protected function tear_down()
     {
         $this->client = null;
         $this->_adapter = null;
@@ -134,7 +136,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testSimpleRequests()
     {
-        $methods = array('GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE');
+        $methods = ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'];
 
         foreach ($methods as $method) {
             $res = $this->client->request($method);
@@ -150,9 +152,9 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'testHeaders.php');
         $this->client->setParameterGet('someinput', 'somevalue');
-        $this->client->setHeaders(array(
+        $this->client->setHeaders([
             'X-Powered-By' => 'My Glorious Golden Ass',
-        ));
+        ]);
 
         $res = $this->client->request(Zend_Http_Client::TRACE);
         if ($res->getStatus() == 405 || $res->getStatus() == 501) {
@@ -177,7 +179,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         $this->client->setParameterGet($params);
         $res = $this->client->request('GET');
-        $this->assertEquals(serialize(array_merge(array('name' => 'Arthur'), $params)), $res->getBody());
+        $this->assertEquals(serialize(array_merge(['name' => 'Arthur'], $params)), $res->getBody());
     }
 
     /**
@@ -320,6 +322,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      * multipart/form-data content type
      *
      * @dataProvider parameterArrayProvider
+     * @doesNotPerformAssertions
      */
     public function testPutDataMultipart($params)
     {
@@ -337,6 +340,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      * multipart/form-data content type
      *
      * @dataProvider parameterArrayProvider
+     * @doesNotPerformAssertions
      */
     public function testPatchDataMultipart($params)
     {
@@ -354,6 +358,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      * multipart/form-data content type
      *
      * @dataProvider parameterArrayProvider
+     * @doesNotPerformAssertions
      */
     public function testOptionsDataMultipart($params)
     {
@@ -431,6 +436,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      * multipart/form-data content type
      *
      * @dataProvider parameterArrayProvider
+     * @doesNotPerformAssertions
      */
     public function testDeleteDataMultipart($params)
     {
@@ -493,14 +499,14 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testResetParameters()
     {
-        $params = array(
+        $params = [
             'quest' => 'To seek the holy grail',
             'YourMother' => 'Was a hamster',
             'specialChars' => '<>$+ &?=[]^%',
-            'array' => array('firstItem', 'secondItem', '3rdItem')
-        );
+            'array' => ['firstItem', 'secondItem', '3rdItem']
+        ];
 
-        $headers = array("X-Foo" => "bar");
+        $headers = ["X-Foo" => "bar"];
 
         $this->client->setParameterPost($params);
         $this->client->setParameterGet($params);
@@ -508,15 +514,21 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         $res = $this->client->request('POST');
 
-        $this->assertContains(serialize($params) . "\n" . serialize($params),
-            $res->getBody(), "returned body does not contain all GET and POST parameters (it should!)");
+        $this->assertStringContainsString(
+            serialize($params) . "\n" . serialize($params),
+            $res->getBody(),
+            "returned body does not contain all GET and POST parameters (it should!)"
+        );
 
         $this->client->resetParameters();
         $res = $this->client->request('POST');
 
-        $this->assertNotContains(serialize($params), $res->getBody(),
-            "returned body contains GET or POST parameters (it shouldn't!)");
-        $this->assertContains($headers["X-Foo"], $this->client->getHeader("X-Foo"), "Header not preserved by reset");
+        $this->assertStringNotContainsString(
+            serialize($params),
+            $res->getBody(),
+            "returned body contains GET or POST parameters (it shouldn't!)"
+        );
+        $this->assertStringContainsString($headers["X-Foo"], $this->client->getHeader("X-Foo"), "Header not preserved by reset");
 
         $this->client->resetParameters(true);
         $this->assertNull($this->client->getHeader("X-Foo"), "Header preserved by reset(true)");
@@ -530,15 +542,15 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'testResetParameters.php');
 
-        $gparams = array (
+        $gparams = [
             'cheese' => 'camambert',
-            'beer'   => 'jever pilnsen',
-        );
+            'beer' => 'jever pilnsen',
+        ];
 
-        $pparams = array (
+        $pparams = [
             'from' => 'bob',
-            'to'   => 'alice'
-        );
+            'to' => 'alice'
+        ];
 
         $this->client->setParameterGet($gparams)->setParameterPost($pparams);
 
@@ -546,8 +558,8 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $this->client->setParameterGet('cheese', null)->setParameterPost('to', null);
         $res = $this->client->request('POST');
 
-        $this->assertNotContains('cheese', $res->getBody(), 'The "cheese" GET parameter was expected to be unset');
-        $this->assertNotContains('alice', $res->getBody(), 'The "to" POST parameter was expected to be unset');
+        $this->assertStringNotContainsString('cheese', $res->getBody(), 'The "cheese" GET parameter was expected to be unset');
+        $this->assertStringNotContainsString('alice', $res->getBody(), 'The "to" POST parameter was expected to be unset');
     }
 
     /**
@@ -562,11 +574,11 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'testHeaders.php');
 
-        $headers = array(
+        $headers = [
             'Accept-encoding' => 'gzip,deflate',
             'X-baz' => 'Foo',
             'X-powered-by' => 'A large wooden badger'
-        );
+        ];
 
         foreach ($headers as $key => $val) {
             $this->client->setHeaders($key, $val);
@@ -582,10 +594,11 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         $body = strtolower($res->getBody());
 
-        foreach ($headers as $key => $val)
-            $this->assertContains(strtolower("$key: $val"), $body);
+        foreach ($headers as $key => $val) {
+            $this->assertStringContainsString(strtolower("$key: $val"), $body);
+        }
 
-        $this->assertContains(strtolower($acceptHeader), $body);
+        $this->assertStringContainsString(strtolower($acceptHeader), $body);
     }
 
     /**
@@ -596,12 +609,12 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'testHeaders.php');
 
-        $headers = array(
+        $headers = [
             'Accept-encoding' => 'gzip,deflate',
             'X-baz' => 'Foo',
             'X-powered-by' => 'A large wooden badger',
             'Accept: text/xml,text/html,*/*'
-        );
+        ];
 
         $this->client->setHeaders($headers);
 
@@ -614,33 +627,33 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         foreach ($headers as $key => $val) {
             if (is_string($key)) {
-                $this->assertContains(strtolower("$key: $val"), $body);
+                $this->assertStringContainsString(strtolower("$key: $val"), $body);
             } else {
-                $this->assertContains(strtolower($val), $body);
+                $this->assertStringContainsString(strtolower($val), $body);
             }
         }
-     }
+    }
 
-     /**
-      * Test we can set a set of values for one header
-      *
-      */
-     public function testMultipleHeader()
-     {
-         $this->client->setUri($this->baseuri . 'testHeaders.php');
-        $headers = array(
+    /**
+     * Test we can set a set of values for one header
+     *
+     */
+    public function testMultipleHeader()
+    {
+        $this->client->setUri($this->baseuri . 'testHeaders.php');
+        $headers = [
             'Accept-encoding' => 'gzip,deflate',
             'X-baz' => 'Foo',
-            'X-powered-by' => array(
+            'X-powered-by' => [
                 'A large wooden badger',
                 'My Shiny Metal Ass',
                 'Dark Matter'
-            ),
-            'Cookie' => array(
+            ],
+            'Cookie' => [
                 'foo=bar',
                 'baz=waka'
-            )
-        );
+            ]
+        ];
 
         $this->client->setHeaders($headers);
         $res = $this->client->request('TRACE');
@@ -650,21 +663,22 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $body = strtolower($res->getBody());
 
         foreach ($headers as $key => $val) {
-            if (is_array($val))
+            if (is_array($val)) {
                 $val = implode(', ', $val);
+            }
 
-            $this->assertContains(strtolower("$key: $val"), $body);
+            $this->assertStringContainsString(strtolower("$key: $val"), $body);
         }
-     }
+    }
 
-     /**
-      * Redirection tests
-      */
+    /**
+     * Redirection tests
+     */
 
-     /**
-      * Test the client properly redirects in default mode
-      *
-      */
+    /**
+     * Test the client properly redirects in default mode
+     *
+     */
     public function testRedirectDefault()
     {
         $this->client->setUri($this->baseuri . 'testRedirections.php');
@@ -679,8 +693,8 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $this->assertEquals(3, $this->client->getRedirectionsCount(), 'Redirection counter is not as expected');
 
         // Make sure the body does *not* contain the set parameters
-        $this->assertNotContains('swallow', $res->getBody());
-        $this->assertNotContains('Camelot', $res->getBody());
+        $this->assertStringNotContainsString('swallow', $res->getBody());
+        $this->assertStringNotContainsString('Camelot', $res->getBody());
     }
 
     /**
@@ -696,7 +710,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $this->client->setParameterPost('Camelot', 'A silly place');
 
         // Set strict redirections
-        $this->client->setConfig(array('strictredirects' => true));
+        $this->client->setConfig(['strictredirects' => true]);
 
         // Request
         $res = $this->client->request('POST');
@@ -704,8 +718,8 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $this->assertEquals(3, $this->client->getRedirectionsCount(), 'Redirection counter is not as expected');
 
         // Make sure the body *does* contain the set parameters
-        $this->assertContains('swallow', $res->getBody());
-        $this->assertContains('Camelot', $res->getBody());
+        $this->assertStringContainsString('swallow', $res->getBody());
+        $this->assertStringContainsString('Camelot', $res->getBody());
     }
 
     /**
@@ -722,18 +736,22 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         // Set lower max redirections
         // Try with strict redirections first
-        $this->client->setConfig(array('strictredirects' => true, 'maxredirects' => 2));
+        $this->client->setConfig(['strictredirects' => true, 'maxredirects' => 2]);
 
         $res = $this->client->request('POST');
-        $this->assertTrue($res->isRedirect(),
-            "Last response was not a redirection as expected. Response code: {$res->getStatus()}. Redirections counter: {$this->client->getRedirectionsCount()} (when strict redirects are on)");
+        $this->assertTrue(
+            $res->isRedirect(),
+            "Last response was not a redirection as expected. Response code: {$res->getStatus()}. Redirections counter: {$this->client->getRedirectionsCount()} (when strict redirects are on)"
+        );
 
         // Then try with normal redirections
         $this->client->setParameterGet('redirection', '0');
-        $this->client->setConfig(array('strictredirects' => false));
+        $this->client->setConfig(['strictredirects' => false]);
         $res = $this->client->request('POST');
-        $this->assertTrue($res->isRedirect(),
-            "Last response was not a redirection as expected. Response code: {$res->getStatus()}. Redirections counter: {$this->client->getRedirectionsCount()} (when strict redirects are off)");
+        $this->assertTrue(
+            $res->isRedirect(),
+            "Last response was not a redirection as expected. Response code: {$res->getStatus()}. Redirections counter: {$this->client->getRedirectionsCount()} (when strict redirects are off)"
+        );
     }
 
     /**
@@ -744,7 +762,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'testRelativeRedirections.php');
         $this->client->setParameterGet('redirect', 'abpath');
-        $this->client->setConfig(array('maxredirects' => 1));
+        $this->client->setConfig(['maxredirects' => 1]);
 
         // Get the host and port part of our baseuri
         $uri = $this->client->getUri()->getScheme() . '://' . $this->client->getUri()->getHost() . ':' .
@@ -752,8 +770,11 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         $res = $this->client->request('GET');
 
-        $this->assertEquals("{$uri}/path/to/fake/file.ext?redirect=abpath", $this->client->getUri(true),
-            "The new location is not as expected: {$this->client->getUri(true)}");
+        $this->assertEquals(
+            "{$uri}/path/to/fake/file.ext?redirect=abpath",
+            $this->client->getUri(true),
+            "The new location is not as expected: {$this->client->getUri(true)}"
+        );
     }
 
     /**
@@ -764,7 +785,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'testRelativeRedirections.php');
         $this->client->setParameterGet('redirect', 'relpath');
-        $this->client->setConfig(array('maxredirects' => 1));
+        $this->client->setConfig(['maxredirects' => 1]);
 
         // Set the new expected URI
         $uri = clone $this->client->getUri();
@@ -773,8 +794,11 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         $res = $this->client->request('GET');
 
-        $this->assertEquals("{$uri}?redirect=relpath", $this->client->getUri(true),
-            "The new location is not as expected: {$this->client->getUri(true)}");
+        $this->assertEquals(
+            "{$uri}?redirect=relpath",
+            $this->client->getUri(true),
+            "The new location is not as expected: {$this->client->getUri(true)}"
+        );
     }
 
     /**
@@ -788,12 +812,12 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testHttpAuthBasic()
     {
-        $this->client->setUri($this->baseuri. 'testHttpAuth.php');
-        $this->client->setParameterGet(array(
-            'user'   => 'alice',
-            'pass'   => 'secret',
+        $this->client->setUri($this->baseuri . 'testHttpAuth.php');
+        $this->client->setParameterGet([
+            'user' => 'alice',
+            'pass' => 'secret',
             'method' => 'Basic'
-        ));
+        ]);
 
         // First - fail password
         $this->client->setAuth('alice', 'wrong');
@@ -815,11 +839,11 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $uri = str_replace('http://', 'http://%s:%s@', $this->baseuri) . 'testHttpAuth.php';
 
-        $this->client->setParameterGet(array(
-            'user'   => 'alice',
-            'pass'   => 'secret',
+        $this->client->setParameterGet([
+            'user' => 'alice',
+            'pass' => 'secret',
             'method' => 'Basic'
-        ));
+        ]);
 
         // First - fail password
         $this->client->setUri(sprintf($uri, 'alice', 'wrong'));
@@ -838,7 +862,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testCancelAuth()
     {
-        $this->client->setUri($this->baseuri. 'testHttpAuth.php');
+        $this->client->setUri($this->baseuri . 'testHttpAuth.php');
 
         // Set auth and cancel it
         $this->client->setAuth('alice', 'secret');
@@ -846,8 +870,8 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $res = $this->client->request();
 
         $this->assertEquals(401, $res->getStatus(), 'Expected HTTP 401 response was not recieved');
-        $this->assertNotContains('alice', $res->getBody(), "Body contains the user name, but it shouldn't");
-        $this->assertNotContains('secret', $res->getBody(), "Body contains the password, but it shouldn't");
+        $this->assertStringNotContainsString('alice', $res->getBody(), "Body contains the user name, but it shouldn't");
+        $this->assertStringNotContainsString('secret', $res->getBody(), "Body contains the password, but it shouldn't");
     }
 
     /**
@@ -864,8 +888,8 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $res = $this->client->request();
 
         $this->assertEquals(401, $res->getStatus(), 'Expected HTTP 401 response was not recieved');
-        $this->assertNotContains('alice', $res->getBody(), "Body contains the user name, but it shouldn't");
-        $this->assertNotContains('secret', $res->getBody(), "Body contains the password, but it shouldn't");
+        $this->assertStringNotContainsString('alice', $res->getBody(), "Body contains the user name, but it shouldn't");
+        $this->assertStringNotContainsString('secret', $res->getBody(), "Body contains the password, but it shouldn't");
     }
 
     /**
@@ -879,12 +903,12 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testCookiesStringNoJar()
     {
-        $this->client->setUri($this->baseuri. 'testCookies.php');
+        $this->client->setUri($this->baseuri . 'testCookies.php');
 
-        $cookies = array(
-            'name'   => 'value',
+        $cookies = [
+            'name' => 'value',
             'cookie' => 'crumble'
-        );
+        ];
 
         foreach ($cookies as $k => $v) {
             $this->client->setCookie($k, $v);
@@ -901,15 +925,15 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testSetCookieObjectNoJar()
     {
-        $this->client->setUri($this->baseuri. 'testCookies.php');
+        $this->client->setUri($this->baseuri . 'testCookies.php');
         $refuri = $this->client->getUri();
 
-        $cookies = array(
+        $cookies = [
             Zend_Http_Cookie::fromString('chocolate=chips', $refuri),
             Zend_Http_Cookie::fromString('crumble=apple', $refuri)
-        );
+        ];
 
-        $strcookies = array();
+        $strcookies = [];
         foreach ($cookies as $c) {
             $this->client->setCookie($c);
             $strcookies[$c->getName()] = $c->getValue();
@@ -925,18 +949,18 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testSetCookieObjectArray()
     {
-        $this->client->setUri($this->baseuri. 'testCookies.php');
+        $this->client->setUri($this->baseuri . 'testCookies.php');
         $refuri = $this->client->getUri();
 
-        $cookies = array(
+        $cookies = [
             Zend_Http_Cookie::fromString('chocolate=chips', $refuri),
             Zend_Http_Cookie::fromString('crumble=apple', $refuri),
             Zend_Http_Cookie::fromString('another=cookie', $refuri)
-        );
+        ];
 
         $this->client->setCookie($cookies);
 
-        $strcookies = array();
+        $strcookies = [];
         foreach ($cookies as $c) {
             $strcookies[$c->getName()] = $c->getValue();
         }
@@ -951,13 +975,13 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testSetCookieStringArray()
     {
-        $this->client->setUri($this->baseuri. 'testCookies.php');
+        $this->client->setUri($this->baseuri . 'testCookies.php');
 
-        $cookies = array(
+        $cookies = [
             'chocolate' => 'chips',
-            'crumble'   => 'apple',
-            'another'   => 'cookie'
-        );
+            'crumble' => 'apple',
+            'another' => 'cookie'
+        ];
 
         $this->client->setCookie($cookies);
 
@@ -971,16 +995,16 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testSetCookieObjectJar()
     {
-        $this->client->setUri($this->baseuri. 'testCookies.php');
+        $this->client->setUri($this->baseuri . 'testCookies.php');
         $this->client->setCookieJar();
         $refuri = $this->client->getUri();
 
-        $cookies = array(
+        $cookies = [
             Zend_Http_Cookie::fromString('chocolate=chips', $refuri),
             Zend_Http_Cookie::fromString('crumble=apple', $refuri)
-        );
+        ];
 
-        $strcookies = array();
+        $strcookies = [];
         foreach ($cookies as $c) {
             $this->client->setCookie($c);
             $strcookies[$c->getName()] = $c->getValue();
@@ -1005,7 +1029,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
             $this->markTestSkipped('File uploads disabled.');
         }
 
-        $this->client->setUri($this->baseuri. 'testUploads.php');
+        $this->client->setUri($this->baseuri . 'testUploads.php');
 
         $rawdata = file_get_contents(__FILE__);
         $this->client->setFileUpload('myfile.txt', 'uploadfile', $rawdata, 'text/plain');
@@ -1025,7 +1049,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
             $this->markTestSkipped('File uploads disabled.');
         }
 
-        $this->client->setUri($this->baseuri. 'testUploads.php');
+        $this->client->setUri($this->baseuri . 'testUploads.php');
         $this->client->setFileUpload(__FILE__, 'uploadfile', null, 'text/x-foo-bar');
         $res = $this->client->request('POST');
 
@@ -1044,21 +1068,22 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $detect = null;
         if (function_exists('finfo_file')) {
             $f = @finfo_open(FILEINFO_MIME);
-            if ($f) $detect = 'finfo';
-
+            if ($f) {
+                $detect = 'finfo';
+            }
         } elseif (function_exists('mime_content_type')) {
             if (mime_content_type(__FILE__)) {
                 $detect = 'mime_magic';
             }
         }
 
-        if (! $detect) {
+        if (!$detect) {
             $this->markTestSkipped('No MIME type detection capability (fileinfo or mime_magic extensions) is available');
         }
 
         $file = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'staticFile.jpg';
 
-        $this->client->setUri($this->baseuri. 'testUploads.php');
+        $this->client->setUri($this->baseuri . 'testUploads.php');
         $this->client->setFileUpload($file, 'uploadfile');
         $res = $this->client->request('POST');
 
@@ -1073,7 +1098,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
             $this->markTestSkipped('File uploads disabled.');
         }
 
-        $this->client->setUri($this->baseuri. 'testUploads.php');
+        $this->client->setUri($this->baseuri . 'testUploads.php');
 
         $rawdata = file_get_contents(__FILE__);
         $this->client->setFileUpload('/some strage/path%/with[!@#$&]/myfile.txt', 'uploadfile', $rawdata, 'text/plain');
@@ -1109,10 +1134,10 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
         $this->client->setUri($this->baseuri . 'testUploads.php');
 
-        $files = array('file1.txt', 'file2.txt', 'someotherfile.foo');
+        $files = ['file1.txt', 'file2.txt', 'someotherfile.foo'];
 
         $expectedBody = '';
-        foreach($files as $filename) {
+        foreach ($files as $filename) {
             $this->client->setFileUpload($filename, 'uploadfile[]', $rawData, 'text/plain');
             $expectedBody .= "uploadfile $filename text/plain " . strlen($rawData) . "\n";
         }
@@ -1138,9 +1163,9 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
     public function testStreamResponse()
     {
-        if(!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
-              $this->markTestSkipped('Current adapter does not support streaming');
-              return;
+        if (!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
+            $this->markTestSkipped('Current adapter does not support streaming');
+            return;
         }
         $this->client->setUri($this->baseuri . 'staticFile.jpg');
         $this->client->setStream();
@@ -1163,9 +1188,9 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
     public function testStreamResponseBody()
     {
-        if(!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
-              $this->markTestSkipped('Current adapter does not support streaming');
-              return;
+        if (!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
+            $this->markTestSkipped('Current adapter does not support streaming');
+            return;
         }
         $this->client->setUri($this->baseuri . 'staticFile.jpg');
         $this->client->setStream();
@@ -1183,9 +1208,9 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
     public function testStreamResponseNamed()
     {
-        if(!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
-              $this->markTestSkipped('Current adapter does not support streaming');
-              return;
+        if (!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
+            $this->markTestSkipped('Current adapter does not support streaming');
+            return;
         }
         $this->client->setUri($this->baseuri . 'staticFile.jpg');
         $outfile = tempnam(sys_get_temp_dir(), "outstream");
@@ -1209,9 +1234,9 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
 
     public function testStreamRequest()
     {
-        if(!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
-              $this->markTestSkipped('Current adapter does not support streaming');
-              return;
+        if (!($this->client->getAdapter() instanceof Zend_Http_Client_Adapter_Stream)) {
+            $this->markTestSkipped('Current adapter does not support streaming');
+            return;
         }
         $data = fopen(dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'staticFile.jpg', "r");
         $res = $this->client->setRawData($data, 'image/jpeg')->request('PUT');
@@ -1230,12 +1255,12 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
         $expect = filesize(dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ZF9404-doubleContentLength.php');
 
         $response = $this->client->request();
-        if (! $response->isSuccessful()) {
+        if (!$response->isSuccessful()) {
             throw new ErrorException("Error requesting test URL");
         }
 
         $clen = $response->getHeader('content-length');
-        if (! (is_array($clen))) {
+        if (!(is_array($clen))) {
             $this->markTestSkipped("Didn't get multiple Content-length headers");
         }
 
@@ -1249,14 +1274,14 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     {
         $this->client->setUri($this->baseuri . 'ZF10645-PutContentType.php');
         $this->client->setMethod(Zend_Http_Client::PUT);
-        $data = array('foo' => 'bar');
+        $data = ['foo' => 'bar'];
         $this->client->setRawData(http_build_query($data), 'text/html; charset=ISO-8859-1');
 
         $response = $this->client->request();
-        $request  = $this->client->getLastRequest();
+        $request = $this->client->getLastRequest();
 
-        $this->assertContains('text/html; charset=ISO-8859-1', $request, $request);
-        $this->assertContains('REQUEST_METHOD: PUT', $response->getBody(), $response->getBody());
+        $this->assertStringContainsString('text/html; charset=ISO-8859-1', $request, $request);
+        $this->assertStringContainsString('REQUEST_METHOD: PUT', $response->getBody(), $response->getBody());
     }
 
 
@@ -1266,19 +1291,18 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
     public function testMultiplePuts()
     {
         $this->client->setUri($this->baseuri . 'ZF10645-PutContentType.php');
-        $data= 'test';
+        $data = 'test';
         $this->client->setRawData($data, 'text/plain');
         $this->client->setMethod(Zend_Http_Client::PUT);
         $response = $this->client->request();
-        $this->assertContains('REQUEST_METHOD: PUT', $response->getBody(), $response->getBody());
+        $this->assertStringContainsString('REQUEST_METHOD: PUT', $response->getBody(), $response->getBody());
 
         $this->client->resetParameters(true);
         $this->client->setUri($this->baseuri . 'ZF10645-PutContentType.php');
         $this->client->setMethod(Zend_Http_Client::PUT);
         $response = $this->client->request();
-        $request= $this->client->getLastRequest();
-        $this->assertNotContains('Content-Type: text/plain', $request);
-
+        $request = $this->client->getLastRequest();
+        $this->assertStringNotContainsString('Content-Type: text/plain', $request);
     }
 
     /**
@@ -1286,7 +1310,7 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public function testGetAdapterWithoutSet()
     {
-        $client  = new Zend_Http_Client(null, $this->config);
+        $client = new Zend_Http_Client(null, $this->config);
         $adapter = $client->getAdapter();
         $this->assertTrue(!empty($adapter));
     }
@@ -1310,38 +1334,38 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public static function parameterArrayProvider()
     {
-        return array(
-            array(
-                array(
+        return [
+            [
+                [
                     'quest' => 'To seek the holy grail',
                     'YourMother' => 'Was a hamster',
                     'specialChars' => '<>$+ &?=[]^%',
-                    'array' => array('firstItem', 'secondItem', '3rdItem')
-                )
-            ),
+                    'array' => ['firstItem', 'secondItem', '3rdItem']
+                ]
+            ],
 
-            array(
-                array(
-                    'someData' => array(
+            [
+                [
+                    'someData' => [
                         "1",
                         "2",
                         'key' => 'value',
-                        'nesting' => array(
+                        'nesting' => [
                             'a' => 'AAA',
                             'b' => 'BBB'
-                        )
-                    ),
-                    'someOtherData' => array('foo', 'bar')
-                )
-            ),
+                        ]
+                    ],
+                    'someOtherData' => ['foo', 'bar']
+                ]
+            ],
 
-            array(
-                array(
+            [
+                [
                     'foo1' => 'bar',
-                    'foo2' => array('baz', 'w00t')
-                )
-            )
-        );
+                    'foo2' => ['baz', 'w00t']
+                ]
+            ]
+        ];
     }
 
     /**
@@ -1351,12 +1375,12 @@ abstract class Zend_Http_Client_CommonHttpTests extends PHPUnit_Framework_TestCa
      */
     public static function invalidConfigProvider()
     {
-        return array(
-            array(false),
-            array('foo => bar'),
-            array(null),
-            array(new stdClass),
-            array(55)
-        );
+        return [
+            [false],
+            ['foo => bar'],
+            [null],
+            [new stdClass()],
+            [55]
+        ];
     }
 }

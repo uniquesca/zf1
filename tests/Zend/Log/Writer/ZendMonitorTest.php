@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -35,26 +40,27 @@ require_once 'Zend/Log/Writer/ZendMonitor.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Log
  */
-class Zend_Log_Writer_ZendMonitorTest extends PHPUnit_Framework_TestCase
+class Zend_Log_Writer_ZendMonitorTest extends TestCase
 {
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
      * @group ZF-10081
+     * @doesNotPerformAssertions
      */
     public function testWrite()
     {
         $writer = new Zend_Log_Writer_ZendMonitor();
-        $writer->write(array('message' => 'my mess', 'priority' => 1));
+        $writer->write(['message' => 'my mess', 'priority' => 1]);
     }
 
     public function testFactory()
     {
-        $cfg = array();
+        $cfg = [];
 
         $writer = Zend_Log_Writer_ZendMonitor::factory($cfg);
         $this->assertTrue($writer instanceof Zend_Log_Writer_ZendMonitor);
@@ -67,6 +73,6 @@ class Zend_Log_Writer_ZendMonitorTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Log_Writer_ZendMonitorTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Log_Writer_ZendMonitorTest::main') {
     Zend_Log_Writer_ZendMonitorTest::main();
 }

@@ -45,8 +45,8 @@ require_once 'TableBugsCustom.php';
  */
 class My_ZendDbTable_TableAccountsCustom extends My_ZendDbTable_TableAccounts
 {
-    protected $_rowClass    = 'My_ZendDbTable_Row_TestMyRow';
+    protected $_rowClass = 'My_ZendDbTable_Row_TestMyRow';
     protected $_rowsetClass = 'My_ZendDbTable_Rowset_TestMyRowset';
 
-    protected $_dependentTables = array('My_ZendDbTable_TableBugsCustom');
+    protected $_dependentTables = ['My_ZendDbTable_TableBugsCustom'];
 }

@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -42,8 +47,13 @@ require_once 'Zend/Server/Exception.php';
  * @group      Zend_Json
  * @group      Zend_Json_Server
  */
-class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
+class Zend_Json_ServerTest extends TestCase
 {
+    /**
+     * @var \Zend_Json_Server|mixed
+     */
+    protected $server;
+
     /**
      * Runs the test methods of this class.
      *
@@ -51,9 +61,8 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Json_ServerTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Json_ServerTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -62,7 +71,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->server = new Zend_Json_Server();
     }
@@ -73,7 +82,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -86,14 +95,14 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
 
     public function testShouldBeAbleToBindCallback1ToServer()
     {
-        $this->server->addFunction(array('Zend_Json_ServerTest_Foo', 'staticBar'));
+        $this->server->addFunction(['Zend_Json_ServerTest_Foo', 'staticBar']);
         $methods = $this->server->getFunctions();
         $this->assertTrue($methods->hasMethod('staticBar'));
     }
 
     public function testShouldBeAbleToBindCallback2ToServer()
     {
-        $this->server->addFunction(array(new Zend_Json_ServerTest_Foo, 'bar'));
+        $this->server->addFunction([new Zend_Json_ServerTest_Foo(), 'bar']);
         $methods = $this->server->getFunctions();
         $this->assertTrue($methods->hasMethod('bar'));
     }
@@ -146,7 +155,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
                      ->setClass(new Zend_Json());
         $methods = $this->server->getFunctions();
         $zjsMethods = get_class_methods('Zend_Json_Server');
-        $zjMethods  = get_class_methods('Zend_Json');
+        $zjMethods = get_class_methods('Zend_Json');
         $this->assertTrue(count($zjsMethods) < count($methods));
         $this->assertTrue(count($zjMethods) < count($methods));
     }
@@ -170,7 +179,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
     public function testShouldAllowSettingRequestObjectManually()
     {
         $orig = $this->server->getRequest();
-        $new  = new Zend_Json_Server_Request();
+        $new = new Zend_Json_Server_Request();
         $this->server->setRequest($new);
         $test = $this->server->getRequest();
         $this->assertSame($new, $test);
@@ -186,7 +195,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
     public function testShouldAllowSettingResponseObjectManually()
     {
         $orig = $this->server->getResponse();
-        $new  = new Zend_Json_Server_Response();
+        $new = new Zend_Json_Server_Response();
         $this->server->setResponse($new);
         $test = $this->server->getResponse();
         $this->assertSame($new, $test);
@@ -277,7 +286,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
                      ->setAutoEmitResponse(false);
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams(array(true, 'foo', 'bar'))
+                ->setParams([true, 'foo', 'bar'])
                 ->setId('foo');
         $response = $this->server->handle();
         $this->assertTrue($response instanceof Zend_Json_Server_Response);
@@ -297,7 +306,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
                      ->setAutoEmitResponse(false);
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams(array(true))
+                ->setParams([true])
                 ->setId('foo');
         $response = $this->server->handle();
         $this->assertTrue($response instanceof Zend_Json_Server_Response);
@@ -311,18 +320,15 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
 
     public function testHandleValidMethodWithMissingParamsShouldThrowException()
     {
+        $this->expectException(Zend_Server_Exception::class);
+        $this->expectExceptionMessage('Method bar is missing required parameter: one');
         $this->server->setClass('Zend_Json_ServerTest_Foo')
             ->setAutoEmitResponse(false);
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-            ->setParams(array('one' => null))
+            ->setParams(['two' => 'two'])
             ->setId('foo');
-        try {
-            $response = $this->server->handle();
-        } catch (Exception $e) {
-            $this->assertTrue($e instanceof Zend_Server_Exception);
-            $this->assertEquals('Method bar is missing required parameter: one', $e->getMessage());
-        }
+        $response = $this->server->handle();
     }
 
     public function testHandleValidMethodWithTooManyParamsShouldWork()
@@ -331,7 +337,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
                      ->setAutoEmitResponse(false);
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams(array(true, 'foo', 'bar', 'baz'))
+                ->setParams([true, 'foo', 'bar', 'baz'])
                 ->setId('foo');
         $response = $this->server->handle();
         $this->assertTrue($response instanceof Zend_Json_Server_Response);
@@ -346,43 +352,43 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
     public function testHandleShouldAllowNamedParamsInAnyOrder1()
     {
         $this->server->setClass('Zend_Json_ServerTest_Foo')
-                     ->setAutoEmitResponse( false );
+                     ->setAutoEmitResponse(false);
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams( array(
+                ->setParams([
                     'three' => 3,
-                    'two'   => 2,
-                    'one'   => 1
-                ))
-                ->setId( 'foo' );
+                    'two' => 2,
+                    'one' => 1
+                ])
+                ->setId('foo');
         $response = $this->server->handle();
         $result = $response->getResult();
 
-        $this->assertTrue( is_array( $result ) );
-        $this->assertEquals( 1, $result[0] );
-        $this->assertEquals( 2, $result[1] );
-        $this->assertEquals( 3, $result[2] );
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(1, $result[0]);
+        $this->assertEquals(2, $result[1]);
+        $this->assertEquals(3, $result[2]);
     }
 
     public function testHandleShouldAllowNamedParamsInAnyOrder2()
     {
         $this->server->setClass('Zend_Json_ServerTest_Foo')
-                     ->setAutoEmitResponse( false );
+                     ->setAutoEmitResponse(false);
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams( array(
+                ->setParams([
                     'three' => 3,
-                    'one'   => 1,
-                    'two'   => 2,
-                ) )
-                ->setId( 'foo' );
+                    'one' => 1,
+                    'two' => 2,
+                ])
+                ->setId('foo');
         $response = $this->server->handle();
         $result = $response->getResult();
 
-        $this->assertTrue( is_array( $result ) );
-        $this->assertEquals( 1, $result[0] );
-        $this->assertEquals( 2, $result[1] );
-        $this->assertEquals( 3, $result[2] );
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(1, $result[0]);
+        $this->assertEquals(2, $result[1]);
+        $this->assertEquals(3, $result[2]);
     }
 
     public function testHandleRequestWithErrorsShouldReturnErrorResponse()
@@ -427,7 +433,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
         $this->server->setClass('Zend_Json_ServerTest_Foo');
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams(array(true, 'foo', 'bar'))
+                ->setParams([true, 'foo', 'bar'])
                 ->setId('foo');
         ob_start();
         $this->server->handle();
@@ -448,7 +454,7 @@ class Zend_Json_ServerTest extends PHPUnit_Framework_TestCase
         $this->server->setClass('Zend_Json_ServerTest_Foo');
         $request = $this->server->getRequest();
         $request->setMethod('bar')
-                ->setParams(array(true, 'foo', 'bar'));
+                ->setParams([true, 'foo', 'bar']);
         ob_start();
         $this->server->handle();
         $buffer = ob_get_clean();
@@ -479,9 +485,9 @@ class Zend_Json_ServerTest_Foo
      * @param  mixed $three
      * @return array
      */
-    static public function staticBar($one, $two = 'two', $three = null)
+    public static function staticBar($one, $two = 'two', $three = null)
     {
-        return array($one, $two, $three);
+        return [$one, $two, $three];
     }
 
     /**
@@ -494,7 +500,7 @@ class Zend_Json_ServerTest_Foo
      */
     public function bar($one, $two = 'two', $three = null)
     {
-        return array($one, $two, $three);
+        return [$one, $two, $three];
     }
 
     /**
@@ -519,6 +525,6 @@ function Zend_Json_ServerTest_FooFunc()
 }
 
 // Call Zend_Json_ServerTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Json_ServerTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Json_ServerTest::main") {
     Zend_Json_ServerTest::main();
 }

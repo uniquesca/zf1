@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,7 +35,7 @@ require_once 'Zend/XmlRpc/Response.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_XmlRpc
  */
-class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
+class Zend_XmlRpc_ResponseTest extends TestCase
 {
     /**
      * Zend_XmlRpc_Response object
@@ -48,7 +51,7 @@ class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
     /**
      * Setup environment
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_response = new Zend_XmlRpc_Response();
     }
@@ -56,7 +59,7 @@ class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
     /**
      * Teardown environment
      */
-    public function tearDown()
+    protected function tear_down()
     {
         unset($this->_response);
     }
@@ -77,8 +80,8 @@ class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
         $this->_response->setReturnValue('string');
         $this->assertEquals('string', $this->_response->getReturnValue());
 
-        $this->_response->setReturnValue(array('one', 'two'));
-        $this->assertSame(array('one', 'two'), $this->_response->getReturnValue());
+        $this->_response->setReturnValue(['one', 'two']);
+        $this->assertSame(['one', 'two'], $this->_response->getReturnValue());
     }
 
     /**
@@ -119,9 +122,9 @@ class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $response = $dom->appendChild($dom->createElement('methodResponse'));
-        $params   = $response->appendChild($dom->createElement('params'));
-        $param    = $params->appendChild($dom->createElement('param'));
-        $value    = $param->appendChild($dom->createElement('value'));
+        $params = $response->appendChild($dom->createElement('params'));
+        $param = $params->appendChild($dom->createElement('param'));
+        $value = $param->appendChild($dom->createElement('value'));
         $value->appendChild($dom->createElement('string', 'Return value'));
 
         $xml = $dom->saveXml();
@@ -143,12 +146,13 @@ class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
      */
     public function testExceptionIsThrownWhenInvalidXmlIsReturnedByServer()
     {
-        set_error_handler(array($this, 'trackError'));
+        set_error_handler([$this, 'trackError']);
         $invalidResponse = 'foo';
         $response = new Zend_XmlRpc_Response();
         $this->assertFalse($this->_errorOccured);
         $this->assertFalse($response->loadXml($invalidResponse));
         $this->assertFalse($this->_errorOccured);
+        restore_error_handler();
     }
 
     /**
@@ -161,19 +165,19 @@ class Zend_XmlRpc_ResponseTest extends PHPUnit_Framework_TestCase
 EOD;
         try {
             $response = new Zend_XmlRpc_Response();
-            $ret      = $response->loadXml($rawResponse);
-        } catch(Exception $e) {
+            $ret = $response->loadXml($rawResponse);
+        } catch (Exception $e) {
             $this->fail("Parsing the response should not throw an exception.");
         }
 
         $this->assertTrue($ret);
-        $this->assertEquals(array(
-            0 => array(
-                'id'            => 1,
-                'name'          => 'birdy num num!',
-                'description'   => null,
-            )
-        ), $response->getReturnValue());
+        $this->assertEquals([
+            0 => [
+                'id' => 1,
+                'name' => 'birdy num num!',
+                'description' => null,
+            ]
+        ], $response->getReturnValue());
     }
 
     /**
@@ -264,14 +268,14 @@ EOD;
         $value = $this->_response->getReturnValue();
         $this->assertTrue(empty($value));
         if (is_string($value)) {
-            $this->assertNotContains('Local file inclusion', $value);
+            $this->assertStringNotContainsString('Local file inclusion', $value);
         }
     }
 
-     public function testShouldDisallowsDoctypeInRequestXmlAndReturnFalseOnLoading()
-     {
-         $payload = file_get_contents(dirname(__FILE__) . '/_files/ZF12293-response.xml');
-         $payload = sprintf($payload, 'file://' . realpath(dirname(__FILE__) . '/_files/ZF12293-payload.txt'));
-         $this->assertFalse($this->_response->loadXml($payload));
-     }
+    public function testShouldDisallowsDoctypeInRequestXmlAndReturnFalseOnLoading()
+    {
+        $payload = file_get_contents(dirname(__FILE__) . '/_files/ZF12293-response.xml');
+        $payload = sprintf($payload, 'file://' . realpath(dirname(__FILE__) . '/_files/ZF12293-payload.txt'));
+        $this->assertFalse($this->_response->loadXml($payload));
+    }
 }

@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -48,8 +53,15 @@ require_once 'Zend/Dojo/View/Helper/Dojo.php';
  * @group      Zend_Dojo
  * @group      Zend_Dojo_View
  */
-class Zend_Dojo_View_Helper_StackContainerTest extends PHPUnit_Framework_TestCase
+class Zend_Dojo_View_Helper_StackContainerTest extends TestCase
 {
+    protected $view;
+
+    /**
+     * @var \Zend_Dojo_View_Helper_StackContainer|mixed
+     */
+    protected $helper;
+
     /**
      * Runs the test methods of this class.
      *
@@ -57,8 +69,8 @@ class Zend_Dojo_View_Helper_StackContainerTest extends PHPUnit_Framework_TestCas
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Dojo_View_Helper_StackContainerTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Dojo_View_Helper_StackContainerTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -67,12 +79,12 @@ class Zend_Dojo_View_Helper_StackContainerTest extends PHPUnit_Framework_TestCas
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         Zend_Registry::_unsetInstance();
         Zend_Dojo_View_Helper_Dojo::setUseDeclarative();
 
-        $this->view   = $this->getView();
+        $this->view = $this->getView();
         $this->helper = new Zend_Dojo_View_Helper_StackContainer();
         $this->helper->setView($this->view);
     }
@@ -83,7 +95,7 @@ class Zend_Dojo_View_Helper_StackContainerTest extends PHPUnit_Framework_TestCas
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -98,30 +110,30 @@ class Zend_Dojo_View_Helper_StackContainerTest extends PHPUnit_Framework_TestCas
     public function getContainer()
     {
         $html = '';
-        foreach (array('top', 'bottom', 'center', 'left', 'right') as $pane) {
-            $id      = $pane . 'Pane';
+        foreach (['top', 'bottom', 'center', 'left', 'right'] as $pane) {
+            $id = $pane . 'Pane';
             $content = 'This is the content of pane ' . $pane;
-            $html   .= $this->view->contentPane($id, $content, array('region' => $pane));
+            $html .= $this->view->contentPane($id, $content, ['region' => $pane]);
         }
-        return $this->helper->stackContainer('container', $html, array('design' => 'headline'));
+        return $this->helper->stackContainer('container', $html, ['design' => 'headline']);
     }
 
     public function testShouldAllowDeclarativeDijitCreation()
     {
         $html = $this->getContainer();
-        $this->assertRegexp('/<div[^>]*(dojoType="dijit.layout.StackContainer")/', $html, $html);
+        $this->assertMatchesRegularExpression('/<div[^>]*(dojoType="dijit.layout.StackContainer")/', $html, $html);
     }
 
     public function testShouldAllowProgrammaticDijitCreation()
     {
         Zend_Dojo_View_Helper_Dojo::setUseProgrammatic();
         $html = $this->getContainer();
-        $this->assertNotRegexp('/<div[^>]*(dojoType="dijit.layout.StackContainer")/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<div[^>]*(dojoType="dijit.layout.StackContainer")/', $html);
         $this->assertNotNull($this->view->dojo()->getDijit('container'));
     }
 }
 
 // Call Zend_Dojo_View_Helper_StackContainerTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Dojo_View_Helper_StackContainerTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Dojo_View_Helper_StackContainerTest::main") {
     Zend_Dojo_View_Helper_StackContainerTest::main();
 }

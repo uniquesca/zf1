@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -38,8 +41,12 @@ require_once 'Zend/Http/Client/Adapter/Test.php';
  * @group      Zend_Service_Amazon
  * @group      Zend_Service_Amazon_Ec2
  */
-class InstanceWindowsTest extends PHPUnit_Framework_TestCase
+class InstanceWindowsTest extends TestCase
 {
+    /**
+     * @var \Zend_Http_Client_Adapter_Test|mixed
+     */
+    protected $adapter;
 
     /**
      * @var Zend_Service_Amazon_Ec2_Instance_Windows
@@ -49,15 +56,15 @@ class InstanceWindowsTest extends PHPUnit_Framework_TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    protected function set_up()
     {
-        parent::setUp();
+        parent::set_up();
         $this->Zend_Service_Amazon_Ec2_Instance_Windows = new Zend_Service_Amazon_Ec2_Instance_Windows('access_key', 'secret_access_key');
 
         $adapter = new Zend_Http_Client_Adapter_Test();
-        $client = new Zend_Http_Client(null, array(
+        $client = new Zend_Http_Client(null, [
             'adapter' => $adapter
-        ));
+        ]);
         $this->adapter = $adapter;
         Zend_Service_Amazon_Ec2_Instance_Windows::setHttpClient($client);
     }
@@ -65,12 +72,12 @@ class InstanceWindowsTest extends PHPUnit_Framework_TestCase
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown()
+    protected function tear_down()
     {
         unset($this->adapter);
         $this->Zend_Service_Amazon_Ec2_Instance_Windows = null;
 
-        parent::tearDown();
+        parent::tear_down();
     }
 
     /**
@@ -87,47 +94,45 @@ class InstanceWindowsTest extends PHPUnit_Framework_TestCase
                     . "Expires: Tue, 31 Mar 1981 05:00:00 GMT\r\n"
                     . "Connection: close\r\n"
                     . "\r\n"
-                    ."<BundleInstanceResponse xmlns=\"http://ec2.amazonaws.com/doc/2009-04-04/\">\r\n"
-                    ."  <requestId>bun-c1a540a8</requestId>\r\n"
-                    ."  <bundleInstanceTask>\r\n"
-                    ."      <instanceId>i-12345678</instanceId>\r\n"
-                    ."      <bundleId>bun-cla322b9</bundleId>\r\n"
-                    ."      <state>bundling</state>\r\n"
-                    ."      <startTime>2008-10-07T11:41:50.000Z</startTime>\r\n"
-                    ."      <updateTime>2008-10-07T11:51:50.000Z</updateTime>\r\n"
-                    ."      <progress>20%</progress>\r\n"
-                    ."      <storage>\r\n"
-                    ."        <S3>\r\n"
-                    ."          <bucket>my-bucket</bucket>\r\n"
-                    ."          <prefix>my-new-image</prefix>\r\n"
-                    ."        </S3>\r\n"
-                    ."      </storage>\r\n"
-                    ."  </bundleInstanceTask>\r\n"
-                    ."</BundleInstanceResponse>";
+                    . "<BundleInstanceResponse xmlns=\"http://ec2.amazonaws.com/doc/2009-04-04/\">\r\n"
+                    . "  <requestId>bun-c1a540a8</requestId>\r\n"
+                    . "  <bundleInstanceTask>\r\n"
+                    . "      <instanceId>i-12345678</instanceId>\r\n"
+                    . "      <bundleId>bun-cla322b9</bundleId>\r\n"
+                    . "      <state>bundling</state>\r\n"
+                    . "      <startTime>2008-10-07T11:41:50.000Z</startTime>\r\n"
+                    . "      <updateTime>2008-10-07T11:51:50.000Z</updateTime>\r\n"
+                    . "      <progress>20%</progress>\r\n"
+                    . "      <storage>\r\n"
+                    . "        <S3>\r\n"
+                    . "          <bucket>my-bucket</bucket>\r\n"
+                    . "          <prefix>my-new-image</prefix>\r\n"
+                    . "        </S3>\r\n"
+                    . "      </storage>\r\n"
+                    . "  </bundleInstanceTask>\r\n"
+                    . "</BundleInstanceResponse>";
         $this->adapter->setResponse($rawHttpResponse);
 
         $return = $this->Zend_Service_Amazon_Ec2_Instance_Windows->bundle('i-12345678', 'my-bucket', 'my-new-image');
 
         print_r($return);
 
-        $arrReturn = array(
+        $arrReturn = [
                 "instanceId" => "i-12345678",
                 "bundleId" => "bun-cla322b9",
                 "state" => "bundling",
                 "startTime" => "2008-10-07T11:41:50.000Z",
                 "updateTime" => "2008-10-07T11:51:50.000Z",
                 "progress" => "20%",
-                "storage" => array(
-                        "s3" => array
-                            (
+                "storage" => [
+                        "s3" => [
                                 "bucket" => "my-bucket",
                                 "prefix" => "my-new-image"
-                            )
-                    )
-                );
+                            ]
+                    ]
+                ];
 
         $this->assertSame($arrReturn, $return);
-
     }
 
     /**
@@ -144,45 +149,41 @@ class InstanceWindowsTest extends PHPUnit_Framework_TestCase
                     . "Expires: Tue, 31 Mar 1981 05:00:00 GMT\r\n"
                     . "Connection: close\r\n"
                     . "\r\n"
-                    ."<CancelBundleTaskResponse xmlns=\"http://ec2.amazonaws.com/doc/2009-04-04/\">\r\n"
-                    ."  <bundleInstanceTask>\r\n"
-                    ."      <instanceId>i-12345678</instanceId>\r\n"
-                    ."      <bundleId>bun-cla322b9</bundleId>\r\n"
-                    ."      <state>canceling</state>\r\n"
-                    ."      <startTime>2008-10-07T11:41:50.000Z</startTime>\r\n"
-                    ."      <updateTime>2008-10-07T11:51:50.000Z</updateTime>\r\n"
-                    ."      <progress>20%</progress>\r\n"
-                    ."      <storage>\r\n"
-                    ."        <S3>\r\n"
-                    ."          <bucket>my-bucket</bucket>\r\n"
-                    ."          <prefix>my-new-image</prefix>\r\n"
-                    ."        </S3>\r\n"
-                    ."      </storage>\r\n"
-                    ."  </bundleInstanceTask>\r\n"
-                    ."</CancelBundleTaskResponse>";
+                    . "<CancelBundleTaskResponse xmlns=\"http://ec2.amazonaws.com/doc/2009-04-04/\">\r\n"
+                    . "  <bundleInstanceTask>\r\n"
+                    . "      <instanceId>i-12345678</instanceId>\r\n"
+                    . "      <bundleId>bun-cla322b9</bundleId>\r\n"
+                    . "      <state>canceling</state>\r\n"
+                    . "      <startTime>2008-10-07T11:41:50.000Z</startTime>\r\n"
+                    . "      <updateTime>2008-10-07T11:51:50.000Z</updateTime>\r\n"
+                    . "      <progress>20%</progress>\r\n"
+                    . "      <storage>\r\n"
+                    . "        <S3>\r\n"
+                    . "          <bucket>my-bucket</bucket>\r\n"
+                    . "          <prefix>my-new-image</prefix>\r\n"
+                    . "        </S3>\r\n"
+                    . "      </storage>\r\n"
+                    . "  </bundleInstanceTask>\r\n"
+                    . "</CancelBundleTaskResponse>";
         $this->adapter->setResponse($rawHttpResponse);
 
         $return = $this->Zend_Service_Amazon_Ec2_Instance_Windows->cancelBundle('bun-cla322b9');
 
-        $arrReturn = array(    "instanceId" => "i-12345678",
+        $arrReturn = [    "instanceId" => "i-12345678",
                 "bundleId" => "bun-cla322b9",
                 "state" => "canceling",
                 "startTime" => "2008-10-07T11:41:50.000Z",
                 "updateTime" => "2008-10-07T11:51:50.000Z",
                 "progress" => "20%",
-                "storage" => array(
-                        "s3" => array
-                            (
+                "storage" => [
+                        "s3" => [
                                 "bucket" => "my-bucket",
                                 "prefix" => "my-new-image"
-                            )
-                    )
-                );
+                            ]
+                    ]
+                ];
 
         $this->assertSame($arrReturn, $return);
-
-
-
     }
 
     /**
@@ -199,49 +200,45 @@ class InstanceWindowsTest extends PHPUnit_Framework_TestCase
                     . "Expires: Tue, 31 Mar 1981 05:00:00 GMT\r\n"
                     . "Connection: close\r\n"
                     . "\r\n"
-                    ."<DescribeBundleTasksResponse xmlns=\"http://ec2.amazonaws.com/doc/2009-04-04/\">\r\n"
-                    ."  <bundleInstanceTasksSet>\r\n"
-                    ."    <item>\r\n"
-                    ."      <instanceId>i-12345678</instanceId>\r\n"
-                    ."      <bundleId>bun-cla322b9</bundleId>\r\n"
-                    ."      <state>bundling</state>\r\n"
-                    ."      <startTime>2008-10-07T11:41:50.000Z</startTime>\r\n"
-                    ."      <updateTime>2008-10-07T11:51:50.000Z</updateTime>\r\n"
-                    ."      <progress>20%</progress>\r\n"
-                    ."      <storage>\r\n"
-                    ."        <S3>\r\n"
-                    ."          <bucket>my-bucket</bucket>\r\n"
-                    ."          <prefix>my-new-image</prefix>\r\n"
-                    ."        </S3>\r\n"
-                    ."      </storage>\r\n"
-                    ."    </item>\r\n"
-                    ."  </bundleInstanceTasksSet>\r\n"
-                    ."</DescribeBundleTasksResponse>";
+                    . "<DescribeBundleTasksResponse xmlns=\"http://ec2.amazonaws.com/doc/2009-04-04/\">\r\n"
+                    . "  <bundleInstanceTasksSet>\r\n"
+                    . "    <item>\r\n"
+                    . "      <instanceId>i-12345678</instanceId>\r\n"
+                    . "      <bundleId>bun-cla322b9</bundleId>\r\n"
+                    . "      <state>bundling</state>\r\n"
+                    . "      <startTime>2008-10-07T11:41:50.000Z</startTime>\r\n"
+                    . "      <updateTime>2008-10-07T11:51:50.000Z</updateTime>\r\n"
+                    . "      <progress>20%</progress>\r\n"
+                    . "      <storage>\r\n"
+                    . "        <S3>\r\n"
+                    . "          <bucket>my-bucket</bucket>\r\n"
+                    . "          <prefix>my-new-image</prefix>\r\n"
+                    . "        </S3>\r\n"
+                    . "      </storage>\r\n"
+                    . "    </item>\r\n"
+                    . "  </bundleInstanceTasksSet>\r\n"
+                    . "</DescribeBundleTasksResponse>";
         $this->adapter->setResponse($rawHttpResponse);
 
         $return = $this->Zend_Service_Amazon_Ec2_Instance_Windows->describeBundle('bun-cla322b9');
 
-        $arrReturn = array(
-            array(
+        $arrReturn = [
+            [
                 "instanceId" => "i-12345678",
                 "bundleId" => "bun-cla322b9",
                 "state" => "bundling",
                 "startTime" => "2008-10-07T11:41:50.000Z",
                 "updateTime" => "2008-10-07T11:51:50.000Z",
                 "progress" => "20%",
-                "storage" => array(
-                        "s3" => array
-                            (
+                "storage" => [
+                        "s3" => [
                                 "bucket" => "my-bucket",
                                 "prefix" => "my-new-image"
-                            )
-                    )
-                )
-            );
+                            ]
+                    ]
+                ]
+            ];
 
         $this->assertSame($arrReturn, $return);
-
     }
-
 }
-

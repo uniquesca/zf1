@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -39,8 +44,18 @@ require_once 'Zend/View.php';
  * @group      Zend_View
  * @group      Zend_View_Helper
  */
-class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
+class Zend_View_Helper_FieldsetTest extends TestCase
 {
+    /**
+     * @var Zend_View
+     */
+    protected $view;
+
+    /**
+     * @var Zend_View_Helper_Fieldset
+     */
+    protected $helper;
+
     /**
      * Runs the test methods of this class.
      *
@@ -48,9 +63,8 @@ class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_View_Helper_FieldsetTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_View_Helper_FieldsetTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -59,9 +73,9 @@ class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
-        $this->view   = new Zend_View();
+        $this->view = new Zend_View();
         $this->helper = new Zend_View_Helper_Fieldset();
         $this->helper->setView($this->view);
         ob_start();
@@ -73,7 +87,7 @@ class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
         ob_end_clean();
     }
@@ -81,15 +95,15 @@ class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
     public function testFieldsetHelperCreatesFieldsetWithProvidedContent()
     {
         $html = $this->helper->fieldset('foo', 'foobar');
-        $this->assertRegexp('#<fieldset[^>]+id="foo".*?>#', $html);
-        $this->assertContains('</fieldset>', $html);
-        $this->assertContains('foobar', $html);
+        $this->assertMatchesRegularExpression('#<fieldset[^>]+id="foo".*?>#', $html);
+        $this->assertStringContainsString('</fieldset>', $html);
+        $this->assertStringContainsString('foobar', $html);
     }
 
     public function testProvidingLegendOptionToFieldsetCreatesLegendTag()
     {
-        $html = $this->helper->fieldset('foo', 'foobar', array('legend' => 'Great Scott!'));
-        $this->assertRegexp('#<legend>Great Scott!</legend>#', $html);
+        $html = $this->helper->fieldset('foo', 'foobar', ['legend' => 'Great Scott!']);
+        $this->assertMatchesRegularExpression('#<legend>Great Scott!</legend>#', $html);
     }
 
     /**
@@ -97,9 +111,9 @@ class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
      */
     public function testEmptyLegendShouldNotRenderLegendTag()
     {
-        foreach (array(null, '', ' ', false) as $legend) {
-            $html = $this->helper->fieldset('foo', 'foobar', array('legend' => $legend));
-            $this->assertNotContains('<legend>', $html, 'Failed with value ' . var_export($legend, 1) . ': ' . $html);
+        foreach ([null, '', ' ', false] as $legend) {
+            $html = $this->helper->fieldset('foo', 'foobar', ['legend' => $legend]);
+            $this->assertStringNotContainsString('<legend>', $html, 'Failed with value ' . var_export($legend, 1) . ': ' . $html);
         }
     }
 
@@ -108,12 +122,12 @@ class Zend_View_Helper_FieldsetTest extends PHPUnit_Framework_TestCase
      */
     public function testHelperShouldAllowDisablingEscapingOfLegend()
     {
-        $html = $this->helper->fieldset('foo', 'foobar', array('legend' => '<b>Great Scott!</b>', 'escape' => false));
-        $this->assertRegexp('#<legend><b>Great Scott!</b></legend>#', $html, $html);
+        $html = $this->helper->fieldset('foo', 'foobar', ['legend' => '<b>Great Scott!</b>', 'escape' => false]);
+        $this->assertMatchesRegularExpression('#<legend><b>Great Scott!</b></legend>#', $html, $html);
     }
 }
 
 // Call Zend_View_Helper_FieldsetTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_View_Helper_FieldsetTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_View_Helper_FieldsetTest::main") {
     Zend_View_Helper_FieldsetTest::main();
 }

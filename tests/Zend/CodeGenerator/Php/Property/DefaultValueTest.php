@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,13 +35,12 @@ require_once 'Zend/CodeGenerator/Php/Property/DefaultValue.php';
  * @group Zend_CodeGenerator
  * @group Zend_CodeGenerator_Php
  */
-class Zend_CodeGenerator_Php_Property_DefaultValueTest extends PHPUnit_Framework_TestCase
+class Zend_CodeGenerator_Php_Property_DefaultValueTest extends TestCase
 {
-
     public function testPropertyDefaultValueConstructor()
     {
         $propDefaultValue = new Zend_CodeGenerator_Php_Property_DefaultValue();
-        $this->isInstanceOf($propDefaultValue, 'Zend_CodeGenerator_Php_Property_DefaultValue');
+        $this->assertInstanceOf('Zend_CodeGenerator_Php_Property_DefaultValue', $propDefaultValue);
     }
 
     public function testPropertyDefaultValueIsSettable()
@@ -59,7 +61,7 @@ class Zend_CodeGenerator_Php_Property_DefaultValueTest extends PHPUnit_Framework
     public function testPropertyDefaultValueCanHandleArray()
     {
         $propDefaultValue = new Zend_CodeGenerator_Php_Property_DefaultValue();
-        $propDefaultValue->setValue(array('foo'));
+        $propDefaultValue->setValue(['foo']);
         $this->assertEquals('array(\'foo\');', $propDefaultValue->generate());
     }
 
@@ -81,20 +83,20 @@ class Zend_CodeGenerator_Php_Property_DefaultValueTest extends PHPUnit_Framework
 
     public function testPropertyDefaultValueCanHandleComplexArrayOfTypes()
     {
-        $targetValue = array(
+        $targetValue = [
             5,
             'one' => 1,
             'two' => '2',
-            array(
+            [
                 'foo',
                 'bar',
-                array(
+                [
                     'baz1',
                     'baz2'
-                    )
-                ),
-            new Zend_CodeGenerator_Php_Property_DefaultValue(array('value' => 'PHP_EOL', 'type' => 'constant'))
-            );
+                    ]
+                ],
+            new Zend_CodeGenerator_Php_Property_DefaultValue(['value' => 'PHP_EOL', 'type' => 'constant'])
+            ];
 
         $expectedSource = <<<EOS
 array(
@@ -119,8 +121,5 @@ EOS;
         $propDefaultValue->setValue($targetValue);
         $generatedTargetSource = $propDefaultValue->generate();
         $this->assertEquals($expectedSource, $generatedTargetSource);
-
     }
-
-
 }

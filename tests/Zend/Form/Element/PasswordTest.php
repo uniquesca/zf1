@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -38,8 +43,18 @@ require_once 'Zend/View.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Form
  */
-class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
+class Zend_Form_Element_PasswordTest extends TestCase
 {
+    /**
+     * @var Zend_Form_Element_Password
+     */
+    protected $element;
+
+    /**
+     * @var array
+     */
+    protected $errors;
+
     /**
      * Runs the test methods of this class.
      *
@@ -47,9 +62,8 @@ class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Form_Element_PasswordTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Form_Element_PasswordTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -58,9 +72,9 @@ class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
-        $this->errors = array();
+        $this->errors = [];
         $this->element = new Zend_Form_Element_Password('foo');
     }
 
@@ -70,7 +84,7 @@ class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -102,23 +116,23 @@ class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
 
     public function testPasswordValueMaskedByGetMessages()
     {
-        $this->element->addValidators(array(
+        $this->element->addValidators([
             'Alpha',
             'Alnum'
-        ));
-        $value  = 'abc-123';
+        ]);
+        $value = 'abc-123';
         $expect = '*******';
         $this->assertFalse($this->element->isValid($value));
         foreach ($this->element->getMessages() as $message) {
-            $this->assertNotContains($value, $message);
-            $this->assertContains($expect, $message, $message);
+            $this->assertStringNotContainsString($value, $message);
+            $this->assertStringContainsString($expect, $message, $message);
         }
     }
 
     public function handleErrors($errno, $errmsg, $errfile, $errline, $errcontext)
     {
         if (!isset($this->errors)) {
-            $this->errors = array();
+            $this->errors = [];
         }
         $this->errors[] = $errmsg;
     }
@@ -128,10 +142,10 @@ class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMessagesReturnsEmptyArrayWhenNoMessagesRegistered()
     {
-        set_error_handler(array($this, 'handleErrors'));
+        set_error_handler([$this, 'handleErrors']);
         $messages = $this->element->getMessages();
         restore_error_handler();
-        $this->assertSame(array(), $messages);
+        $this->assertSame([], $messages);
         $this->assertTrue(empty($this->errors));
     }
 
@@ -167,15 +181,15 @@ class Zend_Form_Element_PasswordTest extends PHPUnit_Framework_TestCase
         $this->element->setValue('foobar')
                       ->setView(new Zend_View());
         $test = $this->element->render();
-        $this->assertContains('value=""', $test);
+        $this->assertStringContainsString('value=""', $test);
 
         $this->element->setRenderPassword(true);
         $test = $this->element->render();
-        $this->assertContains('value="foobar"', $test);
+        $this->assertStringContainsString('value="foobar"', $test);
     }
 }
 
 // Call Zend_Form_Element_PasswordTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Form_Element_PasswordTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Form_Element_PasswordTest::main") {
     Zend_Form_Element_PasswordTest::main();
 }

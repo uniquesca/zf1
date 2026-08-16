@@ -51,7 +51,7 @@ class Zend_Controller_Dispatcher_Standard extends Zend_Controller_Dispatcher_Abs
      * Controller directory(ies)
      * @var array
      */
-    protected $_controllerDirectory = array();
+    protected $_controllerDirectory = [];
 
     /**
      * Constructor: Set current module to default value
@@ -59,7 +59,7 @@ class Zend_Controller_Dispatcher_Standard extends Zend_Controller_Dispatcher_Abs
      * @param  array $params
      * @return void
      */
-    public function __construct(array $params = array())
+    public function __construct(array $params = [])
     {
         parent::__construct($params);
         $this->_curModule = $this->getDefaultModule();
@@ -70,7 +70,7 @@ class Zend_Controller_Dispatcher_Standard extends Zend_Controller_Dispatcher_Abs
      *
      * @param string $path
      * @param string $module
-     * @return Zend_Controller_Dispatcher_Standard
+     * @return $this
      */
     public function addControllerDirectory($path, $module = null)
     {
@@ -89,11 +89,11 @@ class Zend_Controller_Dispatcher_Standard extends Zend_Controller_Dispatcher_Abs
      * Set controller directory
      *
      * @param array|string $directory
-     * @return Zend_Controller_Dispatcher_Standard
+     * @return $this
      */
     public function setControllerDirectory($directory, $module = null)
     {
-        $this->_controllerDirectory = array();
+        $this->_controllerDirectory = [];
 
         if (is_string($directory)) {
             $this->addControllerDirectory($directory, $module);
@@ -116,7 +116,7 @@ class Zend_Controller_Dispatcher_Standard extends Zend_Controller_Dispatcher_Abs
      * If a module is specified, returns just that directory.
      *
      * @param  string $module Module name
-     * @return array|string Returns array of all directories by default, single
+     * @return array|string|null Returns array of all directories by default, single
      * module directory if module argument provided
      */
     public function getControllerDirectory($module = null)
@@ -306,7 +306,7 @@ class Zend_Controller_Dispatcher_Standard extends Zend_Controller_Dispatcher_Abs
 
         try {
             $controller->dispatch($action);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             // Clean output buffer on error
             $curObLevel = ob_get_level();
             if ($curObLevel > $obLevel) {

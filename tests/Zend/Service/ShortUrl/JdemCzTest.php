@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -26,7 +29,7 @@ require_once 'Zend/Service/ShortUrl/JdemCz.php';
  * @package  Zend_Service
  * @subpackage  UnitTests
  */
-class Zend_Service_ShortUrl_JdemCzTest extends PHPUnit_Framework_TestCase
+class Zend_Service_ShortUrl_JdemCzTest extends TestCase
 {
     /**
      * Zend_Service_JdemCz object
@@ -40,7 +43,7 @@ class Zend_Service_ShortUrl_JdemCzTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp ()
+    public function set_up()
     {
         if (!defined('TESTS_ZEND_SERVICE_SHORTURL_JDEMCZ_ENABLED')
             || !constant('TESTS_ZEND_SERVICE_SHORTURL_JDEMCZ_ENABLED')
@@ -55,22 +58,22 @@ class Zend_Service_ShortUrl_JdemCzTest extends PHPUnit_Framework_TestCase
 
     public function testShortenEmptyUrlException()
     {
-        $this->setExpectedException('Zend_Service_ShortUrl_Exception');
+        $this->expectException('Zend_Service_ShortUrl_Exception');
         $this->_s->shorten('');
     }
 
     public function testShortenIncorrectUrlException()
     {
-        $this->setExpectedException('Zend_Service_ShortUrl_Exception');
+        $this->expectException('Zend_Service_ShortUrl_Exception');
         $this->_s->shorten('wrongAdress.cccc');
     }
 
     public function testShorten()
     {
-        $urls = array(
-            'http://framework.zend.com/'           => 'http://jdem.cz/ab2l1',
+        $urls = [
+            'http://framework.zend.com/' => 'http://jdem.cz/ab2l1',
             'http://framework.zend.com/manual/en/' => 'http://jdem.cz/ab3z7'
-        );
+        ];
 
         foreach ($urls as $url => $shortenedUrl) {
             $this->assertEquals($shortenedUrl, $this->_s->shorten($url));
@@ -79,10 +82,10 @@ class Zend_Service_ShortUrl_JdemCzTest extends PHPUnit_Framework_TestCase
 
     public function testUnshorten()
     {
-        $urls = array(
-            'http://framework.zend.com/'           => 'http://jdem.cz/ab2l1',
+        $urls = [
+            'http://framework.zend.com/' => 'http://jdem.cz/ab2l1',
             'http://framework.zend.com/manual/en/' => 'http://jdem.cz/ab3z7'
-        );
+        ];
 
         foreach ($urls as $url => $shortenedUrl) {
             $this->assertEquals($url, $this->_s->unshorten($shortenedUrl));
@@ -91,19 +94,19 @@ class Zend_Service_ShortUrl_JdemCzTest extends PHPUnit_Framework_TestCase
 
     public function testUnshortenEmptyUrlException()
     {
-        $this->setExpectedException('Zend_Service_ShortUrl_Exception');
+        $this->expectException('Zend_Service_ShortUrl_Exception');
         $this->_s->unshorten('');
     }
 
     public function testUnshortenIncorrectUrlException()
     {
-        $this->setExpectedException('Zend_Service_ShortUrl_Exception');
+        $this->expectException('Zend_Service_ShortUrl_Exception');
         $this->_s->unshorten('wrongAdress.cccc');
     }
 
     public function testUnshortenWrongUrlException()
     {
-        $this->setExpectedException('Zend_Service_ShortUrl_Exception');
+        $this->expectException('Zend_Service_ShortUrl_Exception');
         $this->_s->unshorten('http://www.zend.com');
     }
 }

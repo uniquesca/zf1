@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -34,7 +37,7 @@ require_once 'Zend/Validate/GreaterThan.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_GreaterThanTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_GreaterThanTest extends TestCase
 {
     /**
      * Ensures that the validator follows expected behavior
@@ -49,12 +52,12 @@ class Zend_Validate_GreaterThanTest extends PHPUnit_Framework_TestCase
          *      - expected validation result
          *      - array of test input values
          */
-        $valuesExpected = array(
-            array(0, true, array(0.01, 1, 100)),
-            array(0, false, array(0, 0.00, -0.01, -1, -100)),
-            array('a', true, array('b', 'c', 'd')),
-            array('z', false, array('x', 'y', 'z'))
-            );
+        $valuesExpected = [
+            [0, true, [0.01, 1, 100]],
+            [0, false, [0, 0.00, -0.01, -1, -100]],
+            ['a', true, ['b', 'c', 'd']],
+            ['z', false, ['x', 'y', 'z']]
+            ];
         foreach ($valuesExpected as $element) {
             $validator = new Zend_Validate_GreaterThan($element[0]);
             foreach ($element[2] as $input) {
@@ -71,7 +74,7 @@ class Zend_Validate_GreaterThanTest extends PHPUnit_Framework_TestCase
     public function testGetMessages()
     {
         $validator = new Zend_Validate_GreaterThan(10);
-        $this->assertEquals(array(), $validator->getMessages());
+        $this->assertEquals([], $validator->getMessages());
     }
 
     /**

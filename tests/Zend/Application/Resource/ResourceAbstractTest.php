@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -37,22 +42,42 @@ require_once 'Zend/Loader/Autoloader.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Application
  */
-class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_TestCase
+class Zend_Application_Resource_ResourceAbstractTest extends TestCase
 {
+    /**
+     * @var array
+     */
+    protected $loaders;
+
+    /**
+     * @var Zend_Loader_Autoloader
+     */
+    protected $autoloader;
+
+    /**
+     * @var Zend_Application
+     */
+    protected $application;
+
+    /**
+     * @var Zend_Application_Bootstrap_Bootstrap
+     */
+    protected $bootstrap;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         // Store original autoloaders
         $this->loaders = spl_autoload_functions();
         if (!is_array($this->loaders)) {
             // spl_autoload_functions does not return empty array when no
             // autoloaders registered...
-            $this->loaders = array();
+            $this->loaders = [];
         }
 
         Zend_Loader_Autoloader::resetInstance();
@@ -64,7 +89,7 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
         $this->bootstrap = new ZfAppBootstrap($this->application);
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         // Restore original autoloaders
         $loaders = spl_autoload_functions();
@@ -99,9 +124,9 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
         $resource = new Zend_Application_BootstrapTest_Resource_Foo();
-        $options  = array(
+        $options = [
             'foo' => 'bar',
-        );
+        ];
         $resource->setOptions($options);
         $this->assertEquals($options, $resource->getOptions());
     }
@@ -110,15 +135,15 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
         $resource = new Zend_Application_BootstrapTest_Resource_Foo();
-        $options1  = array(
+        $options1 = [
             'foo' => 'bar',
-        );
-        $options2  = array(
+        ];
+        $options2 = [
             'bar' => 'baz',
-        );
-        $options3  = array(
+        ];
+        $options3 = [
             'foo' => 'BAR',
-        );
+        ];
         $expected = $resource->mergeOptions($options1, $options2);
         $expected = $resource->mergeOptions($expected, $options3);
         $resource->setOptions($options1)
@@ -131,9 +156,9 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
         $resource = new Zend_Application_BootstrapTest_Resource_Foo();
-        $options  = array(
+        $options = [
             'someArbitraryKey' => 'test',
-        );
+        ];
         $resource->setOptions($options);
         $this->assertEquals('test', $resource->someArbitraryKey);
     }
@@ -141,9 +166,9 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     public function testConstructorAcceptsArrayConfiguration()
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
-        $options  = array(
+        $options = [
             'foo' => 'bar',
-        );
+        ];
         $resource = new Zend_Application_BootstrapTest_Resource_Foo($options);
         $this->assertEquals($options, $resource->getOptions());
     }
@@ -151,9 +176,9 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     public function testConstructorAcceptsZendConfigObject()
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
-        $options  = array(
+        $options = [
             'foo' => 'bar',
-        );
+        ];
         $config = new Zend_Config($options);
         $resource = new Zend_Application_BootstrapTest_Resource_Foo($config);
         $this->assertEquals($options, $resource->getOptions());
@@ -166,9 +191,9 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
         $resource = new Zend_Application_BootstrapTest_Resource_Foo();
-        $resource->setOptions(array(
+        $resource->setOptions([
             'bootstrap' => $this->bootstrap,
-        ));
+        ]);
         $this->assertSame($this->bootstrap, $resource->getBootstrap());
         $options = $resource->getOptions();
         $this->assertNotContains('bootstrap', array_keys($options));
@@ -180,17 +205,17 @@ class Zend_Application_Resource_ResourceAbstractTest extends PHPUnit_Framework_T
     public function testFirstResourceOptionShouldNotBeDropped()
     {
         require_once dirname(__FILE__) . '/../_files/resources/Foo.php';
-        $options = array(
-            array('someData'),
-            array('someMoreData'),
-        );
+        $options = [
+            ['someData'],
+            ['someMoreData'],
+        ];
 
         $resource = new Zend_Application_BootstrapTest_Resource_Foo($options);
-        $stored   = $resource->getOptions();
+        $stored = $resource->getOptions();
         $this->assertSame($options, $stored);
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Application_Resource_ResourceAbstractTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Application_Resource_ResourceAbstractTest::main') {
     Zend_Application_Resource_ResourceAbstractTest::main();
 }

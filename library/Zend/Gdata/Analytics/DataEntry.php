@@ -35,11 +35,11 @@ class Zend_Gdata_Analytics_DataEntry extends Zend_Gdata_Entry
     /**
      * @var array
      */
-    protected $_dimensions = array();
+    protected $_dimensions = [];
     /**
      * @var array
      */
-    protected $_metrics = array();
+    protected $_metrics = [];
 
     /**
      * @param DOMElement $element
@@ -58,12 +58,12 @@ class Zend_Gdata_Analytics_DataEntry extends Zend_Gdata_Entry
     {
         $absoluteNodeName = $child->namespaceURI . ':' . $child->localName;
         switch ($absoluteNodeName) {
-            case $this->lookupNamespace('analytics') . ':' . 'dimension';
+            case $this->lookupNamespace('analytics') . ':' . 'dimension':
                 $dimension = new Zend_Gdata_Analytics_Extension_Dimension();
                 $dimension->transferFromDOM($child);
                 $this->_dimensions[] = $dimension;
                 break;
-            case $this->lookupNamespace('analytics') . ':' . 'metric';
+            case $this->lookupNamespace('analytics') . ':' . 'metric':
                 $metric = new Zend_Gdata_Analytics_Extension_Metric();
                 $metric->transferFromDOM($child);
                 $this->_metrics[] = $metric;
@@ -75,7 +75,7 @@ class Zend_Gdata_Analytics_DataEntry extends Zend_Gdata_Entry
     }
 
     /**
-     * @param string $name 
+     * @param string $name
      * @return mixed
      */
     public function getDimension($name)
@@ -87,9 +87,9 @@ class Zend_Gdata_Analytics_DataEntry extends Zend_Gdata_Entry
         }
         return null;
     }
-    
-    /** 
-     * @param string $name 
+
+    /**
+     * @param string $name
      * @return mixed
      */
     public function getMetric($name)
@@ -101,9 +101,9 @@ class Zend_Gdata_Analytics_DataEntry extends Zend_Gdata_Entry
         }
         return null;
     }
-    
+
     /**
-     * @param string $name 
+     * @param string $name
      * @return mixed
      */
     public function getValue($name)

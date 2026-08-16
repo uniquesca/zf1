@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -40,7 +45,7 @@ require_once 'Zend/Validate/File/Hash.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_File_HashTest extends TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -49,8 +54,8 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Validate_File_HashTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Validate_File_HashTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -60,12 +65,12 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $valuesExpected = array(
-            array('3f8d07e2', true),
-            array('9f8d07e2', false),
-            array(array('9f8d07e2', '3f8d07e2'), true),
-            array(array('9f8d07e2', '7f8d07e2'), false),
-        );
+        $valuesExpected = [
+            ['3f8d07e2', true],
+            ['9f8d07e2', false],
+            [['9f8d07e2', '3f8d07e2'], true],
+            [['9f8d07e2', '7f8d07e2'], false],
+        ];
 
         foreach ($valuesExpected as $element) {
             $validator = new Zend_Validate_File_Hash($element[0]);
@@ -76,12 +81,12 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
             );
         }
 
-        $valuesExpected = array(
-            array(array('ed74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'), true),
-            array(array('4d74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'), false),
-            array(array('4d74c22109fe9f110579f77b053b8bc3', 'ed74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'), true),
-            array(array('1d74c22109fe9f110579f77b053b8bc3', '4d74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'), false),
-        );
+        $valuesExpected = [
+            [['ed74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'], true],
+            [['4d74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'], false],
+            [['4d74c22109fe9f110579f77b053b8bc3', 'ed74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'], true],
+            [['1d74c22109fe9f110579f77b053b8bc3', '4d74c22109fe9f110579f77b053b8bc3', 'algorithm' => 'md5'], false],
+        ];
 
         foreach ($valuesExpected as $element) {
             $validator = new Zend_Validate_File_Hash($element[0]);
@@ -96,34 +101,34 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($validator->isValid(dirname(__FILE__) . '/_files/nofile.mo'));
         $this->assertTrue(array_key_exists('fileHashNotFound', $validator->getMessages()));
 
-        $files = array(
-            'name'     => 'test1',
-            'type'     => 'text',
-            'size'     => 200,
+        $files = [
+            'name' => 'test1',
+            'type' => 'text',
+            'size' => 200,
             'tmp_name' => 'tmp_test1',
-            'error'    => 0
-        );
+            'error' => 0
+        ];
         $validator = new Zend_Validate_File_Hash('3f8d07e2');
         $this->assertFalse($validator->isValid(dirname(__FILE__) . '/_files/nofile.mo', $files));
         $this->assertTrue(array_key_exists('fileHashNotFound', $validator->getMessages()));
 
-        $files = array(
-            'name'     => 'testsize.mo',
-            'type'     => 'text',
-            'size'     => 200,
+        $files = [
+            'name' => 'testsize.mo',
+            'type' => 'text',
+            'size' => 200,
             'tmp_name' => dirname(__FILE__) . '/_files/testsize.mo',
-            'error'    => 0
-        );
+            'error' => 0
+        ];
         $validator = new Zend_Validate_File_Hash('3f8d07e2');
         $this->assertTrue($validator->isValid(dirname(__FILE__) . '/_files/picture.jpg', $files));
 
-        $files = array(
-            'name'     => 'testsize.mo',
-            'type'     => 'text',
-            'size'     => 200,
+        $files = [
+            'name' => 'testsize.mo',
+            'type' => 'text',
+            'size' => 200,
             'tmp_name' => dirname(__FILE__) . '/_files/testsize.mo',
-            'error'    => 0
-        );
+            'error' => 0
+        ];
         $validator = new Zend_Validate_File_Hash('9f8d07e2');
         $this->assertFalse($validator->isValid(dirname(__FILE__) . '/_files/picture.jpg', $files));
         $this->assertTrue(array_key_exists('fileHashDoesNotMatch', $validator->getMessages()));
@@ -137,10 +142,10 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
     public function testgetHash()
     {
         $validator = new Zend_Validate_File_Hash('12345');
-        $this->assertEquals(array('12345' => 'crc32'), $validator->getHash());
+        $this->assertEquals(['12345' => 'crc32'], $validator->getHash());
 
-        $validator = new Zend_Validate_File_Hash(array('12345', '12333', '12344'));
-        $this->assertEquals(array('12345' => 'crc32', '12333' => 'crc32', '12344' => 'crc32'), $validator->getHash());
+        $validator = new Zend_Validate_File_Hash(['12345', '12333', '12344']);
+        $this->assertEquals(['12345' => 'crc32', '12333' => 'crc32', '12344' => 'crc32'], $validator->getHash());
     }
 
     /**
@@ -152,10 +157,10 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
     {
         $validator = new Zend_Validate_File_Hash('12345');
         $validator->setHash('12333');
-        $this->assertEquals(array('12333' => 'crc32'), $validator->getHash());
+        $this->assertEquals(['12333' => 'crc32'], $validator->getHash());
 
-        $validator->setHash(array('12321', '12121'));
-        $this->assertEquals(array('12321' => 'crc32', '12121' => 'crc32'), $validator->getHash());
+        $validator->setHash(['12321', '12121']);
+        $this->assertEquals(['12321' => 'crc32', '12121' => 'crc32'], $validator->getHash());
     }
 
     /**
@@ -167,14 +172,14 @@ class Zend_Validate_File_HashTest extends PHPUnit_Framework_TestCase
     {
         $validator = new Zend_Validate_File_Hash('12345');
         $validator->addHash('12344');
-        $this->assertEquals(array('12345' => 'crc32', '12344' => 'crc32'), $validator->getHash());
+        $this->assertEquals(['12345' => 'crc32', '12344' => 'crc32'], $validator->getHash());
 
-        $validator->addHash(array('12321', '12121'));
-        $this->assertEquals(array('12345' => 'crc32', '12344' => 'crc32', '12321' => 'crc32', '12121' => 'crc32'), $validator->getHash());
+        $validator->addHash(['12321', '12121']);
+        $this->assertEquals(['12345' => 'crc32', '12344' => 'crc32', '12321' => 'crc32', '12121' => 'crc32'], $validator->getHash());
     }
 }
 
 // Call Zend_Validate_File_HashTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Validate_File_HashTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Validate_File_HashTest::main") {
     Zend_Validate_File_HashTest::main();
 }

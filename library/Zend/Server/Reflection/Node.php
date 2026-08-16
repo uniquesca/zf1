@@ -40,7 +40,7 @@ class Zend_Server_Reflection_Node
      * Array of child nodes (if any)
      * @var array
      */
-    protected $_children = array();
+    protected $_children = [];
 
     /**
      * Parent node (if any)
@@ -55,7 +55,7 @@ class Zend_Server_Reflection_Node
      * @param Zend_Server_Reflection_Node $parent Optional
      * @return Zend_Server_Reflection_Node
      */
-    public function __construct($value, Zend_Server_Reflection_Node $parent = null)
+    public function __construct($value, ?Zend_Server_Reflection_Node $parent = null)
     {
         $this->_value = $value;
         if (null !== $parent) {
@@ -92,9 +92,7 @@ class Zend_Server_Reflection_Node
      */
     public function createChild($value)
     {
-        $child = new self($value, $this);
-
-        return $child;
+        return new self($value, $this);
     }
 
     /**
@@ -174,7 +172,7 @@ class Zend_Server_Reflection_Node
      */
     public function getEndPoints()
     {
-        $endPoints = array();
+        $endPoints = [];
         if (!$this->hasChildren()) {
             return $endPoints;
         }

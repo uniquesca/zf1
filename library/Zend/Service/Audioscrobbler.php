@@ -71,15 +71,9 @@ class Zend_Service_Audioscrobbler
     {
         $this->set('version', '1.0');
 
-        if (PHP_VERSION_ID < 50600) {
-            iconv_set_encoding('output_encoding', 'UTF-8');
-            iconv_set_encoding('input_encoding', 'UTF-8');
-            iconv_set_encoding('internal_encoding', 'UTF-8');
-        } else {
-            ini_set('output_encoding', 'UTF-8');
-            ini_set('input_encoding', 'UTF-8');
-            ini_set('default_charset', 'UTF-8');
-        }
+        ini_set('output_encoding', 'UTF-8');
+        ini_set('input_encoding', 'UTF-8');
+        ini_set('default_charset', 'UTF-8');
     }
 
     /**
@@ -135,7 +129,7 @@ class Zend_Service_Audioscrobbler
      *
      * @param  string $field name of field to set
      * @param  string $value value to assign to the named field
-     * @return Zend_Service_Audioscrobbler Provides a fluent interface
+     * @return $this
      */
     public function set($field, $value)
     {
@@ -174,13 +168,17 @@ class Zend_Service_Audioscrobbler
              */
             require_once 'Zend/Http/Client/Exception.php';
             throw new Zend_Http_Client_Exception('Could not find: ' . $this->_client->getUri());
-        } elseif (preg_match('/No user exists with this name/', $responseBody)) {
+        }
+
+        if (preg_match('/No user exists with this name/', $responseBody)) {
             /**
              * @see Zend_Http_Client_Exception
              */
             require_once 'Zend/Http/Client/Exception.php';
             throw new Zend_Http_Client_Exception('No user exists with this name');
-        } elseif (!$response->isSuccessful()) {
+        }
+
+        if (!$response->isSuccessful()) {
             /**
              * @see Zend_Http_Client_Exception
              */
@@ -188,7 +186,7 @@ class Zend_Service_Audioscrobbler
             throw new Zend_Http_Client_Exception('The web service ' . $this->_client->getUri() . ' returned the following status code: ' . $response->getStatus());
         }
 
-        set_error_handler(array($this, '_errorHandler'));
+        set_error_handler([$this, '_errorHandler']);
 
         if (!$simpleXmlElementResponse = Zend_Xml_Security::scan($responseBody)) {
             restore_error_handler();
@@ -210,7 +208,7 @@ class Zend_Service_Audioscrobbler
     /**
     * Utility function to get Audioscrobbler profile information (eg: Name, Gender)
      *
-    * @return array containing information
+    * @return SimpleXMLElement containing information
     */
     public function userGetProfileInformation()
     {
@@ -221,7 +219,7 @@ class Zend_Service_Audioscrobbler
     /**
      * Utility function get this user's 50 most played artists
      *
-     * @return array containing info
+     * @return SimpleXMLElement containing info
     */
     public function userGetTopArtists()
     {
@@ -242,7 +240,8 @@ class Zend_Service_Audioscrobbler
 
     /**
      * Utility function to get this user's 50 most played tracks
-     * @return SimpleXML object containing resut set
+     *
+     * @return SimpleXMLElement object containing resut set
     */
     public function userGetTopTracks()
     {
@@ -650,13 +649,13 @@ class Zend_Service_Audioscrobbler
      */
     public function _errorHandler($errno, $errstr, $errfile, $errline, array $errcontext)
     {
-        $this->_error = array(
+        $this->_error = [
             'errno'      => $errno,
             'errstr'     => $errstr,
             'errfile'    => $errfile,
             'errline'    => $errline,
             'errcontext' => $errcontext
-            );
+            ];
     }
 
     /**

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -35,7 +38,7 @@ require_once 'Zend/Service/StrikeIron/Decorator.php';
  * @group      Zend_Service
  * @group      Zend_Service_StrikeIron
  */
-class Zend_Service_StrikeIron_DecoratorTest extends PHPUnit_Framework_TestCase
+class Zend_Service_StrikeIron_DecoratorTest extends TestCase
 {
     public function testNoNoticesWhenDecoratedObjectIsNotAnObject()
     {
@@ -52,31 +55,31 @@ class Zend_Service_StrikeIron_DecoratorTest extends PHPUnit_Framework_TestCase
 
     public function testDecoratorReturnsPropertyByItsName()
     {
-        $object = (object)array('Foo' => 'bar',
-                                'Baz' => 'qux');
+        $object = (object)['Foo' => 'bar',
+                                'Baz' => 'qux'];
         $decorator = new Zend_Service_StrikeIron_Decorator($object);
         $this->assertEquals('qux', $decorator->Baz);
     }
 
     public function testDecoratorReturnsPropertyByInflectedName()
     {
-        $object = (object)array('Foo' => 'bar',
-                                'Baz' => 'qux');
+        $object = (object)['Foo' => 'bar',
+                                'Baz' => 'qux'];
         $decorator = new Zend_Service_StrikeIron_Decorator($object);
         $this->assertEquals('qux', $decorator->baz);
     }
 
     public function testDecoratorTriesActualPropertyNameBeforeInflecting()
     {
-        $object = (object)array('foo' => 'bar',
-                                'Foo' => 'qux');
+        $object = (object)['foo' => 'bar',
+                                'Foo' => 'qux'];
         $decorator = new Zend_Service_StrikeIron_Decorator($object);
         $this->assertEquals('bar', $decorator->foo);
     }
 
     public function testDecoratorReturnsAnotherDecoratorWhenValueIsAnObject()
     {
-        $object = (object)array('Foo' => new stdclass);
+        $object = (object)['Foo' => new stdclass()];
         $decorator = new Zend_Service_StrikeIron_Decorator($object);
         $class = get_class($decorator);
         $this->assertTrue($decorator->Foo instanceof $class);

@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -40,28 +43,28 @@ require_once 'Zend/Queue/Adapter/ActivemqTest.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Queue
  */
-class Zend_Queue_FactoryTest extends PHPUnit_Framework_TestCase
+class Zend_Queue_FactoryTest extends TestCase
 {
-    protected function setUp()
+    protected function set_up()
     {
         date_default_timezone_set('GMT');
     }
 
     public function testDb()
     {
-        if ( TESTS_ZEND_QUEUE_DB === false ) {
+        if (TESTS_ZEND_QUEUE_DB === false) {
             $this->markTestSkipped('Db setup required');
         }
 
         $options = json_decode(TESTS_ZEND_QUEUE_DB, true);
 
-        $config = array('name'          => 'queue1',
-                        'driverOptions' => array('host'     => $options['host'],
+        $config = ['name' => 'queue1',
+                        'driverOptions' => ['host' => $options['host'],
                                                  'username' => $options['username'],
                                                  'password' => $options['password'],
-                                                 'dbname'   => $options['dbname'],
-                                                 'type'     => $options['type'],
-                                                 'port'     => $options['port'])); // optional parameter
+                                                 'dbname' => $options['dbname'],
+                                                 'type' => $options['type'],
+                                                 'port' => $options['port']]]; // optional parameter
 
         $adapter = new Zend_Queue('Db', $config);
 
@@ -70,14 +73,14 @@ class Zend_Queue_FactoryTest extends PHPUnit_Framework_TestCase
 
     public function testMemcacheq()
     {
-        if ( TESTS_ZEND_QUEUE_MEMCACHEQ_HOST === false ||
-             TESTS_ZEND_QUEUE_MEMCACHEQ_PORT === false ) {
+        if (TESTS_ZEND_QUEUE_MEMCACHEQ_HOST === false ||
+             TESTS_ZEND_QUEUE_MEMCACHEQ_PORT === false) {
             $this->markTestSkipped('MemcacheQ setup required');
         }
 
-        $config = array('name'          => 'queue1',
-                        'driverOptions' => array('host' => TESTS_ZEND_QUEUE_MEMCACHEQ_HOST,
-                                                 'port' => TESTS_ZEND_QUEUE_MEMCACHEQ_PORT));
+        $config = ['name' => 'queue1',
+                        'driverOptions' => ['host' => TESTS_ZEND_QUEUE_MEMCACHEQ_HOST,
+                                                 'port' => TESTS_ZEND_QUEUE_MEMCACHEQ_PORT]];
 
         $adapter = new Zend_Queue('Memcacheq', $config);
 
@@ -86,18 +89,18 @@ class Zend_Queue_FactoryTest extends PHPUnit_Framework_TestCase
 
     public function testActivemq()
     {
-        if ( TESTS_ZEND_QUEUE_ACTIVEMQ_SCHEME === false ||
+        if (TESTS_ZEND_QUEUE_ACTIVEMQ_SCHEME === false ||
              TESTS_ZEND_QUEUE_ACTIVEMQ_HOST === false ||
-             TESTS_ZEND_QUEUE_ACTIVEMQ_PORT === false ) {
+             TESTS_ZEND_QUEUE_ACTIVEMQ_PORT === false) {
             $this->markTestSkipped('ActiveMQ setup required');
         }
 
-        $config = array('name'          => 'queue1',
-                        'driverOptions' => array('host'     => TESTS_ZEND_QUEUE_ACTIVEMQ_HOST,
-                                                 'port'     => TESTS_ZEND_QUEUE_ACTIVEMQ_PORT,
-                                                 'scheme'   => TESTS_ZEND_QUEUE_ACTIVEMQ_SCHEME,
+        $config = ['name' => 'queue1',
+                        'driverOptions' => ['host' => TESTS_ZEND_QUEUE_ACTIVEMQ_HOST,
+                                                 'port' => TESTS_ZEND_QUEUE_ACTIVEMQ_PORT,
+                                                 'scheme' => TESTS_ZEND_QUEUE_ACTIVEMQ_SCHEME,
                                                  'username' => '',
-                                                 'password' => ''));
+                                                 'password' => '']];
 
         $adapter = new Zend_Queue('Activemq', $config);
 
@@ -106,8 +109,8 @@ class Zend_Queue_FactoryTest extends PHPUnit_Framework_TestCase
 
     public function testArray()
     {
-        $config = array('name'          => 'queue1',
-                        'driverOptions' => array());
+        $config = ['name' => 'queue1',
+                        'driverOptions' => []];
 
         $adapter = new Zend_Queue('Array', $config);
 

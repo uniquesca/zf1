@@ -29,20 +29,20 @@
  */
 class Zend_Mime
 {
-    const TYPE_OCTETSTREAM         = 'application/octet-stream';
-    const TYPE_TEXT                = 'text/plain';
-    const TYPE_HTML                = 'text/html';
-    const ENCODING_7BIT            = '7bit';
-    const ENCODING_8BIT            = '8bit';
-    const ENCODING_QUOTEDPRINTABLE = 'quoted-printable';
-    const ENCODING_BASE64          = 'base64';
-    const DISPOSITION_ATTACHMENT   = 'attachment';
-    const DISPOSITION_INLINE       = 'inline';
-    const LINELENGTH               = 72;
-    const LINEEND                  = "\n";
-    const MULTIPART_ALTERNATIVE    = 'multipart/alternative';
-    const MULTIPART_MIXED          = 'multipart/mixed';
-    const MULTIPART_RELATED        = 'multipart/related';
+    public const TYPE_OCTETSTREAM         = 'application/octet-stream';
+    public const TYPE_TEXT                = 'text/plain';
+    public const TYPE_HTML                = 'text/html';
+    public const ENCODING_7BIT            = '7bit';
+    public const ENCODING_8BIT            = '8bit';
+    public const ENCODING_QUOTEDPRINTABLE = 'quoted-printable';
+    public const ENCODING_BASE64          = 'base64';
+    public const DISPOSITION_ATTACHMENT   = 'attachment';
+    public const DISPOSITION_INLINE       = 'inline';
+    public const LINELENGTH               = 72;
+    public const LINEEND                  = "\n";
+    public const MULTIPART_ALTERNATIVE    = 'multipart/alternative';
+    public const MULTIPART_MIXED          = 'multipart/mixed';
+    public const MULTIPART_RELATED        = 'multipart/related';
 
     /**
      * Boundary
@@ -61,7 +61,7 @@ class Zend_Mime
      *
      * @var array
      */
-    public static $qpKeys = array(
+    public static $qpKeys = [
         "\x00",
         "\x01",
         "\x02",
@@ -223,12 +223,12 @@ class Zend_Mime
         "\xFD",
         "\xFE",
         "\xFF"
-    );
+    ];
 
     /**
      * @var array
      */
-    public static $qpReplaceValues = array(
+    public static $qpReplaceValues = [
         "=00",
         "=01",
         "=02",
@@ -390,7 +390,7 @@ class Zend_Mime
         "=FD",
         "=FE",
         "=FF"
-    );
+    ];
 
     /**
      * @var string
@@ -466,11 +466,12 @@ class Zend_Mime
      */
     private static function _encodeQuotedPrintable($str)
     {
-        $str = str_replace('=', '=3D', $str);
-        $str = str_replace(self::$qpKeys, self::$qpReplaceValues, $str);
-        $str = rtrim($str);
+        $str = str_replace(
+            array_merge(['='], self::$qpKeys),
+            array_merge(['=3D'], self::$qpReplaceValues),
+            $str);
 
-        return $str;
+        return rtrim($str);
     }
 
     /**
@@ -497,11 +498,11 @@ class Zend_Mime
 
         // Mail-Header required chars have to be encoded also:
         $str = str_replace(
-            array('?', ' ', '_', ','), array('=3F', '=20', '=5F', '=2C'), $str
+            ['?', ' ', '_', ','], ['=3F', '=20', '=5F', '=2C'], $str
         );
 
         // initialize first line, we need it anyways
-        $lines = array(0 => "");
+        $lines = [0 => ""];
 
         // Split encoded text into separate lines
         $tmp = "";
@@ -521,8 +522,9 @@ class Zend_Mime
                 }
                 $tmp = "";
             }
+
             // don't forget to append the rest to the last line
-            if (strlen($str) == 0) {
+            if (strlen($str) === 0) {
                 $lines[$currentLine] .= $tmp;
             }
         }
@@ -531,6 +533,7 @@ class Zend_Mime
         for ($i = 0; $i < count($lines); $i++) {
             $lines[$i] = " " . $prefix . $lines[$i] . "?=";
         }
+
         $str = trim(implode($lineEnd, $lines));
 
         return $str;

@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -37,17 +42,17 @@ require_once 'Zend/Search/Lucene.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Search_Lucene
  */
-class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
+class Zend_Search_Lucene_LuceneTest extends TestCase
 {
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
     private function _clearDirectory($dirName)
     {
-        if (!file_exists($dirName) || !is_dir($dirName))  {
+        if (!file_exists($dirName) || !is_dir($dirName)) {
             return;
         }
 
@@ -61,7 +66,7 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
         closedir($dir);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         $this->_clearDirectory(dirname(__FILE__) . '/_index/_files');
     }
@@ -177,7 +182,7 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
     {
         $index = Zend_Search_Lucene::open(dirname(__FILE__) . '/_indexSample/_files');
 
-        $this->assertTrue(array_values($index->getFieldNames()) == array('path', 'modified', 'contents'));
+        $this->assertTrue(array_values($index->getFieldNames()) == ['path', 'modified', 'contents']);
     }
 
     public function testGetDocument()
@@ -202,8 +207,8 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
     {
         $index = Zend_Search_Lucene::open(dirname(__FILE__) . '/_indexSample/_files');
 
-        $this->assertTrue(array_values( $index->termDocs(new Zend_Search_Lucene_Index_Term('packages', 'contents')) ) ==
-                          array(0, 2, 6, 7, 8));
+        $this->assertTrue(array_values($index->termDocs(new Zend_Search_Lucene_Index_Term('packages', 'contents'))) ==
+                          [0, 2, 6, 7, 8]);
     }
 
     public function testTermPositions()
@@ -211,11 +216,11 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
         $index = Zend_Search_Lucene::open(dirname(__FILE__) . '/_indexSample/_files');
 
         $this->assertTrue($index->termPositions(new Zend_Search_Lucene_Index_Term('packages', 'contents')) ==
-                          array(0 => array(174),
-                                2 => array(40, 742),
-                                6 => array(6, 156, 163),
-                                7 => array(194),
-                                8 => array(55, 190, 405)));
+                          [0 => [174],
+                                2 => [40, 742],
+                                6 => [6, 156, 163],
+                                7 => [194],
+                                8 => [55, 190, 405]]);
     }
 
     public function testDocFreq()
@@ -293,20 +298,20 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
             if (is_dir($indexSourceDir . '/' . $file)) {
                 continue;
             }
-            if (strcasecmp(substr($file, strlen($file)-5), '.html') != 0) {
+            if (strcasecmp(substr($file, strlen($file) - 5), '.html') != 0) {
                 continue;
             }
 
             // Create new Document from a file
             $doc = new Zend_Search_Lucene_Document();
             $doc->addField(Zend_Search_Lucene_Field::Text('path', 'IndexSource/' . $file));
-            $doc->addField(Zend_Search_Lucene_Field::Keyword( 'modified', filemtime($indexSourceDir . '/' . $file) ));
+            $doc->addField(Zend_Search_Lucene_Field::Keyword('modified', filemtime($indexSourceDir . '/' . $file)));
 
-            $f = fopen($indexSourceDir . '/' . $file,'rb');
+            $f = fopen($indexSourceDir . '/' . $file, 'rb');
             $byteCount = filesize($indexSourceDir . '/' . $file);
 
             $data = '';
-            while ( $byteCount > 0 && ($nextBlock = fread($f, $byteCount)) != false ) {
+            while ($byteCount > 0 && ($nextBlock = fread($f, $byteCount)) != false) {
                 $data .= $nextBlock;
                 $byteCount -= strlen($nextBlock);
             }
@@ -340,20 +345,20 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
             if (is_dir($indexSourceDir . '/' . $file)) {
                 continue;
             }
-            if (strcasecmp(substr($file, strlen($file)-5), '.html') != 0) {
+            if (strcasecmp(substr($file, strlen($file) - 5), '.html') != 0) {
                 continue;
             }
 
             // Create new Document from a file
             $doc = new Zend_Search_Lucene_Document();
             $doc->addField(Zend_Search_Lucene_Field::Keyword('path', 'IndexSource/' . $file));
-            $doc->addField(Zend_Search_Lucene_Field::Keyword( 'modified', filemtime($indexSourceDir . '/' . $file) ));
+            $doc->addField(Zend_Search_Lucene_Field::Keyword('modified', filemtime($indexSourceDir . '/' . $file)));
 
-            $f = fopen($indexSourceDir . '/' . $file,'rb');
+            $f = fopen($indexSourceDir . '/' . $file, 'rb');
             $byteCount = filesize($indexSourceDir . '/' . $file);
 
             $data = '';
-            while ( $byteCount > 0 && ($nextBlock = fread($f, $byteCount)) != false ) {
+            while ($byteCount > 0 && ($nextBlock = fread($f, $byteCount)) != false) {
                 $data .= $nextBlock;
                 $byteCount -= strlen($nextBlock);
             }
@@ -398,7 +403,7 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
     {
         $index = Zend_Search_Lucene::open(dirname(__FILE__) . '/_indexSample/_files');
 
-        $terms = array();
+        $terms = [];
 
         $index->resetTermsStream();
         while ($index->currentTerm() !== null) {
@@ -413,7 +418,7 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
     {
         $index = Zend_Search_Lucene::open(dirname(__FILE__) . '/_indexSample/_files');
 
-        $terms = array();
+        $terms = [];
 
         $index->resetTermsStream();
         $index->skipTo(new Zend_Search_Lucene_Index_Term('one', 'contents'));
@@ -430,7 +435,7 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
     {
         $index = Zend_Search_Lucene::open(dirname(__FILE__) . '/_indexSample/_files');
 
-        $terms = array();
+        $terms = [];
 
         $index->resetTermsStream();
         $index->skipTo(new Zend_Search_Lucene_Index_Term('one', 'contents'));
@@ -442,10 +447,10 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
         $index->closeTermsStream();
 
         $this->assertTrue($terms ==
-                          array(new Zend_Search_Lucene_Index_Term('one', 'contents'),
+                          [new Zend_Search_Lucene_Index_Term('one', 'contents'),
                                 new Zend_Search_Lucene_Index_Term('only', 'contents'),
                                 new Zend_Search_Lucene_Index_Term('open', 'contents'),
-                               ));
+                               ]);
     }
 
     public function testTermsStreamInterfaceSkipToTermsRetrievingZeroTermsCase()
@@ -564,7 +569,7 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
 
         $index = Zend_Search_Lucene::create(dirname(__FILE__) . '/_index/_files');
 
-        $document = new Zend_Search_Lucene_Document;
+        $document = new Zend_Search_Lucene_Document();
         $document->addField(Zend_Search_Lucene_Field::Keyword('_id', 'myId'));
         $document->addField(Zend_Search_Lucene_Field::Keyword('bla', 'blubb'));
         $index->addDocument($document);
@@ -576,6 +581,6 @@ class Zend_Search_Lucene_LuceneTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Search_Lucene_LuceneTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Search_Lucene_LuceneTest::main') {
     Zend_Search_Lucene_LuceneTest::main();
 }

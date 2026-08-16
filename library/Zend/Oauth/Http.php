@@ -39,7 +39,7 @@ class Zend_Oauth_Http
      *
      * @var array
      */
-    protected $_parameters = array();
+    protected $_parameters = [];
 
     /**
      * Reference to the Zend_Oauth_Consumer instance in use.
@@ -81,8 +81,8 @@ class Zend_Oauth_Http
      */
     public function __construct(
         Zend_Oauth_Consumer $consumer,
-        array $parameters = null,
-        Zend_Oauth_Http_Utility $utility = null
+        ?array $parameters = null,
+        ?Zend_Oauth_Http_Utility $utility = null
     ) {
         $this->_consumer = $consumer;
         $this->_preferredRequestScheme = $this->_consumer->getRequestScheme();
@@ -104,7 +104,7 @@ class Zend_Oauth_Http
      */
     public function setMethod($method)
     {
-        if (!in_array($method, array(Zend_Oauth::POST, Zend_Oauth::GET))) {
+        if (!in_array($method, [Zend_Oauth::POST, Zend_Oauth::GET])) {
             require_once 'Zend/Oauth/Exception.php';
             throw new Zend_Oauth_Exception('invalid HTTP method: ' . $method);
         }
@@ -216,11 +216,11 @@ class Zend_Oauth_Http
      * Manages the switch from OAuth request scheme to another lower preference
      * scheme during a request cycle.
      *
-     * @param  Zend_Http_Response
+     * @param  Zend_Http_Response $response
      * @return void
      * @throws Zend_Oauth_Exception if unable to retrieve valid token response
      */
-    protected function _assessRequestAttempt(Zend_Http_Response $response = null)
+    protected function _assessRequestAttempt(?Zend_Http_Response $response = null)
     {
         switch ($this->_preferredRequestScheme) {
             case Zend_Oauth::REQUEST_SCHEME_HEADER:
@@ -250,7 +250,7 @@ class Zend_Oauth_Http
      */
     protected function _toAuthorizationHeader(array $params, $realm = null)
     {
-        $headerValue = array();
+        $headerValue = [];
         $headerValue[] = 'OAuth realm="' . $realm . '"';
         foreach ($params as $key => $value) {
             if (!preg_match("/^oauth_/", $key)) {

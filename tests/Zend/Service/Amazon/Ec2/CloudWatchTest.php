@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -36,8 +39,12 @@ require_once 'Zend/Http/Client/Adapter/Test.php';
  * @group      Zend_Service_Amazon
  * @group      Zend_Service_Amazon_Ec2
  */
-class Zend_Service_Amazon_Ec2_CloudWatchTest extends PHPUnit_Framework_TestCase
+class Zend_Service_Amazon_Ec2_CloudWatchTest extends TestCase
 {
+    /**
+     * @var \Zend_Http_Client_Adapter_Test|mixed
+     */
+    protected $adapter;
 
     /**
      * @var Zend_Service_Amazon_Ec2_CloudWatch
@@ -47,14 +54,14 @@ class Zend_Service_Amazon_Ec2_CloudWatchTest extends PHPUnit_Framework_TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    protected function set_up()
     {
-        parent::setUp();
+        parent::set_up();
         $this->Zend_Service_Amazon_Ec2_CloudWatch = new Zend_Service_Amazon_Ec2_CloudWatch('access_key', 'secret_access_key');
         $adapter = new Zend_Http_Client_Adapter_Test();
-        $client = new Zend_Http_Client(null, array(
+        $client = new Zend_Http_Client(null, [
             'adapter' => $adapter
-        ));
+        ]);
         $this->adapter = $adapter;
         Zend_Service_Amazon_Ec2_CloudWatch::setHttpClient($client);
     }
@@ -62,12 +69,12 @@ class Zend_Service_Amazon_Ec2_CloudWatchTest extends PHPUnit_Framework_TestCase
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown()
+    protected function tear_down()
     {
         unset($this->adapter);
         $this->Zend_Service_Amazon_Ec2_CloudWatch = null;
 
-        parent::tearDown();
+        parent::tear_down();
     }
 
     /**
@@ -84,49 +91,48 @@ class Zend_Service_Amazon_Ec2_CloudWatchTest extends PHPUnit_Framework_TestCase
                     . "Expires: Tue, 31 Mar 1981 05:00:00 GMT\r\n"
                     . "Connection: close\r\n"
                     . "\r\n"
-                    ."<GetMetricStatisticsResponse xmlns=\"http://monitoring.amazonaws.com/doc/2009-05-15/\">\r\n"
-                    ."  <GetMetricStatisticsResult>\r\n"
-                    ."    <Datapoints>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-06-16T23:57:00Z</Timestamp>\r\n"
-                    ."        <Unit>Bytes</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>14838.0</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-06-17T00:16:00Z</Timestamp>\r\n"
-                    ."        <Unit>Bytes</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>18251.0</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."    </Datapoints>\r\n"
-                    ."    <Label>NetworkIn</Label>"
-                    ."  </GetMetricStatisticsResult>\r\n"
-                    ."</GetMetricStatisticsResponse>\r\n";
+                    . "<GetMetricStatisticsResponse xmlns=\"http://monitoring.amazonaws.com/doc/2009-05-15/\">\r\n"
+                    . "  <GetMetricStatisticsResult>\r\n"
+                    . "    <Datapoints>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-06-16T23:57:00Z</Timestamp>\r\n"
+                    . "        <Unit>Bytes</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>14838.0</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-06-17T00:16:00Z</Timestamp>\r\n"
+                    . "        <Unit>Bytes</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>18251.0</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "    </Datapoints>\r\n"
+                    . "    <Label>NetworkIn</Label>"
+                    . "  </GetMetricStatisticsResult>\r\n"
+                    . "</GetMetricStatisticsResponse>\r\n";
         $this->adapter->setResponse($rawHttpResponse);
 
-        $return = $this->Zend_Service_Amazon_Ec2_CloudWatch->getMetricStatistics(array('MeasureName' => 'NetworkIn', 'Statistics' => array('Average')));
+        $return = $this->Zend_Service_Amazon_Ec2_CloudWatch->getMetricStatistics(['MeasureName' => 'NetworkIn', 'Statistics' => ['Average']]);
 
-        $arrReturn = array(
-            'label'         => 'NetworkIn',
-            'datapoints'    => array(
-                array(
-                    'Timestamp'     => '2009-06-16T23:57:00Z',
-                    'Unit'          => 'Bytes',
-                    'Samples'       => '1.0',
-                    'Average'       => '14838.0',
-                ),
-                array(
-                    'Timestamp'     => '2009-06-17T00:16:00Z',
-                    'Unit'          => 'Bytes',
-                    'Samples'       => '1.0',
-                    'Average'       => '18251.0',
-                )
-            )
-        );
+        $arrReturn = [
+            'label' => 'NetworkIn',
+            'datapoints' => [
+                [
+                    'Timestamp' => '2009-06-16T23:57:00Z',
+                    'Unit' => 'Bytes',
+                    'Samples' => '1.0',
+                    'Average' => '14838.0',
+                ],
+                [
+                    'Timestamp' => '2009-06-17T00:16:00Z',
+                    'Unit' => 'Bytes',
+                    'Samples' => '1.0',
+                    'Average' => '18251.0',
+                ]
+            ]
+        ];
 
         $this->assertSame($arrReturn, $return);
-
     }
 
     /**
@@ -143,71 +149,70 @@ class Zend_Service_Amazon_Ec2_CloudWatchTest extends PHPUnit_Framework_TestCase
                     . "Expires: Tue, 31 Mar 1981 05:00:00 GMT\r\n"
                     . "Connection: close\r\n"
                     . "\r\n"
-                    ."<ListMetricsResponse xmlns=\"http://monitoring.amazonaws.com/doc/2009-05-15/\">\r\n"
-                    ."  <ListMetricsResult>\r\n"
-                    ."    <Metrics>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Dimensions>\r\n"
-                    ."          <member>\r\n"
-                    ."            <Name>InstanceId</Name>\r\n"
-                    ."            <Value>i-bec576d7</Value>\r\n"
-                    ."          </member>\r\n"
-                    ."        </Dimensions>\r\n"
-                    ."        <MeasureName>NetworkIn</MeasureName>\r\n"
-                    ."        <Namespace>AWS/EC2</Namespace>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Dimensions>\r\n"
-                    ."          <member>\r\n"
-                    ."            <Name>InstanceId</Name>\r\n"
-                    ."            <Value>i-bec576d7</Value>\r\n"
-                    ."          </member>\r\n"
-                    ."        </Dimensions>\r\n"
-                    ."        <MeasureName>CPUUtilization</MeasureName>\r\n"
-                    ."        <Namespace>AWS/EC2</Namespace>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Dimensions/>\r\n"
-                    ."        <MeasureName>NetworkIn</MeasureName>\r\n"
-                    ."        <Namespace>AWS/EC2</Namespace>\r\n"
-                    ."      </member>\r\n"
-                    ."    </Metrics>\r\n"
-                    ."  </ListMetricsResult>\r\n"
-                    ."</ListMetricsResponse>\r\n";
+                    . "<ListMetricsResponse xmlns=\"http://monitoring.amazonaws.com/doc/2009-05-15/\">\r\n"
+                    . "  <ListMetricsResult>\r\n"
+                    . "    <Metrics>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Dimensions>\r\n"
+                    . "          <member>\r\n"
+                    . "            <Name>InstanceId</Name>\r\n"
+                    . "            <Value>i-bec576d7</Value>\r\n"
+                    . "          </member>\r\n"
+                    . "        </Dimensions>\r\n"
+                    . "        <MeasureName>NetworkIn</MeasureName>\r\n"
+                    . "        <Namespace>AWS/EC2</Namespace>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Dimensions>\r\n"
+                    . "          <member>\r\n"
+                    . "            <Name>InstanceId</Name>\r\n"
+                    . "            <Value>i-bec576d7</Value>\r\n"
+                    . "          </member>\r\n"
+                    . "        </Dimensions>\r\n"
+                    . "        <MeasureName>CPUUtilization</MeasureName>\r\n"
+                    . "        <Namespace>AWS/EC2</Namespace>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Dimensions/>\r\n"
+                    . "        <MeasureName>NetworkIn</MeasureName>\r\n"
+                    . "        <Namespace>AWS/EC2</Namespace>\r\n"
+                    . "      </member>\r\n"
+                    . "    </Metrics>\r\n"
+                    . "  </ListMetricsResult>\r\n"
+                    . "</ListMetricsResponse>\r\n";
         $this->adapter->setResponse($rawHttpResponse);
 
         $return = $this->Zend_Service_Amazon_Ec2_CloudWatch->listMetrics();
 
-        $arrReturn = array(
-            array(
-                'MeasureName'   => 'NetworkIn',
-                'Namespace'     => 'AWS/EC2',
-                'Deminsions'    => array(
-                    'name'      => 'InstanceId',
-                    'value'     => 'i-bec576d7'
-                )
-            ),
-            array(
-                'MeasureName'   => 'CPUUtilization',
-                'Namespace'     => 'AWS/EC2',
-                'Deminsions'    => array(
-                    'name'      => 'InstanceId',
-                    'value'     => 'i-bec576d7'
-                )
-            ),
-            array(
-                'MeasureName'   => 'NetworkIn',
-                'Namespace'     => 'AWS/EC2',
-                'Deminsions'    => array()
-            )
-        );
+        $arrReturn = [
+            [
+                'MeasureName' => 'NetworkIn',
+                'Namespace' => 'AWS/EC2',
+                'Deminsions' => [
+                    'name' => 'InstanceId',
+                    'value' => 'i-bec576d7'
+                ]
+            ],
+            [
+                'MeasureName' => 'CPUUtilization',
+                'Namespace' => 'AWS/EC2',
+                'Deminsions' => [
+                    'name' => 'InstanceId',
+                    'value' => 'i-bec576d7'
+                ]
+            ],
+            [
+                'MeasureName' => 'NetworkIn',
+                'Namespace' => 'AWS/EC2',
+                'Deminsions' => []
+            ]
+        ];
 
         $this->assertSame($arrReturn, $return);
     }
 
     public function testZF8149()
     {
-
         $rawHttpResponse = "HTTP/1.1 200 OK\r\n"
                     . "Date: Fri, 24 Oct 2008 17:24:52 GMT\r\n"
                     . "Server: hi\r\n"
@@ -217,102 +222,100 @@ class Zend_Service_Amazon_Ec2_CloudWatchTest extends PHPUnit_Framework_TestCase
                     . "Expires: Tue, 31 Mar 1981 05:00:00 GMT\r\n"
                     . "Connection: close\r\n"
                     . "\r\n"
-                    ."<GetMetricStatisticsResponse xmlns=\"http://monitoring.amazonaws.com/doc/2009-05-15/\">\r\n"
-                    ."  <GetMetricStatisticsResult>\r\n"
-                    ."    <Datapoints>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-11-19T21:52:00Z</Timestamp>\r\n"
-                    ."        <Unit>Percent</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>0.09</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-11-19T21:55:00Z</Timestamp>\r\n"
-                    ."        <Unit>Percent</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>0.18</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-11-19T21:54:00Z</Timestamp>\r\n"
-                    ."        <Unit>Percent</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>0.09</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-11-19T21:51:00Z</Timestamp>\r\n"
-                    ."        <Unit>Percent</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>0.18</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."      <member>\r\n"
-                    ."        <Timestamp>2009-11-19T21:53:00Z</Timestamp>\r\n"
-                    ."        <Unit>Percent</Unit>\r\n"
-                    ."        <Samples>1.0</Samples>\r\n"
-                    ."        <Average>0.09</Average>\r\n"
-                    ."      </member>\r\n"
-                    ."    </Datapoints>\r\n"
-                    ."    <Label>CPUUtilization</Label>\r\n"
-                    ."  </GetMetricStatisticsResult>\r\n"
-                    ."  <ResponseMetadata>\r\n"
-                    ."    <RequestId>6fb864fd-d557-11de-ac37-475775222f21</RequestId>\r\n"
-                    ."  </ResponseMetadata>\r\n"
-                    ."</GetMetricStatisticsResponse>";
+                    . "<GetMetricStatisticsResponse xmlns=\"http://monitoring.amazonaws.com/doc/2009-05-15/\">\r\n"
+                    . "  <GetMetricStatisticsResult>\r\n"
+                    . "    <Datapoints>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-11-19T21:52:00Z</Timestamp>\r\n"
+                    . "        <Unit>Percent</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>0.09</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-11-19T21:55:00Z</Timestamp>\r\n"
+                    . "        <Unit>Percent</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>0.18</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-11-19T21:54:00Z</Timestamp>\r\n"
+                    . "        <Unit>Percent</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>0.09</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-11-19T21:51:00Z</Timestamp>\r\n"
+                    . "        <Unit>Percent</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>0.18</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "      <member>\r\n"
+                    . "        <Timestamp>2009-11-19T21:53:00Z</Timestamp>\r\n"
+                    . "        <Unit>Percent</Unit>\r\n"
+                    . "        <Samples>1.0</Samples>\r\n"
+                    . "        <Average>0.09</Average>\r\n"
+                    . "      </member>\r\n"
+                    . "    </Datapoints>\r\n"
+                    . "    <Label>CPUUtilization</Label>\r\n"
+                    . "  </GetMetricStatisticsResult>\r\n"
+                    . "  <ResponseMetadata>\r\n"
+                    . "    <RequestId>6fb864fd-d557-11de-ac37-475775222f21</RequestId>\r\n"
+                    . "  </ResponseMetadata>\r\n"
+                    . "</GetMetricStatisticsResponse>";
         $this->adapter->setResponse($rawHttpResponse);
 
         $return = $this->Zend_Service_Amazon_Ec2_CloudWatch->getMetricStatistics(
-            array(
-            	'MeasureName' => 'CPUUtilization',
-             	'Statistics' =>  array('Average'),
-             	'Dimensions'=>   array('InstanceId'=>'i-93ba31fa'),
-             	'StartTime'=>    '2009-11-19T21:51:57+00:00',
-             	'EndTime'=>      '2009-11-19T21:56:57+00:00'
-           )
+            [
+                'MeasureName' => 'CPUUtilization',
+                 'Statistics' => ['Average'],
+                 'Dimensions' => ['InstanceId' => 'i-93ba31fa'],
+                 'StartTime' => '2009-11-19T21:51:57+00:00',
+                 'EndTime' => '2009-11-19T21:56:57+00:00'
+           ]
         );
 
-        $arrReturn = array (
+        $arrReturn = [
           'label' => 'CPUUtilization',
           'datapoints' =>
-          array (
+          [
             0 =>
-            array (
+            [
               'Timestamp' => '2009-11-19T21:52:00Z',
               'Unit' => 'Percent',
               'Samples' => '1.0',
               'Average' => '0.09',
-            ),
+            ],
             1 =>
-            array (
+            [
               'Timestamp' => '2009-11-19T21:55:00Z',
               'Unit' => 'Percent',
               'Samples' => '1.0',
               'Average' => '0.18',
-            ),
+            ],
             2 =>
-            array (
+            [
               'Timestamp' => '2009-11-19T21:54:00Z',
               'Unit' => 'Percent',
               'Samples' => '1.0',
               'Average' => '0.09',
-            ),
+            ],
             3 =>
-            array (
+            [
               'Timestamp' => '2009-11-19T21:51:00Z',
               'Unit' => 'Percent',
               'Samples' => '1.0',
               'Average' => '0.18',
-            ),
+            ],
             4 =>
-            array (
+            [
               'Timestamp' => '2009-11-19T21:53:00Z',
               'Unit' => 'Percent',
               'Samples' => '1.0',
               'Average' => '0.09',
-            ),
-          ),
-        );
+            ],
+          ],
+        ];
 
         $this->assertSame($arrReturn, $return);
     }
-
 }
-

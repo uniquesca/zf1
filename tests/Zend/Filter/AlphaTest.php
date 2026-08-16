@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -35,7 +38,7 @@ require_once 'Zend/Filter/Alpha.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Filter
  */
-class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
+class Zend_Filter_AlphaTest extends TestCase
 {
     /**
      * Zend_Filter_Alpha object
@@ -70,7 +73,7 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->_filter = new Zend_Filter_Alpha();
         if (null === self::$_unicodeEnabled) {
@@ -78,9 +81,10 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
         }
         if (null === self::$_meansEnglishAlphabet) {
             $this->_locale = new Zend_Locale('auto');
-            self::$_meansEnglishAlphabet = in_array($this->_locale->getLanguage(),
-                                                    array('ja')
-                                                    );
+            self::$_meansEnglishAlphabet = in_array(
+                $this->_locale->getLanguage(),
+                ['ja']
+            );
         }
     }
 
@@ -93,13 +97,13 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
     {
         if (!self::$_unicodeEnabled) {
             // POSIX named classes are not supported, use alternative a-zA-Z match
-            $valuesExpected = array(
-                'abc123'        => 'abc',
-                'abc 123'       => 'abc',
-                'abcxyz'        => 'abcxyz',
-                ''              => ''
-                );
-        } else if (self::$_meansEnglishAlphabet) {
+            $valuesExpected = [
+                'abc123' => 'abc',
+                'abc 123' => 'abc',
+                'abcxyz' => 'abcxyz',
+                '' => ''
+                ];
+        } elseif (self::$_meansEnglishAlphabet) {
             //The Alphabet means english alphabet.
             /**
              * The first element contains multibyte alphabets.
@@ -109,25 +113,25 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
              * The forth  contains various multibyte or singlebyte characters.
              * The last contains only singlebyte alphabets.
              */
-            $valuesExpected = array(
-                'aＡBｂc'  => 'aBc',
-                'z Ｙ　x'  => 'zx',
+            $valuesExpected = [
+                'aＡBｂc' => 'aBc',
+                'z Ｙ　x' => 'zx',
                 'Ｗ1v３Ｕ4t' => 'vt',
                 '，sй.rλ:qν＿p' => 'srqp',
                 'onml' => 'onml'
-                );
+                ];
         } else {
             //The Alphabet means each language's alphabet.
-            $valuesExpected = array(
-                'abc123'        => 'abc',
-                'abc 123'       => 'abc',
-                'abcxyz'        => 'abcxyz',
-                'četně'         => 'četně',
-                'لعربية'        => 'لعربية',
-                'grzegżółka'    => 'grzegżółka',
-                'België'        => 'België',
-                ''              => ''
-                );
+            $valuesExpected = [
+                'abc123' => 'abc',
+                'abc 123' => 'abc',
+                'abcxyz' => 'abcxyz',
+                'četně' => 'četně',
+                'لعربية' => 'لعربية',
+                'grzegżółka' => 'grzegżółka',
+                'België' => 'België',
+                '' => ''
+                ];
         }
 
         foreach ($valuesExpected as $input => $output) {
@@ -135,7 +139,7 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
                 $output,
                 $result = $this->_filter->filter($input),
                 "Expected '$input' to filter to '$output', but received '$result' instead"
-                );
+            );
         }
     }
 
@@ -149,34 +153,35 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
         $this->_filter->setAllowWhiteSpace(true);
         if (!self::$_unicodeEnabled) {
             // POSIX named classes are not supported, use alternative a-zA-Z match
-            $valuesExpected = array(
-                'abc123'        => 'abc',
-                'abc 123'       => 'abc ',
-                'abcxyz'        => 'abcxyz',
-                ''              => '',
-                "\n"            => "\n",
-                " \t "          => " \t "
-                );
-        } if (self::$_meansEnglishAlphabet) {
+            $valuesExpected = [
+                'abc123' => 'abc',
+                'abc 123' => 'abc ',
+                'abcxyz' => 'abcxyz',
+                '' => '',
+                "\n" => "\n",
+                " \t " => " \t "
+                ];
+        }
+        if (self::$_meansEnglishAlphabet) {
             //The Alphabet means english alphabet.
-            $valuesExpected = array(
-                'a B'  => 'a B',
-                'zＹ　x'  => 'zx'
-                );
+            $valuesExpected = [
+                'a B' => 'a B',
+                'zＹ　x' => 'zx'
+                ];
         } else {
             //The Alphabet means each language's alphabet.
-            $valuesExpected = array(
-                'abc123'        => 'abc',
-                'abc 123'       => 'abc ',
-                'abcxyz'        => 'abcxyz',
-                'četně'         => 'četně',
-                'لعربية'        => 'لعربية',
-                'grzegżółka'    => 'grzegżółka',
-                'België'        => 'België',
-                ''              => '',
-                "\n"            => "\n",
-                " \t "          => " \t "
-                );
+            $valuesExpected = [
+                'abc123' => 'abc',
+                'abc 123' => 'abc ',
+                'abcxyz' => 'abcxyz',
+                'četně' => 'četně',
+                'لعربية' => 'لعربية',
+                'grzegżółka' => 'grzegżółka',
+                'België' => 'België',
+                '' => '',
+                "\n" => "\n",
+                " \t " => " \t "
+                ];
         }
 
         foreach ($valuesExpected as $input => $output) {
@@ -184,7 +189,7 @@ class Zend_Filter_AlphaTest extends PHPUnit_Framework_TestCase
                 $output,
                 $result = $this->_filter->filter($input),
                 "Expected '$input' to filter to '$output', but received '$result' instead"
-                );
+            );
         }
     }
 }

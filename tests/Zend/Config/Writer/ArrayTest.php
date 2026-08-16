@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -38,61 +41,61 @@ require_once 'Zend/Config/Writer/Array.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Config
  */
-class Zend_Config_Writer_ArrayTest extends PHPUnit_Framework_TestCase
+class Zend_Config_Writer_ArrayTest extends TestCase
 {
     protected $_tempName;
 
-    public function setUp()
+    protected function set_up()
     {
         $this->_tempName = tempnam(dirname(__FILE__) . '/temp', 'tmp');
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         @unlink($this->_tempName);
     }
 
     public function testNoFilenameSet()
     {
-        $writer = new Zend_Config_Writer_Array(array('config' => new Zend_Config(array())));
+        $writer = new Zend_Config_Writer_Array(['config' => new Zend_Config([])]);
 
         try {
             $writer->write();
             $this->fail('An expected Zend_Config_Exception has not been raised');
         } catch (Zend_Config_Exception $expected) {
-            $this->assertContains('No filename was set', $expected->getMessage());
+            $this->assertStringContainsString('No filename was set', $expected->getMessage());
         }
     }
 
     public function testNoConfigSet()
     {
-        $writer = new Zend_Config_Writer_Array(array('filename' => $this->_tempName));
+        $writer = new Zend_Config_Writer_Array(['filename' => $this->_tempName]);
 
         try {
             $writer->write();
             $this->fail('An expected Zend_Config_Exception has not been raised');
         } catch (Zend_Config_Exception $expected) {
-            $this->assertContains('No config was set', $expected->getMessage());
+            $this->assertStringContainsString('No config was set', $expected->getMessage());
         }
     }
 
     public function testFileNotWritable()
     {
-        $writer = new Zend_Config_Writer_Array(array('config' => new Zend_Config(array()), 'filename' => '/../../../'));
+        $writer = new Zend_Config_Writer_Array(['config' => new Zend_Config([]), 'filename' => '/../../../']);
 
         try {
             $writer->write();
             $this->fail('An expected Zend_Config_Exception has not been raised');
         } catch (Zend_Config_Exception $expected) {
-            $this->assertContains('Could not write to file', $expected->getMessage());
+            $this->assertStringContainsString('Could not write to file', $expected->getMessage());
         }
     }
 
     public function testWriteAndRead()
     {
-        $config = new Zend_Config(array('test' => 'foo'));
+        $config = new Zend_Config(['test' => 'foo']);
 
-        $writer = new Zend_Config_Writer_Array(array('config' => $config, 'filename' => $this->_tempName));
+        $writer = new Zend_Config_Writer_Array(['config' => $config, 'filename' => $this->_tempName]);
         $writer->write();
 
         $config = new Zend_Config(include $this->_tempName);
@@ -102,7 +105,7 @@ class Zend_Config_Writer_ArrayTest extends PHPUnit_Framework_TestCase
 
     public function testArgumentOverride()
     {
-        $config = new Zend_Config(array('test' => 'foo'));
+        $config = new Zend_Config(['test' => 'foo']);
 
         $writer = new Zend_Config_Writer_Array();
         $writer->write($this->_tempName, $config);
@@ -117,7 +120,7 @@ class Zend_Config_Writer_ArrayTest extends PHPUnit_Framework_TestCase
      */
     public function testRender()
     {
-        $config = new Zend_Config(array('test' => 'foo', 'bar' => array(0 => 'baz', 1 => 'foo')));
+        $config = new Zend_Config(['test' => 'foo', 'bar' => [0 => 'baz', 1 => 'foo']]);
 
         $writer = new Zend_Config_Writer_Array();
         $configString = $writer->setConfig($config)->render();

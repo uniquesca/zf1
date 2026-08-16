@@ -101,7 +101,7 @@ class Zend_Gdata_Geo_Extension_GeoRssWhere extends Zend_Gdata_Extension
         $absoluteNodeName = $child->namespaceURI . ':' . $child->localName;
 
         switch ($absoluteNodeName) {
-            case $this->lookupNamespace('gml') . ':' . 'Point';
+            case $this->lookupNamespace('gml') . ':' . 'Point':
                 $point = new Zend_Gdata_Geo_Extension_GmlPoint();
                 $point->transferFromDOM($child);
                 $this->_point = $point;
@@ -124,7 +124,7 @@ class Zend_Gdata_Geo_Extension_GeoRssWhere extends Zend_Gdata_Extension
      * Set the value for this element's point attribute.
      *
      * @param Zend_Gdata_Geo_Extension_GmlPoint $value The desired value for this attribute.
-     * @return Zend_Gdata_Geo_Extension_GeoRssWhere Provides a fluent interface
+     * @return $this
      */
     public function setPoint($value)
     {

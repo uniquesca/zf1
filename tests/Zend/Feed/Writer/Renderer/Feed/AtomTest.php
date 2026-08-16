@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -33,14 +36,13 @@ require_once 'Zend/Version.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
+class Zend_Feed_Writer_Renderer_Feed_AtomTest extends TestCase
 {
-
     protected $_validWriter = null;
 
-    public function setUp()
+    protected function set_up()
     {
-        $this->_validWriter = new Zend_Feed_Writer_Feed;
+        $this->_validWriter = new Zend_Feed_Writer_Feed();
         $this->_validWriter->setTitle('This is a test feed.');
         $this->_validWriter->setDescription('This is a test description.');
         $this->_validWriter->setDateModified(1234567890);
@@ -51,20 +53,24 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->_validWriter->setType('atom');
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         $this->_validWriter = null;
     }
 
     public function testSetsWriterInConstructor()
     {
-        $writer = new Zend_Feed_Writer_Feed;
+        $writer = new Zend_Feed_Writer_Feed();
         $feed = new Zend_Feed_Writer_Renderer_Feed_Atom($writer);
         $this->assertTrue($feed->getDataContainer() instanceof Zend_Feed_Writer_Feed);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testBuildMethodRunsMinimalWriterContainerProperlyBeforeICheckAtomCompliance()
     {
+        // $this->expectException(Zend_Feed_Exception::class);
         $feed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         try {
             $feed->render();
@@ -98,11 +104,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('This is a test feed.', $feed->getTitle());
     }
 
-    /**
-     * @expectedException Zend_Feed_Exception
-     */
     public function testFeedTitleIfMissingThrowsException()
     {
+        $this->expectException(Zend_Feed_Exception::class);
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $this->_validWriter->remove('title');
         $atomFeed->render();
@@ -128,6 +132,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('This is a test description.', $feed->getDescription());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFeedSubtitleThrowsNoExceptionIfMissing()
     {
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
@@ -155,11 +162,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1234567890, $feed->getDateModified()->get(Zend_Date::TIMESTAMP));
     }
 
-    /**
-     * @expectedException Zend_Feed_Exception
-     */
     public function testFeedUpdatedDateIfMissingThrowsException()
     {
+        $this->expectException(Zend_Feed_Exception::class);
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $this->_validWriter->remove('dateModified');
         $atomFeed->render();
@@ -174,6 +179,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('FooFeedBuilder', $feed->getGenerator());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFeedGeneratorIfMissingThrowsNoException()
     {
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
@@ -210,6 +218,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('fr', $feed->getLanguage());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFeedLanguageIfMissingThrowsNoException()
     {
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
@@ -233,6 +244,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com', $feed->getLink());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFeedLinkToHtmlVersionOfFeedIfMissingThrowsNoExceptionIfIdSet()
     {
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
@@ -241,11 +255,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $atomFeed->render();
     }
 
-    /**
-     * @expectedException Zend_Feed_Exception
-     */
     public function testFeedLinkToHtmlVersionOfFeedIfMissingThrowsExceptionIfIdMissing()
     {
+        $this->expectException(Zend_Feed_Exception::class);
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $this->_validWriter->remove('link');
         $atomFeed->render();
@@ -259,11 +271,9 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com/atom', $feed->getFeedLink());
     }
 
-    /**
-     * @expectedException Zend_Feed_Exception
-     */
     public function testFeedLinkToXmlAtomWhereTheFeedWillBeAvailableIfMissingThrowsException()
     {
+        $this->expectException(Zend_Feed_Exception::class);
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $this->_validWriter->remove('feedLinks');
         $atomFeed->render();
@@ -275,10 +285,10 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
         $author = $feed->getAuthor();
-        $this->assertEquals(array(
-            'email'=>'joe@example.com',
-            'name'=>'Joe',
-            'uri'=>'http://www.example.com/joe'), $feed->getAuthor());
+        $this->assertEquals([
+            'email' => 'joe@example.com',
+            'name' => 'Joe',
+            'uri' => 'http://www.example.com/joe'], $feed->getAuthor());
     }
 
     /**
@@ -288,24 +298,30 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
     {
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $this->_validWriter->remove('authors');
-        $this->_validWriter->addAuthor(array(
-            'email'=>'<>&\'"áéíóú',
-            'name'=>'<>&\'"áéíóú',
-            'uri'=>'http://www.example.com/joe'));
+        $this->_validWriter->addAuthor([
+            'email' => '<>&\'"áéíóú',
+            'name' => '<>&\'"áéíóú',
+            'uri' => 'http://www.example.com/joe']);
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
         $author = $feed->getAuthor();
-        $this->assertEquals(array(
-            'email'=>'<>&\'"áéíóú',
-            'name'=>'<>&\'"áéíóú',
-            'uri'=>'http://www.example.com/joe'), $feed->getAuthor());
+        $this->assertEquals([
+            'email' => '<>&\'"áéíóú',
+            'name' => '<>&\'"áéíóú',
+            'uri' => 'http://www.example.com/joe'], $feed->getAuthor());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFeedAuthorIfNotSetThrowsExceptionIfAnyEntriesAlsoAreMissingAuthors()
     {
         $this->markTestIncomplete('Not yet implemented...');
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testFeedAuthorIfNotSetThrowsNoExceptionIfAllEntriesIncludeAtLeastOneAuthor()
     {
         $this->markTestIncomplete('Not yet implemented...');
@@ -357,76 +373,75 @@ class Zend_Feed_Writer_Renderer_Feed_AtomTest extends PHPUnit_Framework_TestCase
 
     public function testCategoriesCanBeSet()
     {
-        $this->_validWriter->addCategories(array(
-            array('term'=>'cat_dog', 'label' => 'Cats & Dogs', 'scheme' => 'http://example.com/schema1'),
-            array('term'=>'cat_dog2')
-        ));
+        $this->_validWriter->addCategories([
+            ['term' => 'cat_dog', 'label' => 'Cats & Dogs', 'scheme' => 'http://example.com/schema1'],
+            ['term' => 'cat_dog2']
+        ]);
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
-        $expected = array(
-            array('term'=>'cat_dog', 'label' => 'Cats & Dogs', 'scheme' => 'http://example.com/schema1'),
-            array('term'=>'cat_dog2', 'label' => 'cat_dog2', 'scheme' => null)
-        );
+        $expected = [
+            ['term' => 'cat_dog', 'label' => 'Cats & Dogs', 'scheme' => 'http://example.com/schema1'],
+            ['term' => 'cat_dog2', 'label' => 'cat_dog2', 'scheme' => null]
+        ];
         $this->assertEquals($expected, (array) $feed->getCategories());
     }
 
     public function testCategoriesCharDataEncoding()
     {
-        $this->_validWriter->addCategories(array(
-            array('term'=>'cat_dog', 'label' => '<>&\'"áéíóú', 'scheme' => 'http://example.com/schema1'),
-            array('term'=>'cat_dog2')
-        ));
+        $this->_validWriter->addCategories([
+            ['term' => 'cat_dog', 'label' => '<>&\'"áéíóú', 'scheme' => 'http://example.com/schema1'],
+            ['term' => 'cat_dog2']
+        ]);
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
-        $expected = array(
-            array('term'=>'cat_dog', 'label' => '<>&\'"áéíóú', 'scheme' => 'http://example.com/schema1'),
-            array('term'=>'cat_dog2', 'label' => 'cat_dog2', 'scheme' => null)
-        );
+        $expected = [
+            ['term' => 'cat_dog', 'label' => '<>&\'"áéíóú', 'scheme' => 'http://example.com/schema1'],
+            ['term' => 'cat_dog2', 'label' => 'cat_dog2', 'scheme' => null]
+        ];
         $this->assertEquals($expected, (array) $feed->getCategories());
     }
 
     public function testHubsCanBeSet()
     {
         $this->_validWriter->addHubs(
-            array('http://www.example.com/hub', 'http://www.example.com/hub2')
+            ['http://www.example.com/hub', 'http://www.example.com/hub2']
         );
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
-        $expected = array(
+        $expected = [
             'http://www.example.com/hub', 'http://www.example.com/hub2'
-        );
+        ];
         $this->assertEquals($expected, (array) $feed->getHubs());
     }
 
     public function testImageCanBeSet()
     {
         $this->_validWriter->setImage(
-            array('uri'=>'http://www.example.com/logo.gif')
+            ['uri' => 'http://www.example.com/logo.gif']
         );
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
-        $expected = array(
+        $expected = [
             'uri' => 'http://www.example.com/logo.gif'
-        );
+        ];
         $this->assertEquals($expected, $feed->getImage());
     }
 
     public function testIconCanBeSet()
     {
         $this->_validWriter->setIcon(
-            array('uri'=>'http://www.example.com/logo.gif')
+            ['uri' => 'http://www.example.com/logo.gif']
         );
         $atomFeed = new Zend_Feed_Writer_Renderer_Feed_Atom($this->_validWriter);
         $atomFeed->render();
         $feed = Zend_Feed_Reader::importString($atomFeed->saveXml());
-        $expected = array(
+        $expected = [
             'uri' => 'http://www.example.com/logo.gif'
-        );
+        ];
         $this->assertEquals($expected, $feed->getIcon());
     }
-
 }

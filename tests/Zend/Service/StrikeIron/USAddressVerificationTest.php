@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -40,12 +43,22 @@ require_once 'Zend/Service/StrikeIron/USAddressVerification.php';
  * @group      Zend_Service
  * @group      Zend_Service_StrikeIron
  */
-class Zend_Service_StrikeIron_USAddressVerificationTest extends PHPUnit_Framework_TestCase
+class Zend_Service_StrikeIron_USAddressVerificationTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \stdclass|mixed
+     */
+    protected $soapClient;
+
+    /**
+     * @var \Zend_Service_StrikeIron_USAddressVerification|mixed
+     */
+    protected $service;
+
+    protected function set_up()
     {
         $this->soapClient = new stdclass();
-        $this->service = new Zend_Service_StrikeIron_USAddressVerification(array('client' => $this->soapClient));
+        $this->service = new Zend_Service_StrikeIron_USAddressVerification(['client' => $this->soapClient]);
     }
 
     public function testInheritsFromBase()
@@ -61,8 +74,8 @@ class Zend_Service_StrikeIron_USAddressVerificationTest extends PHPUnit_Framewor
 
     public function testInstantiationFromFactory()
     {
-        $strikeIron = new Zend_Service_StrikeIron(array('client' => $this->soapClient));
-        $client = $strikeIron->getService(array('class' => 'USAddressVerification'));
+        $strikeIron = new Zend_Service_StrikeIron(['client' => $this->soapClient]);
+        $client = $strikeIron->getService(['class' => 'USAddressVerification']);
 
         $this->assertTrue($client instanceof Zend_Service_StrikeIron_USAddressVerification);
     }

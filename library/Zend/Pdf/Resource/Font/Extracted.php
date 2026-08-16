@@ -40,9 +40,9 @@ class Zend_Pdf_Resource_Font_Extracted extends Zend_Pdf_Resource_Font
     /**
      * Messages
      */
-    const TYPE_NOT_SUPPORTED = 'Unsupported font type.';
-    const ENCODING_NOT_SUPPORTED  = 'Font encoding is not supported';
-    const OPERATION_NOT_SUPPORTED = 'Operation is not supported for extracted fonts';
+    public const TYPE_NOT_SUPPORTED = 'Unsupported font type.';
+    public const ENCODING_NOT_SUPPORTED  = 'Font encoding is not supported';
+    public const OPERATION_NOT_SUPPORTED = 'Operation is not supported for extracted fonts';
 
     /**
      * Extracted font encoding
@@ -74,7 +74,7 @@ class Zend_Pdf_Resource_Font_Extracted extends Zend_Pdf_Resource_Font
         switch ($fontDictionary->Subtype->value) {
             case 'Type0':
                 // Composite type 0 font
-                if (count($fontDictionary->DescendantFonts->items) != 1) {
+                if (count($fontDictionary->DescendantFonts->items) !== 1) {
                     // Multiple descendant fonts are not supported
                     require_once 'Zend/Pdf/Exception.php';
                     throw new Zend_Pdf_Exception(self::TYPE_NOT_SUPPORTED);

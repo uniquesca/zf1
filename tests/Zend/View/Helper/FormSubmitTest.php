@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -40,8 +45,18 @@ require_once 'Zend/Registry.php';
  * @group      Zend_View
  * @group      Zend_View_Helper
  */
-class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
+class Zend_View_Helper_FormSubmitTest extends TestCase
 {
+    /**
+     * @var Zend_View
+     */
+    protected $view;
+
+    /**
+     * @var Zend_View_Helper_FormSubmit
+     */
+    protected $helper;
+
     /**
      * Runs the test methods of this class.
      *
@@ -49,8 +64,8 @@ class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_View_Helper_FormSubmitTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_View_Helper_FormSubmitTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -59,13 +74,13 @@ class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         if (Zend_Registry::isRegistered('Zend_View_Helper_Doctype')) {
             $registry = Zend_Registry::getInstance();
             unset($registry['Zend_View_Helper_Doctype']);
         }
-        $this->view   = new Zend_View();
+        $this->view = new Zend_View();
         $this->helper = new Zend_View_Helper_FormSubmit();
         $this->helper->setView($this->view);
     }
@@ -76,18 +91,18 @@ class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
         unset($this->helper, $this->view);
     }
 
     public function testRendersSubmitInput()
     {
-        $html = $this->helper->formSubmit(array(
-            'name'    => 'foo',
-            'value'   => 'Submit!',
-        ));
-        $this->assertRegexp('/<input[^>]*?(type="submit")/', $html);
+        $html = $this->helper->formSubmit([
+            'name' => 'foo',
+            'value' => 'Submit!',
+        ]);
+        $this->assertMatchesRegularExpression('/<input[^>]*?(type="submit")/', $html);
     }
 
     /**
@@ -95,12 +110,12 @@ class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
      */
     public function testCanDisableSubmitButton()
     {
-        $html = $this->helper->formSubmit(array(
-            'name'    => 'foo',
-            'value'   => 'Submit!',
-            'attribs' => array('disable' => true)
-        ));
-        $this->assertRegexp('/<input[^>]*?(disabled="disabled")/', $html);
+        $html = $this->helper->formSubmit([
+            'name' => 'foo',
+            'value' => 'Submit!',
+            'attribs' => ['disable' => true]
+        ]);
+        $this->assertMatchesRegularExpression('/<input[^>]*?(disabled="disabled")/', $html);
     }
 
     /**
@@ -108,24 +123,24 @@ class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
      */
     public function testValueAttributeIsAlwaysRendered()
     {
-        $html = $this->helper->formSubmit(array(
-            'name'    => 'foo',
-            'value'   => '',
-        ));
-        $this->assertRegexp('/<input[^>]*?(value="")/', $html);
+        $html = $this->helper->formSubmit([
+            'name' => 'foo',
+            'value' => '',
+        ]);
+        $this->assertMatchesRegularExpression('/<input[^>]*?(value="")/', $html);
     }
 
     public function testRendersAsHtmlByDefault()
     {
         $test = $this->helper->formSubmit('foo', 'bar');
-        $this->assertNotContains(' />', $test);
+        $this->assertStringNotContainsString(' />', $test);
     }
 
     public function testCanRendersAsXHtml()
     {
         $this->view->doctype('XHTML1_STRICT');
         $test = $this->helper->formSubmit('foo', 'bar');
-        $this->assertContains(' />', $test);
+        $this->assertStringContainsString(' />', $test);
     }
 
     /**
@@ -134,11 +149,11 @@ class Zend_View_Helper_FormSubmitTest extends PHPUnit_Framework_TestCase
     public function testDoesNotOutputEmptyId()
     {
         $test = $this->helper->formSubmit('', 'bar');
-        $this->assertNotContains('id=""', $test);
+        $this->assertStringNotContainsString('id=""', $test);
     }
 }
 
 // Call Zend_View_Helper_FormSubmitTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_View_Helper_FormSubmitTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_View_Helper_FormSubmitTest::main") {
     Zend_View_Helper_FormSubmitTest::main();
 }

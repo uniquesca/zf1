@@ -34,7 +34,6 @@ require_once 'Zend/Db/Statement/Pdo/TestCommon.php';
  */
 class Zend_Db_Statement_Pdo_IbmTest extends Zend_Db_Statement_Pdo_TestCommon
 {
-
     public function getDriver()
     {
         return 'Pdo_Ibm';
@@ -44,9 +43,9 @@ class Zend_Db_Statement_Pdo_IbmTest extends Zend_Db_Statement_Pdo_TestCommon
      * used by testStatementGetColumnMeta()
      *
      */
-    protected $_getColumnMetaKeys = array(
+    protected $_getColumnMetaKeys = [
         'scale', 'table', 'native_type', 'flags', 'name', 'len', 'precision', 'pdo_type'
-    );
+    ];
 
     public function testStatementNextRowset()
     {
@@ -90,17 +89,17 @@ class Zend_Db_Statement_Pdo_IbmTest extends Zend_Db_Statement_Pdo_TestCommon
         try {
             $stmt->setAttribute(1234, $value);
         } catch (Zend_Exception $e) {
-            $this->assertContains('This driver doesn\'t support setting attributes', $e->getMessage());
+            $this->assertStringContainsString('This driver doesn\'t support setting attributes', $e->getMessage());
         }
 
         try {
             $this->assertEquals($value, $stmt->getAttribute(1234), "Expected '$value' #1");
         } catch (Zend_Exception $e) {
-            $this->assertContains('Driver does not support this function: 1 Unknown attribute', $e->getMessage());
+            $this->assertStringContainsString('Driver does not support this function: 1 Unknown attribute', $e->getMessage());
             return;
         }
 
-        $valueArray = array('value1', 'value2');
+        $valueArray = ['value1', 'value2'];
         $stmt->setAttribute(1235, $valueArray);
         $this->assertEquals($valueArray, $stmt->getAttribute(1235), "Expected array #1");
         $this->assertEquals($value, $stmt->getAttribute(1234), "Expected '$value' #2");

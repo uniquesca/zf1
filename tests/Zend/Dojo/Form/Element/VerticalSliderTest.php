@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -48,8 +53,18 @@ require_once 'Zend/Dojo/View/Helper/Dojo.php';
  * @group      Zend_Dojo
  * @group      Zend_Dojo_Form
  */
-class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCase
+class Zend_Dojo_Form_Element_VerticalSliderTest extends TestCase
 {
+    /**
+     * @var \Zend_View
+     */
+    protected $view;
+
+    /**
+     * @var \Zend_Dojo_Form_Element_VerticalSlider
+     */
+    protected $element;
+
     /**
      * Runs the test methods of this class.
      *
@@ -57,8 +72,8 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Dojo_Form_Element_VerticalSliderTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Dojo_Form_Element_VerticalSliderTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -67,12 +82,12 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         Zend_Registry::_unsetInstance();
         Zend_Dojo_View_Helper_Dojo::setUseDeclarative();
 
-        $this->view    = $this->getView();
+        $this->view = $this->getView();
         $this->element = $this->getElement();
         $this->element->setView($this->view);
     }
@@ -83,7 +98,7 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -99,12 +114,12 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
     {
         $element = new Zend_Dojo_Form_Element_VerticalSlider(
             'foo',
-            array(
+            [
                 'value' => 'some text',
                 'label' => 'VerticalSlider',
                 'class' => 'someclass',
                 'style' => 'width: 100px;',
-            )
+            ]
         );
         return $element;
     }
@@ -137,7 +152,7 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
 
     public function testSettingLeftDecorationLabelsShouldProxyToLeftDecorationDijitParam()
     {
-        $labels = array('0%', '50%', '100%');
+        $labels = ['0%', '50%', '100%'];
         $this->element->setLeftDecorationLabels($labels);
         $this->assertTrue($this->element->hasDijitParam('leftDecoration'));
         $leftDecoration = $this->element->getDijitParam('leftDecoration');
@@ -151,14 +166,14 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
 
     public function testSettingLeftDecorationParamsShouldProxyToLeftDecorationDijitParam()
     {
-        $params = array(
-            'container' => array(
+        $params = [
+            'container' => [
                 'style' => 'height:1.2em; font-size=75%;color:gray;',
-            ),
-            'list' => array(
+            ],
+            'list' => [
                 'style' => 'height:1em; font-size=75%;color:gray;',
-            ),
-        );
+            ],
+        ];
         $this->element->setLeftDecorationParams($params);
         $this->assertTrue($this->element->hasDijitParam('leftDecoration'));
         $leftDecoration = $this->element->getDijitParam('leftDecoration');
@@ -172,14 +187,14 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
 
     public function testSettingLeftDecorationAttribsShouldProxyToLeftDecorationDijitParam()
     {
-        $attribs = array(
-            'container' => array(
+        $attribs = [
+            'container' => [
                 'style' => 'height:1.2em; font-size=75%;color:gray;',
-            ),
-            'list' => array(
+            ],
+            'list' => [
                 'style' => 'height:1em; font-size=75%;color:gray;',
-            ),
-        );
+            ],
+        ];
         $this->element->setLeftDecorationAttribs($attribs);
         $this->assertTrue($this->element->hasDijitParam('leftDecoration'));
         $leftDecoration = $this->element->getDijitParam('leftDecoration');
@@ -219,7 +234,7 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
 
     public function testSettingRightDecorationLabelsShouldProxyToRightDecorationDijitParam()
     {
-        $labels = array('0%', '50%', '100%');
+        $labels = ['0%', '50%', '100%'];
         $this->element->setRightDecorationLabels($labels);
         $this->assertTrue($this->element->hasDijitParam('rightDecoration'));
         $rightDecoration = $this->element->getDijitParam('rightDecoration');
@@ -233,14 +248,14 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
 
     public function testSettingRightDecorationParamsShouldProxyToRightDecorationDijitParam()
     {
-        $params = array(
-            'container' => array(
+        $params = [
+            'container' => [
                 'style' => 'height:1.2em; font-size=75%;color:gray;',
-            ),
-            'list' => array(
+            ],
+            'list' => [
                 'style' => 'height:1em; font-size=75%;color:gray;',
-            ),
-        );
+            ],
+        ];
         $this->element->setRightDecorationParams($params);
         $this->assertTrue($this->element->hasDijitParam('rightDecoration'));
         $rightDecoration = $this->element->getDijitParam('rightDecoration');
@@ -254,14 +269,14 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
 
     public function testSettingRightDecorationAttribsShouldProxyToRightDecorationDijitParam()
     {
-        $attribs = array(
-            'container' => array(
+        $attribs = [
+            'container' => [
                 'style' => 'height:1.2em; font-size=75%;color:gray;',
-            ),
-            'list' => array(
+            ],
+            'list' => [
                 'style' => 'height:1em; font-size=75%;color:gray;',
-            ),
-        );
+            ],
+        ];
         $this->element->setRightDecorationAttribs($attribs);
         $this->assertTrue($this->element->hasDijitParam('rightDecoration'));
         $rightDecoration = $this->element->getDijitParam('rightDecoration');
@@ -279,11 +294,11 @@ class Zend_Dojo_Form_Element_VerticalSliderTest extends PHPUnit_Framework_TestCa
                       ->setMaximum(10)
                       ->setDiscreteValues(11);
         $html = $this->element->render();
-        $this->assertContains('dojoType="dijit.form.VerticalSlider"', $html);
+        $this->assertStringContainsString('dojoType="dijit.form.VerticalSlider"', $html);
     }
 }
 
 // Call Zend_Dojo_Form_Element_VerticalSliderTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Dojo_Form_Element_VerticalSliderTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Dojo_Form_Element_VerticalSliderTest::main") {
     Zend_Dojo_Form_Element_VerticalSliderTest::main();
 }

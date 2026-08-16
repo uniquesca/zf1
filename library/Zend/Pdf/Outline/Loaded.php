@@ -56,7 +56,7 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
      *
      * @var array
      */
-    protected $_originalChildOutlines = array();
+    protected $_originalChildOutlines = [];
 
     /**
      * Get outline title.
@@ -98,7 +98,7 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
 
         if ($this->_outlineDictionary->Count === null) {
             // Do Nothing.
-            return this;
+            return $this;
         }
 
         $childrenCount = $this->_outlineDictionary->Count->value;
@@ -214,9 +214,9 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
             $this->_outlineDictionary->C = null;
         } else {
             $components = $color->getComponents();
-            $colorComponentElements = array(new Zend_Pdf_Element_Numeric($components[0]),
+            $colorComponentElements = [new Zend_Pdf_Element_Numeric($components[0]),
                                             new Zend_Pdf_Element_Numeric($components[1]),
-                                            new Zend_Pdf_Element_Numeric($components[2]));
+                                            new Zend_Pdf_Element_Numeric($components[2])];
             $this->_outlineDictionary->C = new Zend_Pdf_Element_Array($colorComponentElements);
         }
 
@@ -285,7 +285,7 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
      * Set outline options
      *
      * @param array $options
-     * @return Zend_Pdf_Actions_Traceable
+     * @return Zend_Pdf_Outline_Loaded
      * @throws Zend_Pdf_Exception
      */
     public function setOptions(array $options)
@@ -300,15 +300,15 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
     /**
      * Create PDF outline object using specified dictionary
      *
-     * @internal
      * @param Zend_Pdf_Element $dictionary (It's actually Dictionary or Dictionary Object or Reference to a Dictionary Object)
      * @param Zend_Pdf_Action  $parentAction
      * @param SplObjectStorage $processedOutlines  List of already processed Outline dictionaries,
      *                                             used to avoid cyclic references
-     * @return Zend_Pdf_Action
+     * @return void
      * @throws Zend_Pdf_Exception
+     * @internal
      */
-    public function __construct(Zend_Pdf_Element $dictionary, SplObjectStorage $processedDictionaries = null)
+    public function __construct(Zend_Pdf_Element $dictionary, ?SplObjectStorage $processedDictionaries = null)
     {
         if ($dictionary->getType() != Zend_Pdf_Element::TYPE_DICTIONARY) {
             require_once 'Zend/Pdf/Exception.php';
@@ -318,7 +318,7 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
         if ($processedDictionaries === null) {
             $processedDictionaries = new SplObjectStorage();
         }
-        $processedDictionaries->attach($dictionary);
+        $processedDictionaries->offsetSet($dictionary);
 
         $this->_outlineDictionary = $dictionary;
 
@@ -339,12 +339,12 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
             $children = new SplObjectStorage();
             while ($childDictionary !== null) {
                 // Check children structure for cyclic references
-                if ($children->contains($childDictionary)) {
+                if ($children->offsetExists($childDictionary)) {
                     require_once 'Zend/Pdf/Exception.php';
                     throw new Zend_Pdf_Exception('Outline childs load error.');
                 }
 
-                if (!$processedDictionaries->contains($childDictionary)) {
+                if (!$processedDictionaries->offsetExists($childDictionary)) {
                     $this->childOutlines[] = new Zend_Pdf_Outline_Loaded($childDictionary, $processedDictionaries);
                 }
 
@@ -372,13 +372,13 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
     public function dumpOutline(Zend_Pdf_ElementFactory_Interface $factory,
                                                                   $updateNavigation,
                                                  Zend_Pdf_Element $parent,
-                                                 Zend_Pdf_Element $prev = null,
-                                                 SplObjectStorage $processedOutlines = null)
+                                                 ?Zend_Pdf_Element $prev = null,
+                                                 ?SplObjectStorage $processedOutlines = null)
     {
         if ($processedOutlines === null) {
             $processedOutlines = new SplObjectStorage();
         }
-        $processedOutlines->attach($this);
+        $processedOutlines->offsetSet($this);
 
         if ($updateNavigation) {
             $this->_outlineDictionary->touch();
@@ -410,7 +410,7 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
             $this->_outlineDictionary->First = null;
 
             foreach ($this->childOutlines as $childOutline) {
-                if ($processedOutlines->contains($childOutline)) {
+                if ($processedOutlines->offsetExists($childOutline)) {
                     require_once 'Zend/Pdf/Exception.php';
                     throw new Zend_Pdf_Exception('Outlines cyclyc reference is detected.');
                 }
@@ -436,7 +436,7 @@ class Zend_Pdf_Outline_Loaded extends Zend_Pdf_Outline
             }
         } else {
             foreach ($this->childOutlines as $childOutline) {
-                if ($processedOutlines->contains($childOutline)) {
+                if ($processedOutlines->offsetExists($childOutline)) {
                     require_once 'Zend/Pdf/Exception.php';
                     throw new Zend_Pdf_Exception('Outlines cyclyc reference is detected.');
                 }

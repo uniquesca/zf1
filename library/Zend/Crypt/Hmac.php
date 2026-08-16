@@ -66,15 +66,15 @@ class Zend_Crypt_Hmac extends Zend_Crypt
      *
      * @var array
      */
-    protected static $_supportedMhashAlgorithms = array('adler32',' crc32', 'crc32b', 'gost',
+    protected static $_supportedMhashAlgorithms = ['adler32',' crc32', 'crc32b', 'gost',
             'haval128', 'haval160', 'haval192', 'haval256', 'md4', 'md5', 'ripemd160',
-            'sha1', 'sha256', 'tiger', 'tiger128', 'tiger160');
+            'sha1', 'sha256', 'tiger', 'tiger128', 'tiger160'];
 
     /**
      * Constants representing the output mode of the hash algorithm
      */
-    const STRING = 'string';
-    const BINARY = 'binary';
+    public const STRING = 'string';
+    public const BINARY = 'binary';
 
     /**
      * Performs a HMAC computation given relevant details such as Key, Hashing
@@ -108,8 +108,8 @@ class Zend_Crypt_Hmac extends Zend_Crypt
      * Setter for the hash method.
      *
      * @param string $hash
+     * @return void
      * @throws Zend_Crypt_Hmac_Exception
-     * @return Zend_Crypt_Hmac
      */
     protected static function _setHashAlgorithm($hash)
     {

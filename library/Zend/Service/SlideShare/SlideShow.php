@@ -37,10 +37,10 @@ class Zend_Service_SlideShare_SlideShow
      * Status constant mapping for web service
      *
      */
-    const STATUS_QUEUED = 0;
-    const STATUS_PROCESSING = 1;
-    const STATUS_READY = 2;
-    const STATUS_FAILED = 3;
+    public const STATUS_QUEUED = 0;
+    public const STATUS_PROCESSING = 1;
+    public const STATUS_READY = 2;
+    public const STATUS_FAILED = 3;
 
     /**
      * The HTML code to embed the slide show in a web page
@@ -117,7 +117,7 @@ class Zend_Service_SlideShare_SlideShow
      *
      * @var array An array of tags associated with the slide show
      */
-    protected $_tags = array();
+    protected $_tags = [];
 
     /**
      * The location of the slide show

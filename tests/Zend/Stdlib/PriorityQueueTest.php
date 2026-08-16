@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -33,15 +38,20 @@ require_once 'Zend/Stdlib/PriorityQueue.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_Stdlib_PriorityQueueTest extends PHPUnit_Framework_TestCase
+class Zend_Stdlib_PriorityQueueTest extends TestCase
 {
+    /**
+     * @var \Zend_Stdlib_PriorityQueue|mixed
+     */
+    protected $queue;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         $this->queue = new Zend_Stdlib_PriorityQueue();
         $this->queue->insert('foo', 3);
@@ -57,11 +67,11 @@ class Zend_Stdlib_PriorityQueueTest extends PHPUnit_Framework_TestCase
         $count = count($this->queue);
         $this->assertSame($count, count($unserialized), 'Expected count ' . $count . '; received ' . count($unserialized));
 
-        $expected = array();
+        $expected = [];
         foreach ($this->queue as $item) {
             $expected[] = $item;
         }
-        $test = array();
+        $test = [];
         foreach ($unserialized as $item) {
             $test[] = $item;
         }
@@ -70,46 +80,46 @@ class Zend_Stdlib_PriorityQueueTest extends PHPUnit_Framework_TestCase
 
     public function testRetrievingQueueAsArrayReturnsDataOnlyByDefault()
     {
-        $expected = array(
+        $expected = [
             'foo',
             'bar',
             'baz',
             'bat',
-        );
-        $test     = $this->queue->toArray();
+        ];
+        $test = $this->queue->toArray();
         $this->assertSame($expected, $test, var_export($test, 1));
     }
 
     public function testCanCastToArrayOfPrioritiesOnly()
     {
-        $expected = array(
+        $expected = [
             3,
             4,
             2,
             1,
-        );
-        $test     = $this->queue->toArray(Zend_Stdlib_PriorityQueue::EXTR_PRIORITY);
+        ];
+        $test = $this->queue->toArray(Zend_Stdlib_PriorityQueue::EXTR_PRIORITY);
         $this->assertSame($expected, $test, var_export($test, 1));
     }
 
     public function testCanCastToArrayOfDataPriorityPairs()
     {
-        $expected = array(
-            array('data' => 'foo', 'priority' => 3),
-            array('data' => 'bar', 'priority' => 4),
-            array('data' => 'baz', 'priority' => 2),
-            array('data' => 'bat', 'priority' => 1),
-        );
-        $test     = $this->queue->toArray(Zend_Stdlib_PriorityQueue::EXTR_BOTH);
+        $expected = [
+            ['data' => 'foo', 'priority' => 3],
+            ['data' => 'bar', 'priority' => 4],
+            ['data' => 'baz', 'priority' => 2],
+            ['data' => 'bat', 'priority' => 1],
+        ];
+        $test = $this->queue->toArray(Zend_Stdlib_PriorityQueue::EXTR_BOTH);
         $this->assertSame($expected, $test, var_export($test, 1));
     }
 
     public function testCanIterateMultipleTimesAndReceiveSameResults()
     {
-        $expected = array('bar', 'foo', 'baz', 'bat');
+        $expected = ['bar', 'foo', 'baz', 'bat'];
 
         for ($i = 1; $i < 3; $i++) {
-            $test = array();
+            $test = [];
             foreach ($this->queue as $item) {
                 $test[] = $item;
             }
@@ -120,8 +130,8 @@ class Zend_Stdlib_PriorityQueueTest extends PHPUnit_Framework_TestCase
     public function testCanRemoveItemFromQueue()
     {
         $this->queue->remove('baz');
-        $expected = array('bar', 'foo', 'bat');
-        $test = array();
+        $expected = ['bar', 'foo', 'bat'];
+        $test = [];
         foreach ($this->queue as $item) {
             $test[] = $item;
         }
@@ -141,6 +151,6 @@ class Zend_Stdlib_PriorityQueueTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Stdlib_PriorityQueueTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Stdlib_PriorityQueueTest::main') {
     Zend_Stdlib_PriorityQueueTest::main();
 }

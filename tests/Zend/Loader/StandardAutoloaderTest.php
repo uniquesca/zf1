@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -35,23 +38,33 @@ require_once 'Zend/Loader/TestAsset/StandardAutoloader.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Loader
  */
-class Zend_Loader_StandardAutoloaderTest extends PHPUnit_Framework_TestCase
+class Zend_Loader_StandardAutoloaderTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var mixed[]|mixed
+     */
+    protected $loaders;
+
+    /**
+     * @var string|bool|mixed
+     */
+    protected $includePath;
+
+    protected function set_up()
     {
         // Store original autoloaders
         $this->loaders = spl_autoload_functions();
         if (!is_array($this->loaders)) {
             // spl_autoload_functions does not return empty array when no
             // autoloaders registered...
-            $this->loaders = array();
+            $this->loaders = [];
         }
 
         // Store original include_path
         $this->includePath = get_include_path();
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         // Restore original autoloaders
         $loaders = spl_autoload_functions();
@@ -88,28 +101,28 @@ class Zend_Loader_StandardAutoloaderTest extends PHPUnit_Framework_TestCase
     {
         $loader = new Zend_Loader_StandardAutoloader();
 
-        $obj  = new stdClass();
-        foreach (array(true, 'foo', $obj) as $arg) {
+        $obj = new stdClass();
+        foreach ([true, 'foo', $obj] as $arg) {
             try {
                 $loader->setOptions(true);
                 $this->fail('Setting options with invalid type should fail');
             } catch (Zend_Loader_Exception_InvalidArgumentException $e) {
-                $this->assertContains('array or Traversable', $e->getMessage());
+                $this->assertStringContainsString('array or Traversable', $e->getMessage());
             }
         }
     }
 
     public function testPassingArrayOptionsPopulatesProperties()
     {
-        $options = array(
-            'namespaces' => array(
-                'Zend\\'   => dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR,
-            ),
-            'prefixes'   => array(
-                'Zend_'  => dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR,
-            ),
+        $options = [
+            'namespaces' => [
+                'Zend\\' => dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR,
+            ],
+            'prefixes' => [
+                'Zend_' => dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR,
+            ],
             'fallback_autoloader' => true,
-        );
+        ];
         $loader = new Zend_Loader_TestAsset_StandardAutoloader();
         $loader->setOptions($options);
         $this->assertEquals($options['namespaces'], $loader->getNamespaces());
@@ -119,17 +132,17 @@ class Zend_Loader_StandardAutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testPassingTraversableOptionsPopulatesProperties()
     {
-        $namespaces = new ArrayObject(array(
+        $namespaces = new ArrayObject([
             'Zend\\' => dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR,
-        ));
-        $prefixes = new ArrayObject(array(
+        ]);
+        $prefixes = new ArrayObject([
             'Zend_' => dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR,
-        ));
-        $options = new ArrayObject(array(
+        ]);
+        $options = new ArrayObject([
             'namespaces' => $namespaces,
-            'prefixes'   => $prefixes,
+            'prefixes' => $prefixes,
             'fallback_autoloader' => true,
-        ));
+        ]);
         $loader = new Zend_Loader_TestAsset_StandardAutoloader();
         $loader->setOptions($options);
         $this->assertEquals((array) $options['namespaces'], $loader->getNamespaces());
@@ -185,7 +198,7 @@ class Zend_Loader_StandardAutoloaderTest extends PHPUnit_Framework_TestCase
         $loaders = spl_autoload_functions();
         $this->assertTrue(count($this->loaders) < count($loaders));
         $test = array_pop($loaders);
-        $this->assertEquals(array($loader, 'autoload'), $test);
+        $this->assertEquals([$loader, 'autoload'], $test);
     }
 
     public function testAutoloadsNamespacedClassesWithUnderscores()
@@ -203,20 +216,25 @@ class Zend_Loader_StandardAutoloaderTest extends PHPUnit_Framework_TestCase
     public function testZendFrameworkPrefixIsNotLoadedByDefault()
     {
         $loader = new Zend_Loader_StandardAutoloader();
-        $expected = array();
-        $this->assertAttributeEquals($expected, 'prefixes', $loader);
+        $reflection = new ReflectionClass($loader);
+        $prefixes = $reflection->getProperty('prefixes');
+        $prefixes->setAccessible(true);
+        $expected = [];
+        $this->assertEquals($expected, $prefixes->getValue($loader));
     }
 
     public function testCanTellAutoloaderToRegisterZfPrefixAtInstantiation()
     {
-        $loader = new Zend_Loader_StandardAutoloader(array('autoregister_zf' => true));
-        $r      = new ReflectionClass($loader);
-        $file   = $r->getFileName();
-        $expected = array('Zend_' => dirname(dirname($file)) . DIRECTORY_SEPARATOR);
-        $this->assertAttributeEquals($expected, 'prefixes', $loader);
+        $loader = new Zend_Loader_StandardAutoloader(['autoregister_zf' => true]);
+        $r = new ReflectionClass($loader);
+        $file = $r->getFileName();
+        $expected = ['Zend_' => dirname(dirname($file)) . DIRECTORY_SEPARATOR];
+        $prefixes = $r->getProperty('prefixes');
+        $prefixes->setAccessible(true);
+        $this->assertEquals($expected, $prefixes->getValue($loader));
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Loader_StandardAutoloaderTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Loader_StandardAutoloaderTest::main') {
     Zend_Loader_StandardAutoloaderTest::main();
 }

@@ -133,7 +133,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      * @param  string                   $credentialColumn
      * @param  string                   $credentialTreatment
      */
-    public function __construct(Zend_Db_Adapter_Abstract $zendDb = null, $tableName = null, $identityColumn = null,
+    public function __construct(?Zend_Db_Adapter_Abstract $zendDb = null, $tableName = null, $identityColumn = null,
                                 $credentialColumn = null, $credentialTreatment = null)
     {
         $this->_setDbAdapter($zendDb);
@@ -158,11 +158,11 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
     /**
      * _setDbAdapter() - set the database adapter to be used for quering
      *
-     * @param Zend_Db_Adapter_Abstract
-     * @throws Zend_Auth_Adapter_Exception
+     * @param Zend_Db_Adapter_Abstract$zendDb
      * @return Zend_Auth_Adapter_DbTable
+     * @throws Zend_Auth_Adapter_Exception
      */
-    protected function _setDbAdapter(Zend_Db_Adapter_Abstract $zendDb = null)
+    protected function _setDbAdapter(?Zend_Db_Adapter_Abstract $zendDb = null)
     {
         $this->_zendDb = $zendDb;
 
@@ -185,7 +185,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      * setTableName() - set the table name to be used in the select query
      *
      * @param  string $tableName
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @return $this
      */
     public function setTableName($tableName)
     {
@@ -197,7 +197,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      * setIdentityColumn() - set the column name to be used as the identity column
      *
      * @param  string $identityColumn
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @return $this
      */
     public function setIdentityColumn($identityColumn)
     {
@@ -209,7 +209,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      * setCredentialColumn() - set the column name to be used as the credential column
      *
      * @param  string $credentialColumn
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @return $this
      */
     public function setCredentialColumn($credentialColumn)
     {
@@ -232,7 +232,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      *  'MD5(?)'
      *
      * @param  string $treatment
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @return $this
      */
     public function setCredentialTreatment($treatment)
     {
@@ -244,7 +244,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      * setIdentity() - set the value to be used as the identity
      *
      * @param  string $value
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @return $this
      */
     public function setIdentity($value)
     {
@@ -257,7 +257,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
      * to be used, should be supplied in parameterized form, such as 'MD5(?)' or 'PASSWORD(?)'
      *
      * @param  string $credential
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @return $this
      */
     public function setCredential($credential)
     {
@@ -372,7 +372,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
         }
 
         if (true === $this->getAmbiguityIdentity()) {
-            $validIdentities = array ();
+            $validIdentities = [];
             $zendAuthCredentialMatchColumn = $this->_zendDb->foldCase('zend_auth_credential_match');
             foreach ($resultIdentities as $identity) {
                 if (1 === (int) $identity[$zendAuthCredentialMatchColumn]) {
@@ -418,11 +418,11 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
             throw new Zend_Auth_Adapter_Exception($exception);
         }
 
-        $this->_authenticateResultInfo = array(
+        $this->_authenticateResultInfo = [
             'code'     => Zend_Auth_Result::FAILURE,
             'identity' => $this->_identity,
-            'messages' => array()
-            );
+            'messages' => []
+            ];
 
         return true;
     }
@@ -454,7 +454,7 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
 
         // get select
         $dbSelect = clone $this->getDbSelect();
-        $dbSelect->from($this->_tableName, array('*', $credentialExpression))
+        $dbSelect->from($this->_tableName, ['*', $credentialExpression])
                  ->where($this->_zendDb->quoteIdentifier($this->_identityColumn, true) . ' = ?', $this->_identity);
 
         return $dbSelect;
@@ -472,9 +472,9 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
     protected function _authenticateQuerySelect(Zend_Db_Select $dbSelect)
     {
         try {
-            if ($this->_zendDb->getFetchMode() != Zend_DB::FETCH_ASSOC) {
+            if ($this->_zendDb->getFetchMode() != Zend_Db::FETCH_ASSOC) {
                 $origDbFetchMode = $this->_zendDb->getFetchMode();
-                $this->_zendDb->setFetchMode(Zend_DB::FETCH_ASSOC);
+                $this->_zendDb->setFetchMode(Zend_Db::FETCH_ASSOC);
             }
             $resultIdentities = $this->_zendDb->fetchAll($dbSelect);
             if (isset($origDbFetchMode)) {
@@ -527,8 +527,12 @@ class Zend_Auth_Adapter_DbTable implements Zend_Auth_Adapter_Interface
     protected function _authenticateValidateResult($resultIdentity)
     {
         $zendAuthCredentialMatchColumn = $this->_zendDb->foldCase('zend_auth_credential_match');
-
-        if ($resultIdentity[$zendAuthCredentialMatchColumn] != '1') {
+        
+        if (empty($resultIdentity)) {
+            $this->_authenticateResultInfo['code'] = Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND;
+            $this->_authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
+            return $this->_authenticateCreateAuthResult();
+        } elseif ($resultIdentity[$zendAuthCredentialMatchColumn] != '1') {
             $this->_authenticateResultInfo['code'] = Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID;
             $this->_authenticateResultInfo['messages'][] = 'Supplied credential is invalid.';
             return $this->_authenticateCreateAuthResult();

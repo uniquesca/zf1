@@ -1,4 +1,7 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Zend Framework
  *
@@ -32,7 +35,7 @@ require_once 'Zend/Validate/Sitemap/Loc.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Validate
  */
-class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
+class Zend_Validate_Sitemap_LocTest extends TestCase
 {
     /**
      * Validator
@@ -44,7 +47,7 @@ class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
     /**
      * Prepares the environment before running a test
      */
-    protected function setUp()
+    protected function set_up()
     {
         $this->_validator = new Zend_Validate_Sitemap_Loc();
     }
@@ -52,7 +55,7 @@ class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
     /**
      * Cleans up the environment after running a test
      */
-    protected function tearDown()
+    protected function tear_down()
     {
         $this->_validator = null;
     }
@@ -63,7 +66,7 @@ class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
      */
     public function testValidLocs()
     {
-        $values = array(
+        $values = [
             'http://www.example.com',
             'http://www.example.com/',
             'http://www.exmaple.lan/',
@@ -71,7 +74,7 @@ class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
             'http://www.exmaple.com:8080/foo/bar/',
             'https://user:pass@www.exmaple.com:8080/',
             'https://www.exmaple.com/?foo=&quot;bar&apos;&amp;bar=&lt;bat&gt;'
-        );
+        ];
 
         foreach ($values as $value) {
             $this->assertSame(true, $this->_validator->isValid($value));
@@ -84,18 +87,18 @@ class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidLocs()
     {
-        $values = array(
+        $values = [
             'www.example.com',
             '/news/',
             '#',
             'http:/example.com/',
             'https://www.exmaple.com/?foo="bar\'&bar=<bat>'
-        );
+        ];
 
         foreach ($values as $value) {
             $this->assertSame(false, $this->_validator->isValid($value));
             $messages = $this->_validator->getMessages();
-            $this->assertContains('is not a valid', current($messages));
+            $this->assertStringContainsString('is not a valid', current($messages));
         }
     }
 
@@ -105,15 +108,14 @@ class Zend_Validate_Sitemap_LocTest extends PHPUnit_Framework_TestCase
      */
     public function testNotStrings()
     {
-        $values = array(
+        $values = [
             1, 1.4, null, new stdClass(), true, false
-        );
+        ];
 
         foreach ($values as $value) {
             $this->assertSame(false, $this->_validator->isValid($value));
             $messages = $this->_validator->getMessages();
-            $this->assertContains('String expected', current($messages));
+            $this->assertStringContainsString('String expected', current($messages));
         }
     }
-
 }

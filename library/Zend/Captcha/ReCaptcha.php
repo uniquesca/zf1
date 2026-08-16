@@ -61,32 +61,32 @@ class Zend_Captcha_ReCaptcha extends Zend_Captcha_Base
      *
      * @var array
      */
-    protected $_serviceParams = array();
+    protected $_serviceParams = [];
 
     /**
      * Options defined by the service
      *
      * @var array
      */
-    protected $_serviceOptions = array();
+    protected $_serviceOptions = [];
 
     /**#@+
      * Error codes
      */
-    const MISSING_VALUE = 'missingValue';
-    const ERR_CAPTCHA   = 'errCaptcha';
-    const BAD_CAPTCHA   = 'badCaptcha';
+    public const MISSING_VALUE = 'missingValue';
+    public const ERR_CAPTCHA   = 'errCaptcha';
+    public const BAD_CAPTCHA   = 'badCaptcha';
     /**#@-*/
 
     /**
      * Error messages
      * @var array
      */
-    protected $_messageTemplates = array(
+    protected $_messageTemplates = [
         self::MISSING_VALUE => 'Missing captcha fields',
         self::ERR_CAPTCHA   => 'Failed to validate captcha',
         self::BAD_CAPTCHA   => 'Captcha value is wrong: %value%',
-    );
+    ];
 
     /**
      * Retrieve ReCaptcha Private key
@@ -259,13 +259,13 @@ class Zend_Captcha_ReCaptcha extends Zend_Captcha_Base
      * @param  mixed $element
      * @return string
      */
-    public function render(Zend_View_Interface $view = null, $element = null)
+    public function render(?Zend_View_Interface $view = null, $element = null)
     {
         $name = null;
         if ($element instanceof Zend_Form_Element) {
             $name = $element->getBelongsTo();
         }
-        return $this->getService()->getHTML($name);
+        return $this->getService()->getHtml($name);
     }
 
     /**

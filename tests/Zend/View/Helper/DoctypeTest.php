@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -42,7 +47,7 @@ require_once 'Zend/Registry.php';
  * @group      Zend_View
  * @group      Zend_View_Helper
  */
-class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
+class Zend_View_Helper_DoctypeTest extends TestCase
 {
     /**
      * @var Zend_View_Helper_Doctype
@@ -61,9 +66,8 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_View_Helper_DoctypeTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_View_Helper_DoctypeTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -72,7 +76,7 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $regKey = 'Zend_View_Helper_Doctype';
         if (Zend_Registry::isRegistered($regKey)) {
@@ -88,7 +92,7 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
         unset($this->helper);
     }
@@ -117,14 +121,14 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
 
     public function testIsXhtmlReturnsTrueForXhtmlDoctypes()
     {
-        $types = array(
+        $types = [
             'XHTML1_STRICT',
             'XHTML1_TRANSITIONAL',
             'XHTML1_FRAMESET',
             'XHTML1_RDFA',
             'XHTML1_RDFA11',
             'XHTML5',
-        );
+        ];
 
         foreach ($types as $type) {
             $doctype = $this->helper->doctype($type);
@@ -139,7 +143,7 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
 
     public function testIsXhtmlReturnsFalseForNonXhtmlDoctypes()
     {
-        foreach (array('HTML4_STRICT', 'HTML4_LOOSE', 'HTML4_FRAMESET') as $type) {
+        foreach (['HTML4_STRICT', 'HTML4_LOOSE', 'HTML4_FRAMESET'] as $type) {
             $doctype = $this->helper->doctype($type);
             $this->assertEquals($type, $doctype->getDoctype());
             $this->assertFalse($doctype->isXhtml());
@@ -150,19 +154,20 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($doctype->isXhtml());
     }
 
-	public function testIsHtml5() {
-		foreach (array('HTML5', 'XHTML5') as $type) {
+    public function testIsHtml5()
+    {
+        foreach (['HTML5', 'XHTML5'] as $type) {
             $doctype = $this->helper->doctype($type);
             $this->assertEquals($type, $doctype->getDoctype());
             $this->assertTrue($doctype->isHtml5());
         }
 
-		foreach (array('HTML4_STRICT', 'HTML4_LOOSE', 'HTML4_FRAMESET', 'XHTML1_STRICT', 'XHTML1_TRANSITIONAL', 'XHTML1_FRAMESET') as $type) {
-			$doctype = $this->helper->doctype($type);
+        foreach (['HTML4_STRICT', 'HTML4_LOOSE', 'HTML4_FRAMESET', 'XHTML1_STRICT', 'XHTML1_TRANSITIONAL', 'XHTML1_FRAMESET'] as $type) {
+            $doctype = $this->helper->doctype($type);
             $this->assertEquals($type, $doctype->getDoctype());
             $this->assertFalse($doctype->isHtml5());
-		}
-	}
+        }
+    }
 
     public function testIsRdfa()
     {
@@ -170,7 +175,7 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->helper->doctype('XHTML1_RDFA11')->isRdfa());
 
         // built-in doctypes
-        foreach (array('HTML4_STRICT', 'HTML4_LOOSE', 'HTML4_FRAMESET', 'XHTML1_STRICT', 'XHTML1_TRANSITIONAL', 'XHTML1_FRAMESET') as $type) {
+        foreach (['HTML4_STRICT', 'HTML4_LOOSE', 'HTML4_FRAMESET', 'XHTML1_STRICT', 'XHTML1_TRANSITIONAL', 'XHTML1_FRAMESET'] as $type) {
             $doctype = $this->helper->doctype($type);
             $this->assertFalse($doctype->isRdfa());
         }
@@ -180,11 +185,12 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($doctype->isRdfa());
     }
 
-	public function testCanRegisterCustomHtml5Doctype() {
-		$doctype = $this->helper->doctype('<!DOCTYPE html>');
+    public function testCanRegisterCustomHtml5Doctype()
+    {
+        $doctype = $this->helper->doctype('<!DOCTYPE html>');
         $this->assertEquals('CUSTOM', $doctype->getDoctype());
         $this->assertTrue($doctype->isHtml5());
-	}
+    }
 
     public function testCanRegisterCustomXhtmlDoctype()
     {
@@ -200,6 +206,9 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($doctype->isXhtml());
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testMalformedCustomDoctypeRaisesException()
     {
         try {
@@ -211,14 +220,14 @@ class Zend_View_Helper_DoctypeTest extends PHPUnit_Framework_TestCase
 
     public function testStringificationReturnsDoctypeString()
     {
-        $doctype  = $this->helper->doctype('XHTML1_STRICT');
-        $string   = $doctype->__toString();
+        $doctype = $this->helper->doctype('XHTML1_STRICT');
+        $string = $doctype->__toString();
         $registry = Zend_Registry::get('Zend_View_Helper_Doctype');
         $this->assertEquals($registry['doctypes']['XHTML1_STRICT'], $string);
     }
 }
 
 // Call Zend_View_Helper_DoctypeTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_View_Helper_DoctypeTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_View_Helper_DoctypeTest::main") {
     Zend_View_Helper_DoctypeTest::main();
 }

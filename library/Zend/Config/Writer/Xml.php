@@ -72,9 +72,7 @@ class Zend_Config_Writer_Xml extends Zend_Config_Writer_FileAbstract
         $dom = dom_import_simplexml($xml)->ownerDocument;
         $dom->formatOutput = true;
 
-        $xmlString = $dom->saveXML();
-
-        return $xmlString;
+        return $dom->saveXML();
     }
 
     /**
@@ -87,6 +85,7 @@ class Zend_Config_Writer_Xml extends Zend_Config_Writer_FileAbstract
      */
     protected function _addBranch(Zend_Config $config, SimpleXMLElement $xml, SimpleXMLElement $parent)
     {
+        $branchName = null;
         $branchType = null;
 
         foreach ($config as $key => $value) {

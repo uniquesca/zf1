@@ -39,129 +39,188 @@ require_once 'CommonExtendedBackendTest.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Cache
  */
-class Zend_Cache_WinCacheBackendTest extends Zend_Cache_CommonExtendedBackendTest {
-
+class Zend_Cache_WinCacheBackendTest extends Zend_Cache_CommonExtendedBackendTest
+{
     protected $_instance;
 
-    public function __construct($name = null, array $data = array(), $dataName = '')
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct('Zend_Cache_Backend_WinCache', $data, $dataName);
     }
 
-    public function setUp($notag = true)
+    public function set_up($notag = true)
     {
-        $this->_instance = new Zend_Cache_Backend_WinCache(array());
-        parent::setUp($notag);
+        $this->_instance = new Zend_Cache_Backend_WinCache([]);
+        parent::set_up($notag);
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
-        parent::tearDown();
+        parent::tear_down();
         unset($this->_instance);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testConstructorCorrectCall()
     {
         $test = new Zend_Cache_Backend_WinCache();
     }
 
-    public function testCleanModeOld() {
-        $this->_instance->setDirectives(array('logging' => false));
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCleanModeOld()
+    {
+        $this->_instance->setDirectives(['logging' => false]);
         $this->_instance->clean('old');
         // do nothing, just to see if an error occured
-        $this->_instance->setDirectives(array('logging' => true));
+        $this->_instance->setDirectives(['logging' => true]);
     }
 
-    public function testCleanModeMatchingTags() {
-        $this->_instance->setDirectives(array('logging' => false));
-        $this->_instance->clean('matchingTag', array('tag1'));
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCleanModeMatchingTags()
+    {
+        $this->_instance->setDirectives(['logging' => false]);
+        $this->_instance->clean('matchingTag', ['tag1']);
         // do nothing, just to see if an error occured
-        $this->_instance->setDirectives(array('logging' => true));
+        $this->_instance->setDirectives(['logging' => true]);
     }
 
-    public function testCleanModeNotMatchingTags() {
-        $this->_instance->setDirectives(array('logging' => false));
-        $this->_instance->clean('notMatchingTag', array('tag1'));
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCleanModeNotMatchingTags()
+    {
+        $this->_instance->setDirectives(['logging' => false]);
+        $this->_instance->clean('notMatchingTag', ['tag1']);
         // do nothing, just to see if an error occured
-        $this->_instance->setDirectives(array('logging' => true));
+        $this->_instance->setDirectives(['logging' => true]);
     }
 
     // Because of limitations of this backend...
-    public function testGetWithAnExpiredCacheId() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetWithAnExpiredCacheId()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testCleanModeMatchingTags2() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCleanModeMatchingTags2()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testCleanModeNotMatchingTags2() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCleanModeNotMatchingTags2()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testCleanModeNotMatchingTags3() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCleanModeNotMatchingTags3()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsMatchingTags() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsMatchingTags()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsMatchingTags2() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsMatchingTags2()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsMatchingTags3() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsMatchingTags3()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsMatchingTags4() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsMatchingTags4()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsNotMatchingTags() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsNotMatchingTags()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsNotMatchingTags2() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsNotMatchingTags2()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetIdsNotMatchingTags3() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetIdsNotMatchingTags3()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
     
-    public function testGetTags() {
-    	$this->markTestSkipped('This test skipped due to limitations in this adapter.');
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testGetTags()
+    {
+        $this->markTestSkipped('This test skipped due to limitations in this adapter.');
     }
 
     public function testSaveCorrectCall()
     {
-        $this->_instance->setDirectives(array('logging' => false));
+        $this->_instance->setDirectives(['logging' => false]);
         parent::testSaveCorrectCall();
-        $this->_instance->setDirectives(array('logging' => true));
+        $this->_instance->setDirectives(['logging' => true]);
     }
 
     public function testSaveWithNullLifeTime()
     {
-        $this->_instance->setDirectives(array('logging' => false));
+        $this->_instance->setDirectives(['logging' => false]);
         parent::testSaveWithNullLifeTime();
-        $this->_instance->setDirectives(array('logging' => true));
+        $this->_instance->setDirectives(['logging' => true]);
     }
 
     public function testSaveWithSpecificLifeTime()
     {
-
-        $this->_instance->setDirectives(array('logging' => false));
+        $this->_instance->setDirectives(['logging' => false]);
         parent::testSaveWithSpecificLifeTime();
-        $this->_instance->setDirectives(array('logging' => true));
+        $this->_instance->setDirectives(['logging' => true]);
     }
 
     public function testGetMetadatas($notag = true)
     {
         parent::testGetMetadatas($notag);
     }
-
 }
-
-

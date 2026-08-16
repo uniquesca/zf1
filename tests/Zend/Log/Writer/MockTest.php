@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -35,29 +40,29 @@ require_once 'Zend/Log/Writer/Mock.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Log
  */
-class Zend_Log_Writer_MockTest extends PHPUnit_Framework_TestCase
+class Zend_Log_Writer_MockTest extends TestCase
 {
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
     public function testWrite()
     {
         $writer = new Zend_Log_Writer_Mock();
-        $this->assertSame(array(), $writer->events);
+        $this->assertSame([], $writer->events);
 
-        $fields = array('foo' => 'bar');
+        $fields = ['foo' => 'bar'];
         $writer->write($fields);
-        $this->assertSame(array($fields), $writer->events);
+        $this->assertSame([$fields], $writer->events);
     }
 
     public function testFactory()
     {
-        $cfg = array('log' => array('memory' => array(
+        $cfg = ['log' => ['memory' => [
             'writerName' => "Mock"
-        )));
+        ]]];
 
         require_once 'Zend/Log.php';
         $logger = Zend_Log::factory($cfg['log']);
@@ -65,6 +70,6 @@ class Zend_Log_Writer_MockTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Log_Writer_MockTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Log_Writer_MockTest::main') {
     Zend_Log_Writer_MockTest::main();
 }

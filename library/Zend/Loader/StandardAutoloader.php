@@ -34,22 +34,22 @@ require_once dirname(__FILE__) . '/SplAutoloader.php';
  */
 class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
 {
-    const NS_SEPARATOR     = '\\';
-    const PREFIX_SEPARATOR = '_';
-    const LOAD_NS          = 'namespaces';
-    const LOAD_PREFIX      = 'prefixes';
-    const ACT_AS_FALLBACK  = 'fallback_autoloader';
-    const AUTOREGISTER_ZF  = 'autoregister_zf';
+    public const NS_SEPARATOR     = '\\';
+    public const PREFIX_SEPARATOR = '_';
+    public const LOAD_NS          = 'namespaces';
+    public const LOAD_PREFIX      = 'prefixes';
+    public const ACT_AS_FALLBACK  = 'fallback_autoloader';
+    public const AUTOREGISTER_ZF  = 'autoregister_zf';
 
     /**
      * @var array Namespace/directory pairs to search; ZF library added by default
      */
-    protected $namespaces = array();
+    protected $namespaces = [];
 
     /**
      * @var array Prefix/directory pairs to search
      */
-    protected $prefixes = array();
+    protected $prefixes = [];
 
     /**
      * @var bool Whether or not the autoloader should also act as a fallback autoloader
@@ -110,12 +110,12 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
                     }
                     break;
                 case self::LOAD_NS:
-                    if (is_array($pairs) || $pairs instanceof Traversable) {
+                    if (is_iterable($pairs)) {
                         $this->registerNamespaces($pairs);
                     }
                     break;
                 case self::LOAD_PREFIX:
-                    if (is_array($pairs) || $pairs instanceof Traversable) {
+                    if (is_iterable($pairs)) {
                         $this->registerPrefixes($pairs);
                     }
                     break;
@@ -255,7 +255,7 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
      */
     public function register()
     {
-        spl_autoload_register(array($this, 'autoload'));
+        spl_autoload_register([$this, 'autoload']);
     }
 
     /**
@@ -263,9 +263,9 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
      *
      * Used by {@link loadClass} during fallback autoloading in PHP versions
      * prior to 5.3.0.
-     * 
-     * @param mixed $errno 
-     * @param mixed $errstr 
+     *
+     * @param mixed $errno
+     * @param mixed $errstr
      * @return void
      */
     public function handleError($errno, $errstr)
@@ -284,7 +284,7 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
     {
         // $class may contain a namespace portion, in  which case we need
         // to preserve any underscores in that portion.
-        $matches = array();
+        $matches = [];
         preg_match('/(?P<namespace>.+\\\)?(?P<class>[^\\\]+$)/', $class, $matches);
 
         $class     = (isset($matches['class'])) ? $matches['class'] : '';
@@ -305,7 +305,7 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
      */
     protected function loadClass($class, $type)
     {
-        if (!in_array($type, array(self::LOAD_NS, self::LOAD_PREFIX, self::ACT_AS_FALLBACK))) {
+        if (!in_array($type, [self::LOAD_NS, self::LOAD_PREFIX, self::ACT_AS_FALLBACK])) {
             require_once dirname(__FILE__) . '/Exception/InvalidArgumentException.php';
             throw new Zend_Loader_Exception_InvalidArgumentException();
         }
@@ -322,7 +322,7 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
                 return false;
             }
             $this->error = false;
-            set_error_handler(array($this, 'handleError'), E_WARNING);
+            set_error_handler([$this, 'handleError'], E_WARNING);
             include $filename;
             restore_error_handler();
             if ($this->error) {
@@ -357,7 +357,7 @@ class Zend_Loader_StandardAutoloader implements Zend_Loader_SplAutoloader
     protected function normalizeDirectory($directory)
     {
         $last = $directory[strlen($directory) - 1];
-        if (in_array($last, array('/', '\\'))) {
+        if (in_array($last, ['/', '\\'])) {
             $directory[strlen($directory) - 1] = DIRECTORY_SEPARATOR;
             return $directory;
         }

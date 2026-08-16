@@ -45,21 +45,21 @@ class Zend_Service_ReCaptcha extends Zend_Service_Abstract
      *
      * @var string
      */
-    const API_SERVER = 'http://www.google.com/recaptcha/api';
+    public const API_SERVER = 'http://www.google.com/recaptcha/api';
 
     /**
      * URI to the secure API
      *
      * @var string
      */
-    const API_SECURE_SERVER = 'https://www.google.com/recaptcha/api';
+    public const API_SECURE_SERVER = 'https://www.google.com/recaptcha/api';
 
     /**
      * URI to the verify server
      *
      * @var string
      */
-    const VERIFY_SERVER = 'http://www.google.com/recaptcha/api/verify';
+    public const VERIFY_SERVER = 'http://www.google.com/recaptcha/api/verify';
 
     /**
      * Public key used when displaying the captcha
@@ -87,13 +87,13 @@ class Zend_Service_ReCaptcha extends Zend_Service_Abstract
      *
      * @var array
      */
-    protected $_params = array(
+    protected $_params = [
         'ssl' => false, /* Use SSL or not when generating the recaptcha */
         'error' => null, /* The error message to display in the recaptcha */
         'xhtml' => false /* Enable XHTML output (this will not be XHTML Strict
                             compliant since the IFRAME is necessary when
                             Javascript is disabled) */
-    );
+    ];
 
     /**
      * Options for tailoring reCaptcha
@@ -102,11 +102,11 @@ class Zend_Service_ReCaptcha extends Zend_Service_Abstract
      *
      * @var array
      */
-    protected $_options = array(
+    protected $_options = [
         'theme'               => 'red',
         'lang'                => 'en',
-        'custom_translations' => array(),
-    );
+        'custom_translations' => [],
+    ];
 
     /**
      * Response from the verify server
@@ -472,10 +472,10 @@ HTML;
         $httpClient = self::getHttpClient();
         $httpClient->resetParameters(true);
 
-        $postParams = array('privatekey' => $this->_privateKey,
+        $postParams = ['privatekey' => $this->_privateKey,
                             'remoteip'   => $this->_ip,
                             'challenge'  => $challengeField,
-                            'response'   => $responseField);
+                            'response'   => $responseField];
 
         /* Make the POST and return the response */
         return $httpClient->setUri(self::VERIFY_SERVER)

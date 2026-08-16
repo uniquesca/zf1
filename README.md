@@ -1,182 +1,48 @@
-![Logo](http://framework.zend.com/images/logos/ZendFramework-logo.png)
+![zf1-future logo](https://imgur.com/S0i6qOh.png)
+<sub><sup>Thanks to [WebTigers](https://github.com/WebTigers) for the logo</sup></sub>
+# Zend Framework 1 now for PHP 8.2!
+### Classic ZF1 Reborn
+Zend may have abandoned the original Zend Framework, but the global Zend Framework Community has not! Since Zend sentenced ZF1 to EOL, the Zend Framework community around the globe has continued to work and build on what we consider to be one of the best PHP frameworks of all time.
+Framework is tested by users up to PHP version 8.2. Note, that with 8.3+ you can experience some incompatibilities.
 
-> ## End-of-Life occurred 28 Sep 2016
->
-> This project is no longer maintained, and reached its end of life on 28 Sep
-> 2016; the last public release was 1.12.20.
->
-> At this time, the repository has been archived, and is read-only.
+# ZF1-Future Sponsors
+### Products and Projects built with ZF1-Future:
 
----
+<a href="https://webtigers.com"><img src="https://webtigers.s3.amazonaws.com/logos/Logo-New-1-Dark.png" width="50%" /></a>
 
-Welcome to the Zend Framework 1.12 Release! 
+Creators of the [Tiger Development Platform](https://webtigers.com) featuring ZF1-Future
 
+<a href="https://seidengroup.com"><img src="https://www.seidengroup.com/wp-content/uploads/2017/03/SeidenLogo-180.png" alt="Seiden Group: IBM i modernization, PHP, Python, Node.js, and modern RPG" /></a>
 
-RELEASE INFORMATION
-===================
+Creators of [Seiden PHP+ for IBM i](https://www.seidengroup.com/seiden-php-for-ibm-i/) featuring ZF1-Future
 
-Zend Framework 1.12.21dev Release.
-Released on MMM DD, YYYY.
+# ZF1 is Now Version 1.25!
+### Over 250 updates and bug fixes since 1.12!
+The ZF1 community has been hard at work updating Zend Framework with all of the latest features of 8.2.
 
-IMPORTANT FIXES FOR 1.12.21
----------------------------
+# Documentation
+New ZF1-Future Manual: [ZF1-Future Docs](https://zf1future.com/manual)
 
-See http://framework.zend.com/changelog for full details.
+### Original Docs
+The original docs can be found here: https://framework.zend.com/manual/1.12/en/manual.html
 
-NEW FEATURES
-============
+### Installation
 
-Zend_Loader changes
--------------------
+Installable through git clone or through  
+`composer require shardj/zf1-future` https://packagist.org/packages/shardj/zf1-future  
 
-A number of autoloaders and autoloader facilities were back ported from
-ZF2 to provide performant alternatives to those already available in the
-1.X releases.  These include: Zend_Loader_StandardAutoloader, which
-improves on Zend_Loader_Autoloader by allowing the ability to specify a
-specific path to associate with a vendor prefix or namespace;
-Zend_Loader_ClassMapAutoloader, which provides the ability to use lookup
-tables for autoloading (which are typically the fastest possible way to
-autoload); and Zend_Loader_AutoloaderFactory, which can both create and
-update autoloaders for you, as well as register them with
-spl_autoload_register().
+# System Requirements
+ZF1 Future runs on any version of PHP between 7.4 and 8.2! (see composer.json)
 
-The Zend_Loader changes were back ported from ZF2 by Matthew Weier
-O’Phinney
+# License
+The files in this archive are released under the Zend Framework license. You can find a copy of this license in [LICENSE.txt](LICENSE.txt).
 
-Zend_EventManager
------------------
+# Related Projects
 
-Zend_EventManager is a component that allows you to attach and detach
-listeners to named events, both on a per-instance basis as well as via
-shared collections; trigger events; and interrupt execution of
-listeners.
+*  [ZF1 Extras Future](https://github.com/Shardj/zf1-extras-future)
+* [ZF1s](https://github.com/zf1s) - Another community supported continuation of ZF1, with a focus on splitting the frameworks original components into individual packages
 
-Zend_EventManager was back ported from ZF2 by Matthew Weier O’Phinney
+# Known issues and solutions
 
-Zend_Http_UserAgent_Features_Adapter_Browscap
----------------------------------------------
-
-This class provides a features adapter that calls get_browser() in order
-to discover mobile device capabilities to inject into UserAgent device
-instances.
-
-Browscap (http://browsers.garykeith.com/) is an open project dedicated
-to collecting an disseminating a “database” of browser capabilities. PHP
-has built-in support for using these files via the get_browser()
-function. This function requires that your php.ini provides a browscap
-entry pointing to the PHP-specific php_browscap.ini file which is
-available at http://browsers.garykeith.com/stream.asp?PHP_BrowsCapINI.
-
-Zend_Http_UserAgent_Features_Adapter_Browscap was created by Matthew
-Weier O’Phinney
-
-Zend_Mobile_Push
-----------------
-
-Zend_Mobile_Push is a component for implementing push notifications for
-the 3 major push notification platforms (Apple (Apns), Google (C2dm) and
-Microsoft (Mpns).
-
-Zend_Mobile_Push was contributed by Mike Willbanks.
-
-Zend_Gdata_Analytics
---------------------
-
-Zend_Gdata_Analytics is an extension to Zend_Gdata to allow interaction
-with Google’s Analytics Data Export API. This extension does not
-encompass any major changes in the overall operation of Zend_Gdata
-components.
-
-Zend_Gdata_Analytics was contributed by Daniel Hartmann.
-
-Removed features
-================
-
-Zend_Http_UserAgent_Features_Adapter_WurflApi
----------------------------------------------
-
-Due to the changes in licensing of WURFL, we have removed the WurflApi
-adapter. We will be providing the WurflApi adapter to ScientiaMobile so
-that users of WURFL will still have that option.
-
-Bug Fixes
-=========
-
-In addition,  over 200 reported issues in the tracker have been fixed.
-We’d like to particularly thank Adam Lundrigan, Frank Brückner and
-Martin Hujer for their efforts in making this happen. Thanks also to the
-many people who ran the ZF1 unit tests and reported their results!
-
-For a complete list of closed issues beginning with 1.12.3, visit:
-
- * https://github.com/zendframework/zf1/issues?labels=&milestone=&page=1&state=closed
- * http://framework.zend.com/changelog/
-
-MIGRATION NOTES
-===============
-
-A detailed list of migration notes may be found at:
-
-http://framework.zend.com/manual/en/migration.html
-
-SYSTEM REQUIREMENTS
-===================
-
-Zend Framework requires PHP 5.2.11 or later. Please see our reference
-guide for more detailed system requirements:
-
-http://framework.zend.com/manual/en/requirements.html
-
-INSTALLATION
-============
-
-Please see [INSTALL.md](INSTALL.md).
-
-REPOSITORY HISTORY
-==================
-
-This repository was created based on the release-1.12 branch of a Subversion
-repository, http://framework.zend.com/svn/framework/standard/. It contains a
-subset of the project history, dating from between the 1.5.0 and 1.6.0 releases,
-and only contains the tags for the 1.12 series. If you would like an older
-version, you may access the subversion repository linked above, or download an
-older version from http://framework.zend.com/downloads/archives.
-
-CONTRIBUTING
-============
-
-Please see [README-GIT.md](README-GIT.md) and
-[DEVELOPMENT_README.md](DEVELOPMENT_README.md).
-
-QUESTIONS AND FEEDBACK
-======================
-
-Online documentation can be found at http://framework.zend.com/manual.
-Questions that are not addressed in the manual should be directed to the
-appropriate mailing list:
-
-- http://framework.zend.com/wiki/display/ZFDEV/Mailing+Lists
-
-If you find code in this release behaving in an unexpected manner or
-contrary to its documented behavior, please create an issue in the Zend
-Framework issue tracker at:
-
-- https://github.com/zendframework/zf1/issues
-
-If you would like to be notified of new releases, you can subscribe to
-the fw-announce mailing list by sending a blank message to:
-
-- fw-announce-subscribe@lists.zend.com.
-
-LICENSE
-=======
-
-The files in this archive are released under the Zend Framework license.
-You can find a copy of this license in [LICENSE.txt](LICENSE.txt).
-
-ACKNOWLEDGEMENTS
-================
-
-The Zend Framework team would like to thank all the contributors to the Zend
-Framework project, our corporate sponsor, and you, the Zend Framework user.
-Please visit us sometime soon at http://framework.zend.com.
+* ``Bootstrap error: Unable to resolve plugin "useragent"; no corresponding plugin with that name``  
+   See comments in: https://github.com/Shardj/zf1-future/issues/92

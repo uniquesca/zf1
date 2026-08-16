@@ -1,4 +1,8 @@
 <?php
+
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -44,8 +48,8 @@ require_once 'Zend/Cloud/StorageService/Adapter/WindowsAzure.php';
  */
 class Zend_Cloud_StorageService_Adapter_WindowsAzureTest extends Zend_Cloud_StorageService_TestCase
 {
-	protected $_clientType = 'Zend_Service_WindowsAzure_Storage_Blob';
-	/**
+    protected $_clientType = 'Zend_Service_WindowsAzure_Storage_Blob';
+    /**
      * Runs the test methods of this class.
      *
      * @access public
@@ -53,8 +57,8 @@ class Zend_Cloud_StorageService_Adapter_WindowsAzureTest extends Zend_Cloud_Stor
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
     protected function _getConfig()
@@ -68,7 +72,7 @@ class Zend_Cloud_StorageService_Adapter_WindowsAzureTest extends Zend_Cloud_Stor
             $this->markTestSkipped("Windows Azure access not configured, skipping test");
         }
 
-        $config = new Zend_Config(array(
+        $config = new Zend_Config([
             Zend_Cloud_StorageService_Factory::STORAGE_ADAPTER_KEY => 'Zend_Cloud_StorageService_Adapter_WindowsAzure',
             Zend_Cloud_StorageService_Adapter_WindowsAzure::ACCOUNT_NAME => constant('TESTS_ZEND_SERVICE_WINDOWSAZURE_ONLINE_ACCOUNTNAME'),
             Zend_Cloud_StorageService_Adapter_WindowsAzure::ACCOUNT_KEY => constant('TESTS_ZEND_SERVICE_WINDOWSAZURE_ONLINE_ACCOUNTKEY'),
@@ -77,12 +81,12 @@ class Zend_Cloud_StorageService_Adapter_WindowsAzureTest extends Zend_Cloud_Stor
             Zend_Cloud_StorageService_Adapter_WindowsAzure::PROXY_PORT => constant('TESTS_ZEND_SERVICE_WINDOWSAZURE_ONLINE_STORAGE_PROXY_PORT'),
             Zend_Cloud_StorageService_Adapter_WindowsAzure::PROXY_CREDENTIALS => constant('TESTS_ZEND_SERVICE_WINDOWSAZURE_ONLINE_STORAGE_PROXY_CREDENTIALS'),
             Zend_Cloud_StorageService_Adapter_WindowsAzure::CONTAINER => constant('TESTS_ZEND_CLOUD_STORAGE_WINDOWSAZURE_CONTAINER'),
-        ));
+        ]);
 
         return $config;
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Cloud_StorageService_Adapter_WindowsAzureTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Cloud_StorageService_Adapter_WindowsAzureTest::main') {
     Zend_Cloud_StorageService_Adapter_WindowsAzureTest::main();
 }

@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -36,7 +41,7 @@ require_once 'Zend/Amf/Value/MessageHeader.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Amf
  */
-class Zend_Amf_Value_MessageHeaderTest extends PHPUnit_Framework_TestCase
+class Zend_Amf_Value_MessageHeaderTest extends TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -45,8 +50,8 @@ class Zend_Amf_Value_MessageHeaderTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Amf_Value_MessageHeaderTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Amf_Value_MessageHeaderTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     public function testConstructorShouldSetMessageHeaderName()
@@ -73,9 +78,9 @@ class Zend_Amf_Value_MessageHeaderTest extends PHPUnit_Framework_TestCase
 
     public function testConstructorShouldSetMessageHeaderDataUnmodified()
     {
-        $data = new stdClass;
+        $data = new stdClass();
         $data->foo = 'bar';
-        $data->bar = array('baz' => 'bat');
+        $data->bar = ['baz' => 'bat'];
         $messageHeader = new Zend_Amf_Value_MessageHeader('foo', true, $data);
         $this->assertSame($data, $messageHeader->data);
     }
@@ -93,6 +98,6 @@ class Zend_Amf_Value_MessageHeaderTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Amf_Value_MessageHeaderTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Amf_Value_MessageHeaderTest::main') {
     Zend_Amf_Value_MessageHeaderTest::main();
 }

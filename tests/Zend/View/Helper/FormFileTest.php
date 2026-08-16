@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -42,7 +47,7 @@ require_once 'Zend/Registry.php';
  * @group      Zend_View
  * @group      Zend_View_Helper
  */
-class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
+class Zend_View_Helper_FormFileTest extends TestCase
 {
     /**
      * @var Zend_View
@@ -62,8 +67,8 @@ class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_View_Helper_FormFileTest");
-        PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_View_Helper_FormFileTest");
+        (new resources_Runner())->run($suite);
     }
 
     /**
@@ -72,7 +77,7 @@ class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
      *
      * @access protected
      */
-    protected function setUp()
+    protected function set_up()
     {
         if (Zend_Registry::isRegistered('Zend_View_Helper_Doctype')) {
             $registry = Zend_Registry::getInstance();
@@ -88,12 +93,12 @@ class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
      */
     public function testCanDisableElement()
     {
-        $html = $this->helper->formFile(array(
-            'name'    => 'foo',
-            'attribs' => array('disable' => true)
-        ));
+        $html = $this->helper->formFile([
+            'name' => 'foo',
+            'attribs' => ['disable' => true]
+        ]);
 
-        $this->assertRegexp('/<input[^>]*?(disabled="disabled")/', $html);
+        $this->assertMatchesRegularExpression('/<input[^>]*?(disabled="disabled")/', $html);
     }
 
     /**
@@ -101,30 +106,30 @@ class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
      */
     public function testDisablingElementDoesNotRenderHiddenElements()
     {
-        $html = $this->helper->formFile(array(
-            'name'    => 'foo',
-            'attribs' => array('disable' => true)
-        ));
+        $html = $this->helper->formFile([
+            'name' => 'foo',
+            'attribs' => ['disable' => true]
+        ]);
 
-        $this->assertNotRegexp('/<input[^>]*?(type="hidden")/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<input[^>]*?(type="hidden")/', $html);
     }
 
 
     public function testRendersAsHtmlByDefault()
     {
-        $test = $this->helper->formFile(array(
+        $test = $this->helper->formFile([
             'name' => 'foo',
-        ));
-        $this->assertNotContains(' />', $test);
+        ]);
+        $this->assertStringNotContainsString(' />', $test);
     }
 
     public function testCanRendersAsXHtml()
     {
         $this->view->doctype('XHTML1_STRICT');
-        $test = $this->helper->formFile(array(
+        $test = $this->helper->formFile([
             'name' => 'foo',
-        ));
-        $this->assertContains(' />', $test);
+        ]);
+        $this->assertStringContainsString(' />', $test);
     }
 
     /**
@@ -134,10 +139,10 @@ class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
     {
         $test = $this->helper->formFile(
             'foo',
-            array(
+            [
                  'data-image-old' => 100,
                  'data-image-new' => 200,
-            )
+            ]
         );
         $this->assertEquals(
             '<input type="file" name="foo" id="foo" data-image-old="100" data-image-new="200">',
@@ -147,6 +152,6 @@ class Zend_View_Helper_FormFileTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_View_Helper_FormFileTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_View_Helper_FormFileTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_View_Helper_FormFileTest::main") {
     Zend_View_Helper_FormFileTest::main();
 }

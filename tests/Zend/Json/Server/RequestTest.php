@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -37,8 +42,13 @@ require_once 'Zend/Json.php';
  * @group      Zend_Json
  * @group      Zend_Json_Server
  */
-class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
+class Zend_Json_Server_RequestTest extends TestCase
 {
+    /**
+     * @var \Zend_Json_Server_Request|mixed
+     */
+    protected $request;
+
     /**
      * Runs the test methods of this class.
      *
@@ -46,9 +56,8 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-
-        $suite  = new PHPUnit_Framework_TestSuite("Zend_Json_Server_RequestTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("Zend_Json_Server_RequestTest");
+        $result = (new resources_Runner())->run($suite);
     }
 
     /**
@@ -57,7 +66,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function set_up()
     {
         $this->request = new Zend_Json_Server_Request();
     }
@@ -68,7 +77,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tear_down()
     {
     }
 
@@ -99,7 +108,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
     public function testInvalidKeysShouldBeIgnored()
     {
         $count = 0;
-        foreach (array(array('foo', true), array('foo', new stdClass), array('foo', array())) as $spec) {
+        foreach ([['foo', true], ['foo', new stdClass()], ['foo', []]] as $spec) {
             $this->request->addParam($spec[0], $spec[1]);
             $this->assertNull($this->request->getParam('foo'));
             $params = $this->request->getParams();
@@ -110,11 +119,11 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
 
     public function testShouldBeAbleToAddMultipleIndexedParamsAtOnce()
     {
-        $params = array(
+        $params = [
             'foo',
             'bar',
             'baz',
-        );
+        ];
         $this->request->addParams($params);
         $test = $this->request->getParams();
         $this->assertSame($params, $test);
@@ -122,11 +131,11 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
 
     public function testShouldBeAbleToAddMultipleNamedParamsAtOnce()
     {
-        $params = array(
+        $params = [
             'foo' => 'bar',
             'bar' => 'baz',
             'baz' => 'bat',
-        );
+        ];
         $this->request->addParams($params);
         $test = $this->request->getParams();
         $this->assertSame($params, $test);
@@ -134,11 +143,11 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
 
     public function testShouldBeAbleToAddMixedIndexedAndNamedParamsAtOnce()
     {
-        $params = array(
+        $params = [
             'foo' => 'bar',
             'baz',
             'baz' => 'bat',
-        );
+        ];
         $this->request->addParams($params);
         $test = $this->request->getParams();
         $this->assertEquals(array_values($params), array_values($test));
@@ -150,11 +159,11 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
     public function testSetParamsShouldOverwriteParams()
     {
         $this->testShouldBeAbleToAddMixedIndexedAndNamedParamsAtOnce();
-        $params = array(
+        $params = [
             'one',
             'two',
             'three',
-        );
+        ];
         $this->request->setParams($params);
         $this->assertSame($params, $this->request->getParams());
     }
@@ -186,7 +195,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
 
     public function testSettingMethodWithInvalidNameShouldSetError()
     {
-        foreach (array('1ad', 'abc-123', 'ad$$832r#@') as $method) {
+        foreach (['1ad', 'abc-123', 'ad$$832r#@'] as $method) {
             $this->request->setMethod($method);
             $this->assertNull($this->request->getMethod());
             $this->assertTrue($this->request->isMethodError());
@@ -221,7 +230,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
     public function testShouldBeAbleToLoadRequestFromJsonString()
     {
         $options = $this->getOptions();
-        $json    = Zend_Json::encode($options);
+        $json = Zend_Json::encode($options);
         $this->request->loadJson($json);
 
         $this->assertEquals('foo', $this->request->getMethod());
@@ -233,7 +242,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
     {
         $options = $this->getOptions();
         $options['jsonrpc'] = '2.0';
-        $json    = Zend_Json::encode($options);
+        $json = Zend_Json::encode($options);
         $this->request->loadJson($json);
         $this->assertEquals('2.0', $this->request->getVersion());
     }
@@ -242,7 +251,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
     {
         $options = $this->getOptions();
         $this->request->setOptions($options);
-        $json    = $this->request->toJson();
+        $json = $this->request->toJson();
         $this->validateJson($json, $options);
     }
 
@@ -250,7 +259,7 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
     {
         $options = $this->getOptions();
         $this->request->setOptions($options);
-        $json    = $this->request->__toString();
+        $json = $this->request->__toString();
         $this->validateJson($json, $options);
     }
 
@@ -265,15 +274,15 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
 
     public function getOptions()
     {
-        return array(
+        return [
             'method' => 'foo',
-            'params' => array(
+            'params' => [
                 5,
                 'four',
                 true,
-            ),
-            'id'     => 'foobar'
-        );
+            ],
+            'id' => 'foobar'
+        ];
     }
 
     public function validateJson($json, array $options)
@@ -296,6 +305,6 @@ class Zend_Json_Server_RequestTest extends PHPUnit_Framework_TestCase
 }
 
 // Call Zend_Json_Server_RequestTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_Json_Server_RequestTest::main") {
+if (PHPUnit_MAIN_METHOD === "Zend_Json_Server_RequestTest::main") {
     Zend_Json_Server_RequestTest::main();
 }

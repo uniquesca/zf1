@@ -56,7 +56,7 @@ class Zend_Layout_Controller_Action_Helper_Layout extends Zend_Controller_Action
      * @param  Zend_Layout $layout
      * @return void
      */
-    public function __construct(Zend_Layout $layout = null)
+    public function __construct(?Zend_Layout $layout = null)
     {
         if (null !== $layout) {
             $this->setLayoutInstance($layout);
@@ -177,7 +177,7 @@ class Zend_Layout_Controller_Action_Helper_Layout extends Zend_Controller_Action
     {
         $layout = $this->getLayoutInstance();
         if (method_exists($layout, $method)) {
-            return call_user_func_array(array($layout, $method), $args);
+            return call_user_func_array([$layout, $method], $args);
         }
 
         require_once 'Zend/Layout/Exception.php';

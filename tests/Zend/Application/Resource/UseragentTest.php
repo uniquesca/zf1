@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -28,7 +33,7 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
  */
 require_once 'Zend/Loader/Autoloader.php';
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
-require_once 'Zend/Application/Resource/Useragent.php';
+require_once 'Zend/Application/Resource/UserAgent.php';
 
 /**
  * @category   Zend
@@ -38,22 +43,42 @@ require_once 'Zend/Application/Resource/Useragent.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_Application
  */
-class Zend_Application_Resource_UseragentTest extends PHPUnit_Framework_TestCase
+class Zend_Application_Resource_UseragentTest extends TestCase
 {
+    /**
+     * @var array
+     */
+    protected $loaders;
+
+    /**
+     * @var Zend_Loader_Autoloader
+     */
+    protected $autoloader;
+
+    /**
+     * @var Zend_Application
+     */
+    protected $application;
+
+    /**
+     * @var ZfAppBootstrap
+     */
+    protected $bootstrap;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         // Store original autoloaders
         $this->loaders = spl_autoload_functions();
         if (!is_array($this->loaders)) {
             // spl_autoload_functions does not return empty array when no
             // autoloaders registered...
-            $this->loaders = array();
+            $this->loaders = [];
         }
 
         Zend_Loader_Autoloader::resetInstance();
@@ -67,7 +92,7 @@ class Zend_Application_Resource_UseragentTest extends PHPUnit_Framework_TestCase
         Zend_Controller_Action_HelperBroker::resetHelpers();
     }
 
-    public function tearDown()
+    protected function tear_down()
     {
         // Restore original autoloaders
         $loaders = spl_autoload_functions();
@@ -85,7 +110,7 @@ class Zend_Application_Resource_UseragentTest extends PHPUnit_Framework_TestCase
 
     public function testInitializationInitializesUserAgentObject()
     {
-        $resource = new Zend_Application_Resource_Useragent(array());
+        $resource = new Zend_Application_Resource_Useragent([]);
         $resource->setBootstrap($this->bootstrap);
         $resource->init();
         $this->assertTrue($resource->getUserAgent() instanceof Zend_Http_UserAgent);
@@ -93,25 +118,25 @@ class Zend_Application_Resource_UseragentTest extends PHPUnit_Framework_TestCase
 
     public function testOptionsPassedToResourceAreUsedToSetUserAgentState()
     {
-        $options = array(
-            'storage' => array('adapter' => 'NonPersistent'),
-        );
+        $options = [
+            'storage' => ['adapter' => 'NonPersistent'],
+        ];
         $resource = new Zend_Application_Resource_Useragent($options);
         $resource->setBootstrap($this->bootstrap);
         $resource->init();
-        $ua      = $resource->getUserAgent();
+        $ua = $resource->getUserAgent();
         $storage = $ua->getStorage();
         $this->assertTrue($storage instanceof Zend_Http_UserAgent_Storage_NonPersistent);
     }
 
     public function testInjectsUserAgentIntoViewHelperWhenViewResourcePresent()
     {
-        $this->bootstrap->registerPluginResource('view', array());
-        $resource = new Zend_Application_Resource_Useragent(array());
+        $this->bootstrap->registerPluginResource('view', []);
+        $resource = new Zend_Application_Resource_Useragent([]);
         $resource->setBootstrap($this->bootstrap);
         $resource->init();
 
-        $view   = $this->bootstrap->getResource('view');
+        $view = $this->bootstrap->getResource('view');
         $helper = $view->getHelper('userAgent');
 
         $expected = $resource->getUserAgent();
@@ -119,6 +144,6 @@ class Zend_Application_Resource_UseragentTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_Application_Resource_UseragentTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_Application_Resource_UseragentTest::main') {
     Zend_Application_Resource_UseragentTest::main();
 }

@@ -1,4 +1,9 @@
 <?php
+
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
+
 /**
  * Zend Framework
  *
@@ -36,26 +41,36 @@ require_once 'Zend/EventManager/TestAsset/StaticEventsMock.php';
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zend_EventManager_StaticIntegrationTest extends PHPUnit_Framework_TestCase
+class Zend_EventManager_StaticIntegrationTest extends TestCase
 {
+    /**
+     * @var \stdClass|mixed
+     */
+    protected $counter;
+
+    /**
+     * @var \stdClass|mixed
+     */
+    protected $test;
+
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite(__CLASS__);
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite(__CLASS__);
+        $result = (new resources_Runner())->run($suite);
     }
 
-    public function setUp()
+    protected function set_up()
     {
         Zend_EventManager_StaticEventManager::resetInstance();
     }
 
     public function testCanConnectStaticallyToClassWithEvents()
     {
-        $this->counter = (object) array('count' => 0);
+        $this->counter = (object) ['count' => 0];
         Zend_EventManager_StaticEventManager::getInstance()->attach(
-            'Zend_EventManager_TestAsset_ClassWithEvents', 
-            'foo', 
-            array($this, 'advanceCounter')
+            'Zend_EventManager_TestAsset_ClassWithEvents',
+            'foo',
+            [$this, 'advanceCounter']
         );
         $class = new Zend_EventManager_TestAsset_ClassWithEvents();
         $class->foo();
@@ -64,42 +79,42 @@ class Zend_EventManager_StaticIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testLocalHandlersAreExecutedPriorToStaticHandlersWhenSetWithSamePriority()
     {
-        $this->test = (object) array('results' => array());
+        $this->test = (object) ['results' => []];
         Zend_EventManager_StaticEventManager::getInstance()->attach(
-            'Zend_EventManager_TestAsset_ClassWithEvents', 
-            'foo', 
-            array($this, 'aggregateStatic')
+            'Zend_EventManager_TestAsset_ClassWithEvents',
+            'foo',
+            [$this, 'aggregateStatic']
         );
         $class = new Zend_EventManager_TestAsset_ClassWithEvents();
-        $class->events()->attach('foo', array($this, 'aggregateLocal'));
+        $class->events()->attach('foo', [$this, 'aggregateLocal']);
         $class->foo();
-        $this->assertEquals(array('local', 'static'), $this->test->results);
+        $this->assertEquals(['local', 'static'], $this->test->results);
     }
 
     public function testLocalHandlersAreExecutedInPriorityOrderRegardlessOfStaticOrLocalRegistration()
     {
-        $this->test = (object) array('results' => array());
+        $this->test = (object) ['results' => []];
         Zend_EventManager_StaticEventManager::getInstance()->attach(
-            'Zend_EventManager_TestAsset_ClassWithEvents', 
-            'foo', 
-            array($this, 'aggregateStatic'),
+            'Zend_EventManager_TestAsset_ClassWithEvents',
+            'foo',
+            [$this, 'aggregateStatic'],
             10000 // high priority
         );
         $class = new Zend_EventManager_TestAsset_ClassWithEvents();
-        $class->events()->attach('foo', array($this, 'aggregateLocal'), 1); // low priority
-        $class->events()->attach('foo', array($this, 'aggregateLocal2'), 1000); // medium priority
-        $class->events()->attach('foo', array($this, 'aggregateLocal3'), 15000); // highest priority
+        $class->events()->attach('foo', [$this, 'aggregateLocal'], 1); // low priority
+        $class->events()->attach('foo', [$this, 'aggregateLocal2'], 1000); // medium priority
+        $class->events()->attach('foo', [$this, 'aggregateLocal3'], 15000); // highest priority
         $class->foo();
-        $this->assertEquals(array('local3', 'static', 'local2', 'local'), $this->test->results);
+        $this->assertEquals(['local3', 'static', 'local2', 'local'], $this->test->results);
     }
 
     public function testPassingNullValueToSetSharedCollectionsDisablesSharedCollections()
     {
-        $this->counter = (object) array('count' => 0);
+        $this->counter = (object) ['count' => 0];
         Zend_EventManager_StaticEventManager::getInstance()->attach(
-            'Zend_EventManager_TestAsset_ClassWithEvents', 
-            'foo', 
-            array($this, 'advanceCounter')
+            'Zend_EventManager_TestAsset_ClassWithEvents',
+            'foo',
+            [$this, 'advanceCounter']
         );
         $class = new Zend_EventManager_TestAsset_ClassWithEvents();
         $class->events()->unsetSharedCollections();
@@ -109,11 +124,11 @@ class Zend_EventManager_StaticIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testCanPassAlternateSharedCollectionsHolder()
     {
-        $this->counter = (object) array('count' => 0);
+        $this->counter = (object) ['count' => 0];
         Zend_EventManager_StaticEventManager::getInstance()->attach(
-            'Zend_EventManager_TestAsset_ClassWithEvents', 
-            'foo', 
-            array($this, 'advanceCounter')
+            'Zend_EventManager_TestAsset_ClassWithEvents',
+            'foo',
+            [$this, 'advanceCounter']
         );
         $mockStaticEvents = new Zend_EventManager_TestAsset_StaticEventsMock();
         $class = new Zend_EventManager_TestAsset_ClassWithEvents();
@@ -125,17 +140,17 @@ class Zend_EventManager_StaticIntegrationTest extends PHPUnit_Framework_TestCase
 
     public function testTriggerMergesPrioritiesOfStaticAndInstanceListeners()
     {
-        $this->test = (object) array('results' => array());
+        $this->test = (object) ['results' => []];
         Zend_EventManager_StaticEventManager::getInstance()->attach(
-            'Zend_EventManager_TestAsset_ClassWithEvents', 
-            'foo', 
-            array($this, 'aggregateStatic'),
+            'Zend_EventManager_TestAsset_ClassWithEvents',
+            'foo',
+            [$this, 'aggregateStatic'],
             100
         );
         $class = new Zend_EventManager_TestAsset_ClassWithEvents();
-        $class->events()->attach('foo', array($this, 'aggregateLocal'), -100);
+        $class->events()->attach('foo', [$this, 'aggregateLocal'], -100);
         $class->foo();
-        $this->assertEquals(array('static', 'local'), $this->test->results);
+        $this->assertEquals(['static', 'local'], $this->test->results);
     }
 
     /*
@@ -168,6 +183,6 @@ class Zend_EventManager_StaticIntegrationTest extends PHPUnit_Framework_TestCase
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'Zend_EventManager_StaticIntegrationTest::main') {
+if (PHPUnit_MAIN_METHOD === 'Zend_EventManager_StaticIntegrationTest::main') {
     Zend_EventManager_StaticIntegrationTest::main();
 }
