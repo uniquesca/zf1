@@ -1,0 +1,24 @@
+name: Release new version
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish-release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - id: get_version
+        name: Get version
+        run: echo "version=$(echo ${GITHUB_REF#refs/tags/})" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        uses: uniquesca/ci/github-release@main
+        with:
+          release_version: ${{ steps.get_version.outputs.version }}
+          rescan_satis: true
+          satis_rebuild_token: ${{ secrets.SATIS_REBUILD_TOKEN }}
