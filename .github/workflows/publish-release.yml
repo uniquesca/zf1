@@ -21,4 +21,4 @@ jobs:
         with:
           release_version: ${{ steps.get_version.outputs.version }}
           rescan_satis: true
-          satis_rebuild_token: ${{ secrets.SATIS_REBUILD_TOKEN }}
+          satis_rebuild_token: ${{ secrets.SATIS_PUBLIC_REBUILD_TOKEN }}
