@@ -55,6 +55,7 @@ current — it is what makes the next upstream merge tractable.
 | Cache | `library/Zend/Cache/Backend/Memcached.php` | `load()` honours `$doNotTestCacheValidity` and returns the raw entry instead of unwrapping `$tmp[0]`. |
 | i18n | `resources/languages/fr/Zend_Captcha.php` | French CAPTCHA messages. Upstream ships `fr/Zend_Validate.php` but no `fr` CAPTCHA translation. |
 | TLD list | `library/Zend/Validate/Hostname.php` | Two appended blocks in `$_validTlds`: U-label forms for IDN TLDs upstream lists only in Punycode, and delegated TLDs upstream omits entirely. See below. |
+| Session | `library/Zend/Session.php` | Missing `require_once` for the save-handler adapter, without which `setSaveHandler()` is fatal. **Upstream's own fix, carried early — not ours.** Drop when a merge brings in PR #543. See below. |
 
 Plus `composer.json` (package identity) and this file.
 
@@ -98,6 +99,31 @@ pre-2.0 fork:
 `tests/` has no coverage for this. When merging a new upstream release, re-run
 those four checks rather than eyeballing the diff.
 
+### The session save-handler `require_once`
+
+`Zend_Session::setSaveHandler()` instantiates
+`Zend_Session_SaveHandler_SessionHandlerInterfaceAdapter`, but upstream declares
+that class in a file called `SaveHandlerInterfaceAdapter.php`. The two have never
+agreed: the file was `SaveHandlerInterfaceAdaptor.php` until `d7b63473`
+(2026-05-19) corrected "Adaptor" to "Adapter" without touching the class name or
+the reference. PSR-0 derives the path from the class name, so it cannot find the
+file, and **any consumer that calls `setSaveHandler()` takes a fatal
+`Class not found`** — on every request, since that call belongs in bootstrap.
+Applications with a DB-backed session handler hit this immediately; ones on the
+default file handler never do, which is why it has survived this long upstream.
+
+Upstream's fix is open as
+[PR #543](https://github.com/Shardj/zf1-future/pull/543) and is **not** in
+`1.25.1`. Its commit `f67b2e4e` is cherry-picked here, adding the missing
+`require_once` beside the existing ones at the top of `Zend/Session.php`. That
+resolves without an autoloader because the package declares
+`include-path: ["library/"]`, so Composer prepends `library/`.
+
+Unlike everything else in the table, this is not a Uniques customization — it is
+upstream's own patch carried early, so it should have the shortest life of any
+row here. When a merge brings PR #543 in, drop it; keeping both leaves a
+duplicate `require_once`.
+
 That is the whole delta. If it ever reaches zero, this fork can be retired in
 favour of requiring `shardj/zf1-future` directly.
 
@@ -123,12 +149,14 @@ replay.
 
 Conflicts should be confined to `composer.json` (keep our `name`,
 `description`, `homepage`, `version`, `branch-alias`, `extra.upstream` and
-`replace`) and possibly the two customized files above.
+`replace`) and possibly the customized files above.
 
 Afterwards:
 
 1. Set `Zend_Version::VERSION` to upstream's new version — take theirs.
 2. Bump `version` in `composer.json` by our own semver rules.
 3. Update `extra.upstream.merged-to`.
-4. Update this file if the customization set changed.
-5. Tag.
+4. Drop any backported upstream fix the merge has now brought in — currently the
+   session `require_once` above, once PR #543 lands.
+5. Update this file if the customization set changed.
+6. Tag.
