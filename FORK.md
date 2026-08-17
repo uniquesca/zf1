@@ -23,6 +23,14 @@ Our own semver, independent of upstream's numbering:
 
 `^2.0` is the constraint consumers want.
 
+**The tag is the version.** `composer.json` deliberately has no `version` field, so
+there is nothing to keep in step with the tag you cut. This is not cosmetic: when
+a `version` field disagrees with the tag name, Composer **silently discards the
+tag** — `Skipped tag X, tag (X) does not match version (Y) in composer.json` — and
+it is discarded by Satis too, so the release simply never appears and `composer
+require` reports the version as nonexistent. 2.0.1 through 2.0.4 were all lost
+that way before the field was removed.
+
 The upstream release we are merged up to is recorded in `composer.json` under
 `extra.upstream.merged-to`, so "how far behind are we?" stays a one-line answer
 without overloading the version number:
@@ -148,15 +156,16 @@ The two repositories share history back to the `zendframework/zf1` EOL commit
 replay.
 
 Conflicts should be confined to `composer.json` (keep our `name`,
-`description`, `homepage`, `version`, `branch-alias`, `extra.upstream` and
-`replace`) and possibly the customized files above.
+`description`, `homepage`, `branch-alias`, `extra.upstream` and `replace`, and
+keep the `version` field *absent* if upstream reintroduces one) and possibly the
+customized files above.
 
 Afterwards:
 
 1. Set `Zend_Version::VERSION` to upstream's new version — take theirs.
-2. Bump `version` in `composer.json` by our own semver rules.
-3. Update `extra.upstream.merged-to`.
-4. Drop any backported upstream fix the merge has now brought in — currently the
+2. Update `extra.upstream.merged-to`.
+3. Drop any backported upstream fix the merge has now brought in — currently the
    session `require_once` above, once PR #543 lands.
-5. Update this file if the customization set changed.
-6. Tag.
+4. Update this file if the customization set changed.
+5. Tag, by our own semver rules above. The tag is the only place the release
+   version is stated.

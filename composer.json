@@ -2,7 +2,6 @@
     "name": "uniquesca/zf1",
     "description": "Zend Framework 1, tracking Shardj/zf1-future for PHP 8 support, plus local customizations. See FORK.md.",
     "type": "library",
-    "version": "2.0.0",
     "keywords": [
         "framework",
         "zf1"
